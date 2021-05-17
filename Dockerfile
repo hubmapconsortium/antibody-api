@@ -11,6 +11,4 @@ RUN pip install -r requirements.txt
 WORKDIR /app/server
 COPY server/app.py .
 
-ARG FLASK_ENV
-ENV FLASK_ENV=$FLASK_ENV
 CMD ["flask", "run", "--host=0.0.0.0"]
