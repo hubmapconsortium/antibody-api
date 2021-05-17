@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    build:
+      args:
+        - FLASK_ENV=development
+      context: .
+    ports:
+      - '3001:5000'
+    volumes:
+      - ./server:/app/server
