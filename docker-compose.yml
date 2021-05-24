@@ -1,9 +1,21 @@
 version: '3'
 
 services:
+  db:
+    environment:
+      - POSTGRES_DB=ontologydb
+      - POSTGRES_PASSWORD=password
+    image: postgres:13.3
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
   web:
     build: .
+    depends_on:
+      - db
     environment:
+        - FLASK_APP=ontologyapi
         - FLASK_ENV=development
     ports:
       - '3001:5000'
