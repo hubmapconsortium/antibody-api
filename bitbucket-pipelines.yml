@@ -10,7 +10,7 @@ pipelines:
             - python3 -m venv $VIRTUAL_ENV
             - export PATH="$VIRTUAL_ENV/bin:$PATH"
             - pip install -r requirements.txt
-            - cd antibodyapi
+            - cd server/antibodyapi
             - pip install -e .
             - pytest -v
 definitions:
