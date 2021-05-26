@@ -3,13 +3,16 @@ from werkzeug.exceptions import BadRequest
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
+
+    if testing:
+        app.config['TESTING'] = True
 
     def database_name():
         if app.config['TESTING']:
-            return 'ontologydb_test'
-        return 'ontologydb'
+            return 'antibodydb_test'
+        return 'antibodydb'
 
     @app.route("/antibodies", methods=['POST'])
     def save_antibody():
