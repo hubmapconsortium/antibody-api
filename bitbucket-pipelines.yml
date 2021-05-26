@@ -5,7 +5,7 @@ pipelines:
     '**':
       - step:
           script:
-            - apk add --no-cache --update build-base postgresql-dev postgresql-libs
+            - apk add --no-cache --update build-base postgresql-client postgresql-dev postgresql-libs
             - echo "127.0.0.1 db" > /etc/hosts
             - PGPASSWORD=password psql -h db -d antibodydb_test -U postgres -f deploy/postgresql_init_scripts/create_database.sql
             - export VIRTUAL_ENV=${PWD}
