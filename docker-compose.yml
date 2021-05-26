@@ -3,7 +3,7 @@ version: '3'
 services:
   db:
     environment:
-      - POSTGRES_DB=ontologydb
+      - POSTGRES_DB=antibodydb
       - POSTGRES_PASSWORD=password
     image: postgres:13.3
     ports:
@@ -15,7 +15,7 @@ services:
     depends_on:
       - db
     environment:
-        - FLASK_APP=ontologyapi
+        - FLASK_APP=antibodyapi
         - FLASK_ENV=development
     ports:
       - '3001:5000'

@@ -3,12 +3,11 @@ import random
 import psycopg2
 import pytest
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from ontologyapi import create_app
+from antibodyapi import create_app
 
 @pytest.fixture(scope="session")
 def client():
-    flask_app = create_app()
-    flask_app.config['TESTING'] = True
+    flask_app = create_app(testing=True)
     with flask_app.test_client() as testing_client:
         with flask_app.app_context():
             yield testing_client
@@ -54,7 +53,7 @@ def antibody_data(faker):
 @pytest.fixture(scope="session")
 def conn():
     conn = psycopg2.connect(
-        dbname='ontologydb_test',
+        dbname='antibodydb_test',
         user='postgres',
         password='password',
         host='db'

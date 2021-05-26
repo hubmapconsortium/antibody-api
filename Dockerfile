@@ -14,6 +14,6 @@ ARG DEVELOPMENT
 RUN if [ -z $DEVELOPMENT ] ; then apk --purge del build-base postgresql-dev ; fi
 
 WORKDIR /app/server
-COPY server/ontologyapi .
+COPY server/antibodyapi .
 
 CMD ["flask", "run", "--host=0.0.0.0"]
