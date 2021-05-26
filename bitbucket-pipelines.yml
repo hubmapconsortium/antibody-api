@@ -12,6 +12,7 @@ pipelines:
             - pip install -r requirements.txt
             - cd server
             - pip install -e .
+            - echo "127.0.0.1 db" > /etc/hosts
             - pytest -v
 definitions:
   services:
