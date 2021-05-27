@@ -42,7 +42,6 @@ def antibody_data(faker):
             'organ_or_tissue': faker.first_name(),
             'hubmap_platform': faker.first_name(),
             'submitter_orciid': faker.uuid4(),
-            'created_timestamp': faker.unix_time(),
             'created_by_user_displayname': faker.first_name(),
             'created_by_user_email': faker.ascii_email(),
             'created_by_user_sub': faker.last_name(),
