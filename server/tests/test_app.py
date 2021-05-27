@@ -5,25 +5,25 @@ import pytest
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from antibodyapi import create_app
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def client():
     flask_app = create_app(testing=True)
     with flask_app.test_client() as testing_client:
         with flask_app.app_context():
             yield testing_client
 
-@pytest.fixture()
+@pytest.fixture
 def mimetype():
     return 'application/json'
 
-@pytest.fixture()
+@pytest.fixture
 def headers(mimetype):
     return {
         'Content-Type': mimetype,
         'Accepts': mimetype
     }
 
-@pytest.fixture()
+@pytest.fixture
 def antibody_data(faker):
     return {
         'antibody': {
@@ -49,12 +49,12 @@ def antibody_data(faker):
         }
     }
 
-@pytest.fixture()
+@pytest.fixture
 def antibody_incomplete_data(antibody_data):
     del antibody_data['antibody'][random.choice(list(antibody_data['antibody'].keys()))]
     return antibody_data
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def conn():
     conn = psycopg2.connect(
         dbname='antibodydb_test',
@@ -96,12 +96,8 @@ class TestPostWithCompleteJSONBody:
         return self.get_antibodies_count(cursor)
 
     @pytest.fixture
-    def response(self, client, antibody_data, headers):
+    def response(self, client, antibody_data, headers, initial_antibodies_count):
         return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
-
-    @pytest.fixture(autouse=True)
-    def post_antibody(self, initial_antibodies_count, response):
-        pass
 
     @classmethod
     def get_antibodies_count(cls, cursor):
@@ -117,7 +113,7 @@ class TestPostWithCompleteJSONBody:
         assert response.status == '201 CREATED'
 
     def test_antibody_count_in_database_should_increase_by_one(
-        self, initial_antibodies_count, cursor
+        self, initial_antibodies_count, cursor, response
     ):
         assert (initial_antibodies_count + 1) == self.get_antibodies_count(cursor)
 
