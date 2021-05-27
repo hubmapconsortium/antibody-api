@@ -39,7 +39,7 @@ def create_app(testing=False):
         )
         try:
             antibody = request.get_json()['antibody']
-        except BadRequest:
+        except KeyError:
             abort(406)
         for prop in required_properties:
             if prop not in antibody:

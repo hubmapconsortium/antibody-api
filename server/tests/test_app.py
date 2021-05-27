@@ -5,25 +5,25 @@ import pytest
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from antibodyapi import create_app
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def client():
     flask_app = create_app(testing=True)
     with flask_app.test_client() as testing_client:
         with flask_app.app_context():
             yield testing_client
 
-@pytest.fixture
+@pytest.fixture()
 def mimetype():
     return 'application/json'
 
-@pytest.fixture
+@pytest.fixture()
 def headers(mimetype):
     return {
         'Content-Type': mimetype,
         'Accepts': mimetype
     }
 
-@pytest.fixture
+@pytest.fixture()
 def antibody_data(faker):
     return {
         'antibody': {
@@ -49,7 +49,12 @@ def antibody_data(faker):
         }
     }
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
+def antibody_incomplete_data(antibody_data):
+    del antibody_data['antibody'][random.choice(list(antibody_data['antibody'].keys()))]
+    return antibody_data
+
+@pytest.fixture()
 def conn():
     conn = psycopg2.connect(
         dbname='antibodydb_test',
@@ -61,32 +66,51 @@ def conn():
     yield conn
     conn.close()
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def cursor(conn):
     cur = conn.cursor()
     yield cur
     cur.execute('DELETE FROM antibodies')
     cur.close()
 
-def get_antibodies_count(cursor):
-    cursor.execute('SELECT COUNT(*) AS count FROM antibodies')
-    return cursor.fetchone()[0]
-
-def get_last_antibody_id(cursor):
-    cursor.execute('SELECT id FROM antibodies ORDER BY id DESC LIMIT 1')
-    return cursor.fetchone()[0]
-
-def test_post_antibody(client, headers, antibody_data, cursor):
-    antibodies_count = get_antibodies_count(cursor)
-    response = client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
-
-    assert response.status == '201 CREATED'
-
-    new_antibodies_count = get_antibodies_count(cursor)
-    assert (new_antibodies_count-antibodies_count) == 1
-
-    assert json.loads(response.data) == {'id': get_last_antibody_id(cursor)}
-
-def test_post_empty_antibody(client, headers):
+def test_post_with_no_body_should_return_400(client, headers):
     response = client.post('/antibodies', headers=headers)
+    assert response.status == '400 BAD REQUEST'
+
+def test_post_with_empty_json_body_should_return_406(client, headers):
+    response = client.post('/antibodies', data=json.dumps({}), headers=headers)
     assert response.status == '406 NOT ACCEPTABLE'
+
+def test_post_with_incomplete_json_body_should_return_406(
+        client, headers, antibody_incomplete_data
+    ):
+    response = client.post(
+        '/antibodies', data=json.dumps(antibody_incomplete_data), headers=headers
+    )
+    assert response.status == '406 NOT ACCEPTABLE'
+
+class TestPostNewAntibodySuccess:
+    @pytest.fixture(autouse=True)
+    def post_antibody(self, client, headers, antibody_data, cursor):
+        self.initial_antibodies_count = self.get_antibodies_count(cursor)
+        self.response = client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
+        self.final_antibodies_count = self.get_antibodies_count(cursor)
+
+    @classmethod
+    def get_antibodies_count(cls, cursor):
+        cursor.execute('SELECT COUNT(*) AS count FROM antibodies')
+        return cursor.fetchone()[0]
+
+    @classmethod
+    def get_last_antibody_id(cls, cursor):
+        cursor.execute('SELECT id FROM antibodies ORDER BY id DESC LIMIT 1')
+        return cursor.fetchone()[0]
+
+    def test_correct_201_response(self):
+        assert self.response.status == '201 CREATED'
+
+    def test_antibody_count_increased_by_one(self):
+        assert (self.initial_antibodies_count + 1) == self.final_antibodies_count
+
+    def test_api_is_returning_created_id(self, cursor):
+        assert json.loads(self.response.data) == {'id': self.get_last_antibody_id(cursor)}
