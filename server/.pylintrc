@@ -2,4 +2,3 @@
 disable=
     C0114, C0115, C0116, # missing-module-docstring, missing-class-docstring missing-function-docstring
     W0621, # redefined-outer-name (pytest fixtures trigger this one)
-    W0201, # pytest classes cannot have an __init__ method

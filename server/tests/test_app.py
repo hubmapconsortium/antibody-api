@@ -90,11 +90,18 @@ def test_post_with_incomplete_json_body_should_return_406(
     assert response.status == '406 NOT ACCEPTABLE'
 
 class TestPostWithCompleteJSONBody:
+    # pylint: disable=no-self-use,unused-argument
+    @pytest.fixture
+    def initial_antibodies_count(self, cursor):
+        return self.get_antibodies_count(cursor)
+
+    @pytest.fixture
+    def response(self, client, antibody_data, headers):
+        return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
+
     @pytest.fixture(autouse=True)
-    def post_antibody(self, client, headers, antibody_data, cursor):
-        self.initial_antibodies_count = self.get_antibodies_count(cursor)
-        self.response = client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
-        self.final_antibodies_count = self.get_antibodies_count(cursor)
+    def post_antibody(self, initial_antibodies_count, response):
+        pass
 
     @classmethod
     def get_antibodies_count(cls, cursor):
@@ -106,11 +113,13 @@ class TestPostWithCompleteJSONBody:
         cursor.execute('SELECT id FROM antibodies ORDER BY id DESC LIMIT 1')
         return cursor.fetchone()[0]
 
-    def test_should_return_a_201_response(self):
-        assert self.response.status == '201 CREATED'
+    def test_should_return_a_201_response(self, response):
+        assert response.status == '201 CREATED'
 
-    def test_antibody_count_in_database_should_increase_by_one(self):
-        assert (self.initial_antibodies_count + 1) == self.final_antibodies_count
+    def test_antibody_count_in_database_should_increase_by_one(
+        self, initial_antibodies_count, cursor
+    ):
+        assert (initial_antibodies_count + 1) == self.get_antibodies_count(cursor)
 
-    def test_api_should_return_created_id_in_json_format(self, cursor):
-        assert json.loads(self.response.data) == {'id': self.get_last_antibody_id(cursor)}
+    def test_api_should_return_created_id_in_json_format(self, cursor, response):
+        assert json.loads(response.data) == {'id': self.get_last_antibody_id(cursor)}
