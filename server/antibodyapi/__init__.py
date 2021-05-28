@@ -32,7 +32,6 @@ def create_app(testing=False):
           'organ_or_tissue',
           'hubmap_platform',
           'submitter_orciid',
-          'created_timestamp',
           'created_by_user_displayname',
           'created_by_user_email',
           'created_by_user_sub',
@@ -40,7 +39,7 @@ def create_app(testing=False):
         )
         try:
             antibody = request.get_json()['antibody']
-        except BadRequest:
+        except KeyError:
             abort(406)
         for prop in required_properties:
             if prop not in antibody:
@@ -56,30 +55,51 @@ def create_app(testing=False):
         cur = conn.cursor()
 
         insert_query = '''
-INSERT INTO antibodies (avr_url,protocols_io_doi,uniprot_accession_number,target_name,rrid,antibody_name,host_organism,clonality,vendor,catalog_number,lot_number,recombinant,organ_or_tissue,hubmap_platform,submitter_orciid,created_timestamp,created_by_user_displayname,created_by_user_email,created_by_user_sub,group_uuid) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+INSERT INTO antibodies (
+    avr_url,
+    protocols_io_doi,
+    uniprot_accession_number,
+    target_name,
+    rrid,
+    antibody_name,
+    host_organism,
+    clonality,
+    vendor,
+    catalog_number,
+    lot_number,
+    recombinant,
+    organ_or_tissue,
+    hubmap_platform,
+    submitter_orciid,
+    created_timestamp,
+    created_by_user_displayname,
+    created_by_user_email,
+    created_by_user_sub,
+    group_uuid
+) 
+VALUES (
+    %(avr_url)s,
+    %(protocols_io_doi)s,
+    %(uniprot_accession_number)s,
+    %(target_name)s,
+    %(rrid)s,
+    %(antibody_name)s,
+    %(host_organism)s,
+    %(clonality)s,
+    %(vendor)s,
+    %(catalog_number)s,
+    %(lot_number)s,
+    %(recombinant)s,
+    %(organ_or_tissue)s,
+    %(hubmap_platform)s,
+    %(submitter_orciid)s,
+    EXTRACT(epoch FROM NOW()),
+    %(created_by_user_displayname)s,
+    %(created_by_user_email)s,
+    %(created_by_user_sub)s,
+    %(group_uuid)s
+) RETURNING id
         '''
-        insert_fields = (
-            antibody['avr_url'],
-            antibody['protocols_io_doi'],
-            antibody['uniprot_accession_number'],
-            antibody['target_name'],
-            antibody['rrid'],
-            antibody['antibody_name'],
-            antibody['host_organism'],
-            antibody['clonality'],
-            antibody['vendor'],
-            antibody['catalog_number'],
-            antibody['lot_number'],
-            antibody['recombinant'],
-            antibody['organ_or_tissue'],
-            antibody['hubmap_platform'],
-            antibody['submitter_orciid'],
-            antibody['created_timestamp'],
-            antibody['created_by_user_displayname'],
-            antibody['created_by_user_email'],
-            antibody['created_by_user_sub'],
-            antibody['group_uuid']
-        )
-        cur.execute(insert_query, insert_fields)
+        cur.execute(insert_query, antibody)
         return make_response(jsonify(id=cur.fetchone()[0]), 201)
     return app
