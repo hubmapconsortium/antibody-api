@@ -2,17 +2,16 @@ from flask import Flask, abort, jsonify, make_response, request
 from werkzeug.exceptions import BadRequest
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from . import default_config
 
 def create_app(testing=False):
-    app = Flask(__name__)
-
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(default_config.DefaultConfig)
     if testing:
         app.config['TESTING'] = True
-
-    def database_name():
-        if app.config['TESTING']:
-            return 'antibodydb_test'
-        return 'antibodydb'
+    else:
+        # We should not load the gitignored app.conf during tests.
+        app.config.from_pyfile('app.conf')
 
     @app.route("/antibodies", methods=['POST'])
     def save_antibody():
@@ -46,10 +45,10 @@ def create_app(testing=False):
                 abort(406)
 
         conn = psycopg2.connect(
-            dbname=database_name(),
-            user='postgres',
-            password='password',
-            host='db'
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()

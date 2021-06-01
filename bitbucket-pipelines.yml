@@ -7,10 +7,11 @@ pipelines:
           script:
             - apk add --no-cache --update build-base postgresql-client postgresql-dev postgresql-libs
             - echo "127.0.0.1 db" > /etc/hosts
-            - PGPASSWORD=password psql -h db -d antibodydb_test -U postgres -f deploy/postgresql_init_scripts/create_database.sql
+            - PGPASSWORD=password psql -h db -d antibodydb_test -U postgres -f deploy/postgresql_init_scripts/create_tables.sql
             - export VIRTUAL_ENV=${PWD}
             - python3 -m venv $VIRTUAL_ENV
             - export PATH="$VIRTUAL_ENV/bin:$PATH"
+            - python3 -m pip install --upgrade pip
             - pip install -r requirements.txt
             - cd server
             - pip install -e .
