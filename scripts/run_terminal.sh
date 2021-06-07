@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose run --rm --entrypoint "/bin/sh" web
+docker-compose -f docker-compose.yml -f docker-compose.development.yml run --rm --entrypoint "/bin/sh" web
