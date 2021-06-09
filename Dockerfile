@@ -21,6 +21,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
+WORKDIR /app/var/antibodyapi-instance
+COPY app.conf .
+
 WORKDIR /app/server
 COPY server/uwsgi.ini .
 COPY server/wsgi.py .
