@@ -17,11 +17,6 @@ def create_app(testing=False):
     def hubmap():
         return render_template('pages/base.html', test_var="hello, world!")
 
-    #Create the main driver function
-    if __name__ == '__main__':
-        #call the run method
-        app.run()
-
     @app.route("/antibodies", methods=['POST'])
     def save_antibody():
         required_properties = (
