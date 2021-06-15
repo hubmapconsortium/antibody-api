@@ -1,4 +1,4 @@
-from flask import Flask, abort, jsonify, make_response, request
+from flask import Flask, abort, jsonify, make_response, request, render_template
 from werkzeug.exceptions import BadRequest
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
@@ -12,6 +12,10 @@ def create_app(testing=False):
     else:
         # We should not load the gitignored app.conf during tests.
         app.config.from_pyfile('app.conf')
+
+    @app.route('/')
+    def hubmap():
+        return render_template('pages/base.html', test_var="hello, world!")
 
     @app.route("/antibodies", methods=['POST'])
     def save_antibody():
