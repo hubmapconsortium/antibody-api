@@ -23,7 +23,7 @@ def mimetype():
 def headers(mimetype):
     return {
         'Content-Type': mimetype,
-        'Accepts': mimetype
+        'Accept': mimetype
     }
 
 @pytest.fixture
@@ -54,8 +54,9 @@ def antibody_data(faker):
 
 @pytest.fixture
 def antibody_incomplete_data(antibody_data):
-    del antibody_data['antibody'][random.choice(list(antibody_data['antibody'].keys()))]
-    return antibody_data
+    removed_field = random.choice(list(antibody_data['antibody'].keys()))
+    del antibody_data['antibody'][removed_field]
+    return (antibody_data, removed_field)
 
 @pytest.fixture(scope="session")
 def conn(flask_app):
@@ -84,38 +85,54 @@ def test_post_with_empty_json_body_should_return_406(client, headers):
     response = client.post('/antibodies', data=json.dumps({}), headers=headers)
     assert response.status == '406 NOT ACCEPTABLE'
 
+def test_post_with_empty_json_should_return_error_message(client, headers):
+    response = client.post('/antibodies', data=json.dumps({}), headers=headers)
+    assert json.loads(response.data) == {
+        'message': 'Antibody missing'
+    }
+
 def test_post_with_incomplete_json_body_should_return_406(
         client, headers, antibody_incomplete_data
     ):
+    incomplete_data, _ = antibody_incomplete_data
     response = client.post(
-        '/antibodies', data=json.dumps(antibody_incomplete_data), headers=headers
+        '/antibodies', data=json.dumps(incomplete_data), headers=headers
     )
     assert response.status == '406 NOT ACCEPTABLE'
 
+def test_post_with_incomplete_json_body_should_return_error_message(
+        client, headers, antibody_incomplete_data
+    ):
+    incomplete_data, removed_field = antibody_incomplete_data
+    response = client.post(
+        '/antibodies', data=json.dumps(incomplete_data), headers=headers
+    )
+    assert json.loads(response.data) == {
+        'message': 'Antibody data incomplete: missing %s parameter' % removed_field
+    }
+
+class TestGetAntibodies:
+    # pylint: disable=no-self-use,unused-argument
+    @pytest.fixture(autouse=True)
+    def create_antibody(self, cursor, client, antibody_data, headers):
+        client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
+        yield
+        cursor.execute('DELETE FROM antibodies')
+
+    @pytest.fixture
+    def response(self, client, headers):
+        return client.get('/antibodies', headers=headers)
+
+    def test_should_return_a_200_response(self, response):
+        assert response.status == '200 OK'
+
+    def test_all_antibody_fields_are_retrieved_correctly(
+        self, response, antibody_data
+    ):
+        assert antibody_data['antibody'] == json.loads(response.data)['antibodies'][0]
+
 class TestPostWithCompleteJSONBody:
     # pylint: disable=no-self-use,unused-argument
-    @pytest.fixture
-    def initial_antibodies_count(self, cursor):
-        return self.get_antibodies_count(cursor)
-
-    @pytest.fixture
-    def final_antibodies_count(self, cursor):
-        return self.get_antibodies_count(cursor)
-
-    @pytest.fixture
-    def last_antibody_id(self, cursor):
-        cursor.execute('SELECT id FROM antibodies ORDER BY id DESC LIMIT 1')
-        return cursor.fetchone()[0]
-
-    @pytest.fixture
-    def response(self, client, antibody_data, headers, initial_antibodies_count):
-        return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
-
-    @pytest.fixture
-    def last_antibody_data(self, ant_query, cursor, last_antibody_id):
-        cursor.execute(ant_query, (last_antibody_id,))
-        return cursor.fetchone()
-
     @pytest.fixture
     def ant_query(self):
         return '''
@@ -132,6 +149,28 @@ SELECT
     created_by_user_sub, group_uuid
 FROM antibodies WHERE id = %s
 '''
+
+    @pytest.fixture
+    def last_antibody_data(self, ant_query, cursor, last_antibody_id):
+        cursor.execute(ant_query, (last_antibody_id,))
+        return cursor.fetchone()
+
+    @pytest.fixture
+    def last_antibody_id(self, cursor):
+        cursor.execute('SELECT id FROM antibodies ORDER BY id DESC LIMIT 1')
+        return cursor.fetchone()[0]
+
+    @pytest.fixture
+    def initial_antibodies_count(self, cursor):
+        return self.get_antibodies_count(cursor)
+
+    @pytest.fixture
+    def final_antibodies_count(self, cursor):
+        return self.get_antibodies_count(cursor)
+
+    @pytest.fixture
+    def response(self, client, antibody_data, headers, initial_antibodies_count):
+        return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
 
     @classmethod
     def get_antibodies_count(cls, cursor):
@@ -155,3 +194,17 @@ FROM antibodies WHERE id = %s
         self, response, antibody_data, last_antibody_data
     ):
         assert tuple(antibody_data['antibody'].values()) == last_antibody_data
+
+    def test_if_antibody_fails_uniqueness_index_it_should_return_a_406_response(
+        self, response, antibody_data, client, headers
+    ):
+        assert client.post(
+            '/antibodies', data=json.dumps(antibody_data), headers=headers
+        ).status == '406 NOT ACCEPTABLE'
+
+    def test_if_antibody_fails_uniqueness_index_it_should_inform_it_in_message(
+        self, response, antibody_data, client, headers
+    ):
+        assert json.loads(client.post(
+            '/antibodies', data=json.dumps(antibody_data), headers=headers
+        ).data) == {'message': 'Antibody not unique'}
