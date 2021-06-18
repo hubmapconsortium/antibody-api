@@ -2,6 +2,8 @@ from flask import Flask, abort, jsonify, make_response, request, render_template
 from werkzeug.exceptions import BadRequest
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+# pylint: disable=no-name-in-module
+from psycopg2.errors import UniqueViolation
 from . import default_config
 
 def create_app(testing=False):
@@ -16,6 +18,58 @@ def create_app(testing=False):
     @app.route('/')
     def hubmap():
         return render_template('pages/base.html', test_var="hello, world!")
+
+    @app.route("/antibodies", methods=['GET'])
+    def list_antibodies():
+        conn = psycopg2.connect(
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute(
+            '''
+SELECT
+    avr_url, protocols_io_doi,
+    uniprot_accession_number,
+    target_name, rrid,
+    antibody_name, host_organism,
+    clonality, vendor,
+    catalog_number, lot_number,
+    recombinant, organ_or_tissue,
+    hubmap_platform, submitter_orciid,
+    created_by_user_displayname, created_by_user_email,
+    created_by_user_sub, group_uuid
+FROM antibodies
+ORDER BY id ASC
+''')
+        results = []
+        for antibody in cur:
+            ant = {
+                'avr_url': antibody[0],
+                'protocols_io_doi': antibody[1],
+                'uniprot_accession_number': antibody[2],
+                'target_name': antibody[3],
+                'rrid': antibody[4],
+                'antibody_name': antibody[5],
+                'host_organism': antibody[6],
+                'clonality': antibody[7],
+                'vendor': antibody[8],
+                'catalog_number': antibody[9],
+                'lot_number': antibody[10],
+                'recombinant': antibody[11],
+                'organ_or_tissue': antibody[12],
+                'hubmap_platform': antibody[13],
+                'submitter_orciid': antibody[14],
+                'created_by_user_displayname': antibody[15],
+                'created_by_user_email': antibody[16],
+                'created_by_user_sub': antibody[17],
+                'group_uuid': antibody[18]
+            }
+            results.append(ant)
+        return make_response(jsonify(antibodies=results), 200)
 
     @app.route("/antibodies", methods=['POST'])
     def save_antibody():
@@ -43,10 +97,13 @@ def create_app(testing=False):
         try:
             antibody = request.get_json()['antibody']
         except KeyError:
-            abort(406)
+            abort(json_error('Antibody missing', 406))
         for prop in required_properties:
             if prop not in antibody:
-                abort(406)
+                abort(json_error(
+                    'Antibody data incomplete: missing %s parameter' % prop, 406
+                    )
+                )
 
         conn = psycopg2.connect(
             dbname=app.config['DATABASE_NAME'],
@@ -103,6 +160,12 @@ VALUES (
     %(group_uuid)s
 ) RETURNING id
         '''
-        cur.execute(insert_query, antibody)
+        try:
+            cur.execute(insert_query, antibody)
+        except UniqueViolation:
+            abort(json_error("Antibody not unique", 406))
         return make_response(jsonify(id=cur.fetchone()[0]), 201)
     return app
+
+def json_error(message, error_code):
+    return make_response(jsonify(message=message), error_code)
