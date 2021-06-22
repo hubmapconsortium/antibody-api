@@ -1,118 +1,12 @@
 import json
-import random
-import psycopg2
 import pytest
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from antibodyapi import create_app
-
-@pytest.fixture(scope="session")
-def flask_app():
-    return create_app(testing=True)
-
-@pytest.fixture(scope="session")
-def client(flask_app):
-    with flask_app.test_client() as testing_client:
-        with flask_app.app_context():
-            yield testing_client
-
-@pytest.fixture
-def mimetype():
-    return 'application/json'
-
-@pytest.fixture
-def headers(mimetype):
-    return {
-        'Content-Type': mimetype,
-        'Accept': mimetype
-    }
-
-@pytest.fixture
-def antibody_data(faker):
-    return {
-        'antibody': {
-            'avr_url': faker.uri(),
-            'protocols_io_doi': faker.uri(),
-            'uniprot_accession_number': faker.uuid4(),
-            'target_name': faker.first_name(),
-            'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
-            'antibody_name': faker.first_name(),
-            'host_organism': faker.first_name(),
-            'clonality': random.choice(('monoclonal','polyclonal')),
-            'vendor': faker.first_name(),
-            'catalog_number': faker.uuid4(),
-            'lot_number': faker.uuid4(),
-            'recombinant': faker.pybool(),
-            'organ_or_tissue': faker.first_name(),
-            'hubmap_platform': faker.first_name(),
-            'submitter_orciid': faker.uuid4(),
-            'created_by_user_displayname': faker.first_name(),
-            'created_by_user_email': faker.ascii_email(),
-            'created_by_user_sub': faker.last_name(),
-            'group_uuid': faker.uuid4()
-        }
-    }
-
-@pytest.fixture
-def antibody_incomplete_data(antibody_data):
-    removed_field = random.choice(list(antibody_data['antibody'].keys()))
-    del antibody_data['antibody'][removed_field]
-    return (antibody_data, removed_field)
-
-@pytest.fixture(scope="session")
-def conn(flask_app):
-    conn = psycopg2.connect(
-        dbname=flask_app.config['DATABASE_NAME'],
-        user=flask_app.config['DATABASE_USER'],
-        password=flask_app.config['DATABASE_PASSWORD'],
-        host=flask_app.config['DATABASE_HOST']
-    )
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    yield conn
-    conn.close()
-
-@pytest.fixture()
-def cursor(conn):
-    cur = conn.cursor()
-    yield cur
-    cur.execute('DELETE FROM antibodies')
-    cur.close()
 
 def test_post_with_no_body_should_return_400(client, headers):
     response = client.post('/antibodies', headers=headers)
     assert response.status == '400 BAD REQUEST'
 
-def test_post_with_empty_json_body_should_return_406(client, headers):
-    response = client.post('/antibodies', data=json.dumps({}), headers=headers)
-    assert response.status == '406 NOT ACCEPTABLE'
-
-def test_post_with_empty_json_should_return_error_message(client, headers):
-    response = client.post('/antibodies', data=json.dumps({}), headers=headers)
-    assert json.loads(response.data) == {
-        'message': 'Antibody missing'
-    }
-
-def test_post_with_incomplete_json_body_should_return_406(
-        client, headers, antibody_incomplete_data
-    ):
-    incomplete_data, _ = antibody_incomplete_data
-    response = client.post(
-        '/antibodies', data=json.dumps(incomplete_data), headers=headers
-    )
-    assert response.status == '406 NOT ACCEPTABLE'
-
-def test_post_with_incomplete_json_body_should_return_error_message(
-        client, headers, antibody_incomplete_data
-    ):
-    incomplete_data, removed_field = antibody_incomplete_data
-    response = client.post(
-        '/antibodies', data=json.dumps(incomplete_data), headers=headers
-    )
-    assert json.loads(response.data) == {
-        'message': 'Antibody data incomplete: missing %s parameter' % removed_field
-    }
-
 class TestGetAntibodies:
-    # pylint: disable=no-self-use,unused-argument
+    # pylint: disable=no-self-use
     @pytest.fixture(autouse=True)
     def create_antibody(self, cursor, client, antibody_data, headers):
         client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
@@ -130,6 +24,50 @@ class TestGetAntibodies:
         self, response, antibody_data
     ):
         assert antibody_data['antibody'] == json.loads(response.data)['antibodies'][0]
+
+class TestPostEmptyJSONBody:
+    # pylint: disable=no-self-use
+    @pytest.fixture
+    def response(self, client, headers):
+        return client.post(
+            '/antibodies', data=json.dumps({}), headers=headers
+        )
+
+    def test_post_with_empty_json_body_should_return_406(self, response):
+        assert response.status == '406 NOT ACCEPTABLE'
+
+    def test_post_with_empty_json_should_return_error_message(self, response):
+        assert json.loads(response.data) == {
+            'message': 'Antibody missing'
+        }
+
+class TestPostIncompleteJSONBody:
+    # pylint: disable=no-self-use
+    @pytest.fixture
+    def removed_field(self, antibody_incomplete_data):
+        return antibody_incomplete_data[1]
+
+    @pytest.fixture
+    def incomplete_data(self, antibody_incomplete_data):
+        return antibody_incomplete_data[0]
+
+    @pytest.fixture
+    def response(self, client, headers, incomplete_data):
+        return client.post(
+            '/antibodies', data=json.dumps(incomplete_data), headers=headers
+        )
+
+    def test_post_with_incomplete_json_body_should_return_406(
+            self, response
+        ):
+        assert response.status == '406 NOT ACCEPTABLE'
+
+    def test_post_with_incomplete_json_body_should_return_error_message(
+            self, response, removed_field
+        ):
+        assert json.loads(response.data) == {
+            'message': 'Antibody data incomplete: missing %s parameter' % removed_field
+        }
 
 class TestPostWithCompleteJSONBody:
     # pylint: disable=no-self-use,unused-argument
