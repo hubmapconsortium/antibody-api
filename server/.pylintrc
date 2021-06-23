@@ -2,3 +2,4 @@
 disable=
     C0114, C0115, C0116, # missing-module-docstring, missing-class-docstring missing-function-docstring
     W0621, # redefined-outer-name (pytest fixtures trigger this one)
+    R0801 # duplicate-code (there are duplicate queries in tests and app)
