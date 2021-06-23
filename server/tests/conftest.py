@@ -31,6 +31,34 @@ def antibody_data(faker):
     }
 
 @pytest.fixture
+def antibody_data_multiple(faker):
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        antibody = {
+            'avr_url': faker.uri(),
+            'protocols_io_doi': faker.uri(),
+            'uniprot_accession_number': faker.uuid4(),
+            'target_name': faker.first_name(),
+            'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
+            'antibody_name': faker.first_name(),
+            'host_organism': faker.first_name(),
+            'clonality': random.choice(('monoclonal','polyclonal')),
+            'vendor': faker.first_name(),
+            'catalog_number': faker.uuid4(),
+            'lot_number': faker.uuid4(),
+            'recombinant': faker.pybool(),
+            'organ_or_tissue': faker.first_name(),
+            'hubmap_platform': faker.first_name(),
+            'submitter_orciid': faker.uuid4(),
+            'created_by_user_displayname': faker.first_name(),
+            'created_by_user_email': faker.ascii_email(),
+            'created_by_user_sub': faker.last_name(),
+            'group_uuid': faker.uuid4()
+        }
+        antibodies.append(antibody)
+    return {'antibody': antibodies}
+
+@pytest.fixture
 def antibody_incomplete_data(antibody_data):
     removed_field = random.choice(list(antibody_data['antibody'].keys()))
     del antibody_data['antibody'][removed_field]
