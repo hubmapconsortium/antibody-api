@@ -1,76 +1,60 @@
 import random
 import psycopg2
 import pytest
+from faker import Faker
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from antibodyapi import create_app
 
-@pytest.fixture
-def antibody_data(faker):
+def raw_antibody_data():
+    faker = Faker()
     return {
-        'antibody': {
-            'avr_url': faker.uri(),
-            'protocols_io_doi': faker.uri(),
-            'uniprot_accession_number': faker.uuid4(),
-            'target_name': faker.first_name(),
-            'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
-            'antibody_name': faker.first_name(),
-            'host_organism': faker.first_name(),
-            'clonality': random.choice(('monoclonal','polyclonal')),
-            'vendor': faker.first_name(),
-            'catalog_number': faker.uuid4(),
-            'lot_number': faker.uuid4(),
-            'recombinant': faker.pybool(),
-            'organ_or_tissue': faker.first_name(),
-            'hubmap_platform': faker.first_name(),
-            'submitter_orciid': faker.uuid4(),
-            'created_by_user_displayname': faker.first_name(),
-            'created_by_user_email': faker.ascii_email(),
-            'created_by_user_sub': faker.last_name(),
-            'group_uuid': faker.uuid4()
-        }
+        'avr_url': faker.uri(),
+        'protocols_io_doi': faker.uri(),
+        'uniprot_accession_number': faker.uuid4(),
+        'target_name': faker.first_name(),
+        'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
+        'antibody_name': faker.first_name(),
+        'host_organism': faker.first_name(),
+        'clonality': random.choice(('monoclonal','polyclonal')),
+        'vendor': faker.first_name(),
+        'catalog_number': faker.uuid4(),
+        'lot_number': faker.uuid4(),
+        'recombinant': faker.pybool(),
+        'organ_or_tissue': faker.first_name(),
+        'hubmap_platform': faker.first_name(),
+        'submitter_orciid': faker.uuid4(),
+        'created_by_user_displayname': faker.first_name(),
+        'created_by_user_email': faker.ascii_email(),
+        'created_by_user_sub': faker.last_name(),
+        'group_uuid': faker.uuid4()
     }
 
-@pytest.fixture
-def antibody_data_multiple(faker):
+@pytest.fixture(scope='class')
+def antibody_data():
+    return {
+        'antibody': raw_antibody_data()
+    }
+
+@pytest.fixture(scope='class')
+def antibody_data_multiple():
     antibodies = []
     for _ in range(random.randint(2,8)):
-        antibody = {
-            'avr_url': faker.uri(),
-            'protocols_io_doi': faker.uri(),
-            'uniprot_accession_number': faker.uuid4(),
-            'target_name': faker.first_name(),
-            'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
-            'antibody_name': faker.first_name(),
-            'host_organism': faker.first_name(),
-            'clonality': random.choice(('monoclonal','polyclonal')),
-            'vendor': faker.first_name(),
-            'catalog_number': faker.uuid4(),
-            'lot_number': faker.uuid4(),
-            'recombinant': faker.pybool(),
-            'organ_or_tissue': faker.first_name(),
-            'hubmap_platform': faker.first_name(),
-            'submitter_orciid': faker.uuid4(),
-            'created_by_user_displayname': faker.first_name(),
-            'created_by_user_email': faker.ascii_email(),
-            'created_by_user_sub': faker.last_name(),
-            'group_uuid': faker.uuid4()
-        }
-        antibodies.append(antibody)
+        antibodies.append(raw_antibody_data())
     return {'antibody': antibodies}
 
-@pytest.fixture
+@pytest.fixture(scope='class')
 def antibody_incomplete_data(antibody_data):
     removed_field = random.choice(list(antibody_data['antibody'].keys()))
     del antibody_data['antibody'][removed_field]
     return (antibody_data, removed_field)
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def client(flask_app):
     with flask_app.test_client() as testing_client:
         with flask_app.app_context():
             yield testing_client
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def conn(flask_app):
     conn = psycopg2.connect(
         dbname=flask_app.config['DATABASE_NAME'],
@@ -89,17 +73,17 @@ def cursor(conn):
     cur.execute('DELETE FROM antibodies')
     cur.close()
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def flask_app():
     return create_app(testing=True)
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def headers(mimetype):
     return {
         'Content-Type': mimetype,
         'Accept': mimetype
     }
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def mimetype():
     return 'application/json'

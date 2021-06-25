@@ -92,9 +92,9 @@ def create_app(testing=False):
 
     @app.route('/')
     def hubmap():
-        return render_template('pages/base.html', test_var="hello, world!")
+        return render_template('pages/base.html', test_var='hello, world!')
 
-    @app.route("/antibodies/import", methods=['POST'])
+    @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies():
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
@@ -117,13 +117,15 @@ def create_app(testing=False):
                 for row in antibodycsv:
                     try:
                         cur.execute(insert_query(), row)
+                    except KeyError:
+                        abort(json_error('CSV fields are wrong', 406))
                     except UniqueViolation:
-                        abort(json_error("Antibody not unique", 406))
+                        abort(json_error('Antibody not unique', 406))
         else:
             abort(json_error('Filetype forbidden', 406))
         return ('', 204)
 
-    @app.route("/antibodies", methods=['GET'])
+    @app.route('/antibodies', methods=['GET'])
     def list_antibodies():
         conn = psycopg2.connect(
             dbname=app.config['DATABASE_NAME'],
@@ -160,7 +162,7 @@ def create_app(testing=False):
             results.append(ant)
         return make_response(jsonify(antibodies=results), 200)
 
-    @app.route("/antibodies", methods=['POST'])
+    @app.route('/antibodies', methods=['POST'])
     def save_antibody():
         required_properties = (
           'avr_url',
@@ -205,7 +207,7 @@ def create_app(testing=False):
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
-            abort(json_error("Antibody not unique", 406))
+            abort(json_error('Antibody not unique', 406))
         return make_response(jsonify(id=cur.fetchone()[0]), 201)
     return app
 
