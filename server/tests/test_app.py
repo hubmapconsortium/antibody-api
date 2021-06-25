@@ -56,14 +56,9 @@ class AntibodyTesting:
 
 class TestGetAntibodies:
     # pylint: disable=no-self-use
-    @pytest.fixture(autouse=True)
-    def create_antibody(self, cursor, client, antibody_data, headers):
+    @pytest.fixture(scope='class')
+    def response(self, client, headers, antibody_data):
         client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
-        yield
-        cursor.execute('DELETE FROM antibodies')
-
-    @pytest.fixture
-    def response(self, client, headers):
         return client.get('/antibodies', headers=headers)
 
     def test_should_return_a_200_response(self, response):
@@ -86,14 +81,13 @@ class TestPostCSVFile(AntibodyTesting):
         return cursor.fetchone()
 
     @pytest.fixture
-    def response(self, client, headers, request_data, cursor):
+    def response(self, client, headers, request_data):
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
             data=request_data,
             headers=headers
         )
-        cursor.execute('DELETE FROM antibodies')
 
     @pytest.fixture
     def response_to_empty_request(self, client, headers):
@@ -118,6 +112,15 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
+    def response_to_request_with_weird_csv_file(self, client, headers, weird_csv_file):
+        return client.post(
+            '/antibodies/import',
+            content_type='multipart/form-data',
+            data={'file': (io.BytesIO(weird_csv_file), 'antibodies.csv')},
+            headers=headers
+        )
+
+    @pytest.fixture
     def request_data(self, csv_file):
         return {'file': (io.BytesIO(csv_file), 'antibodies.csv')}
 
@@ -129,12 +132,28 @@ class TestPostCSVFile(AntibodyTesting):
             values += ','.join(str(v) for v in antibody.values()) + '\n'
         return bytes(fields + '\n' + values, 'utf-8')
 
+    @pytest.fixture
+    def weird_csv_file(self):
+        return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
+
     def test_post_csv_file_should_save_antibodies_correctly(
         self, response, antibody_data_multiple, cursor
     ):
         assert tuple(
             antibody_data_multiple['antibody'][-1].values()
         ) == self.last_antibody(cursor)
+
+    def test_post_csv_file_should_return_406_if_weird_csv_file_was_sent(
+        self, response_to_request_with_weird_csv_file
+    ):
+        assert response_to_request_with_weird_csv_file.status == '406 NOT ACCEPTABLE'
+
+    def test_post_csv_file_should_return_error_message_if_weird_csv_file_was_sent(
+        self, response_to_request_with_weird_csv_file
+    ):
+        assert json.loads(response_to_request_with_weird_csv_file.data) == {
+            'message': 'CSV fields are wrong'
+        }
 
     def test_post_csv_file_should_return_406_if_no_filename_was_sent(
         self, response_to_request_without_filename
@@ -180,12 +199,12 @@ class TestPostCSVFile(AntibodyTesting):
         antibody_data_multiple
     ):
         assert (
-            initial_antibodies_count + len(antibody_data_multiple['antibody'])
-        ) == final_antibodies_count
+            final_antibodies_count
+        ) == len(antibody_data_multiple['antibody'])
 
 class TestPostEmptyJSONBody:
     # pylint: disable=no-self-use
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def response(self, client, headers):
         return client.post(
             '/antibodies', data=json.dumps({}), headers=headers
@@ -201,15 +220,15 @@ class TestPostEmptyJSONBody:
 
 class TestPostIncompleteJSONBody:
     # pylint: disable=no-self-use
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def removed_field(self, antibody_incomplete_data):
         return antibody_incomplete_data[1]
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def incomplete_data(self, antibody_incomplete_data):
         return antibody_incomplete_data[0]
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def response(self, client, headers, incomplete_data):
         return client.post(
             '/antibodies', data=json.dumps(incomplete_data), headers=headers
