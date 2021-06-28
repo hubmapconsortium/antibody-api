@@ -71,6 +71,7 @@ def cursor(conn):
     cur = conn.cursor()
     yield cur
     cur.execute('DELETE FROM antibodies')
+    cur.execute('DELETE FROM vendors')
     cur.close()
 
 @pytest.fixture(scope='session')
