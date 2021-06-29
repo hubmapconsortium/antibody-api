@@ -5,17 +5,18 @@ import pytest
 def base_antibody_query():
     return '''
 SELECT 
-    avr_url, protocols_io_doi,
-    uniprot_accession_number,
-    target_name, rrid,
-    antibody_name, host_organism,
-    clonality, vendor,
-    catalog_number, lot_number,
-    recombinant, organ_or_tissue,
-    hubmap_platform, submitter_orciid,
-    created_by_user_displayname, created_by_user_email,
-    created_by_user_sub, group_uuid
-FROM antibodies
+    a.avr_url, a.protocols_io_doi,
+    a.uniprot_accession_number,
+    a.target_name, a.rrid,
+    a.antibody_name, a.host_organism,
+    a.clonality, v.name,
+    a.catalog_number, a.lot_number,
+    a.recombinant, a.organ_or_tissue,
+    a.hubmap_platform, a.submitter_orciid,
+    a.created_by_user_displayname, a.created_by_user_email,
+    a.created_by_user_sub, a.group_uuid
+FROM antibodies a
+JOIN vendors v ON a.vendor_id = v.id
 '''
 
 def test_post_with_no_body_should_return_400(client, headers):
@@ -26,7 +27,7 @@ class AntibodyTesting:
     # pylint: disable=no-self-use,unused-argument
     @pytest.fixture
     def ant_query(self):
-        return base_antibody_query() + 'WHERE id = %s'
+        return base_antibody_query() + 'WHERE a.id = %s'
 
     @pytest.fixture
     def last_antibody_data(self, ant_query, cursor, last_antibody_id):
@@ -42,6 +43,14 @@ class AntibodyTesting:
             return None
 
     @pytest.fixture
+    def last_vendor_data(self, cursor):
+        cursor.execute('SELECT name FROM vendors ORDER BY id DESC LIMIT 1')
+        try:
+            return cursor.fetchone()[0]
+        except TypeError:
+            return None
+
+    @pytest.fixture
     def initial_antibodies_count(self, cursor):
         return self.get_antibodies_count(cursor)
 
@@ -49,9 +58,22 @@ class AntibodyTesting:
     def final_antibodies_count(self, cursor):
         return self.get_antibodies_count(cursor)
 
+    @pytest.fixture
+    def initial_vendor_count(self, cursor):
+        return self.get_vendors_count(cursor)
+
+    @pytest.fixture
+    def final_vendor_count(self, cursor):
+        return self.get_vendors_count(cursor)
+
     @classmethod
     def get_antibodies_count(cls, cursor):
         cursor.execute('SELECT COUNT(*) AS count FROM antibodies')
+        return cursor.fetchone()[0]
+
+    @classmethod
+    def get_vendors_count(cls, cursor):
+        cursor.execute('SELECT COUNT(*) AS count FROM vendors')
         return cursor.fetchone()[0]
 
 class TestGetAntibodies:
@@ -73,7 +95,7 @@ class TestPostCSVFile(AntibodyTesting):
     # pylint: disable=no-self-use, unused-argument
     @classmethod
     def last_query(cls):
-        return base_antibody_query() + ' ORDER BY id DESC LIMIT 1'
+        return base_antibody_query() + ' ORDER BY a.id DESC LIMIT 1'
 
     @classmethod
     def last_antibody(cls, cursor):
@@ -249,6 +271,13 @@ class TestPostIncompleteJSONBody:
 class TestPostWithCompleteJSONBody(AntibodyTesting):
     # pylint: disable=no-self-use, unused-argument
     @pytest.fixture
+    def add_vendor(self, cursor, antibody_data):
+        cursor.execute(
+            'INSERT INTO vendors (name) VALUES (%s)',
+            (antibody_data['antibody']['vendor'],)
+        )
+
+    @pytest.fixture
     def response(self, client, antibody_data, headers, initial_antibodies_count):
         return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
 
@@ -283,3 +312,18 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         assert json.loads(client.post(
             '/antibodies', data=json.dumps(antibody_data), headers=headers
         ).data) == {'message': 'Antibody not unique'}
+
+    def test_api_should_create_a_new_vendor_if_it_does_not_exist_already(
+        self, initial_vendor_count, response, final_vendor_count
+    ):
+        assert (initial_vendor_count + 1) == final_vendor_count
+
+    def test_api_should_save_new_vendor_correctly(
+        self, response, antibody_data, last_vendor_data
+    ):
+        assert antibody_data['antibody']['vendor'] == last_vendor_data
+
+    def test_api_should_not_create_vendor_if_it_exists_already(
+        self, add_vendor, initial_vendor_count, response, final_vendor_count
+    ):
+        assert initial_vendor_count == final_vendor_count
