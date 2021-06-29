@@ -1,27 +1,31 @@
-version: '3'
+version: "3.7"
 
 services:
-  web:
+  antibody-api:
+    hostname: antibody-api
     container_name: antibody-api
+    # Will need to manually change the tag for deployment on PROD
+    image: hubmap/antibody-api:latest
     environment:
-        - HOST_GID=${HOST_GID:-1000}
-        - HOST_UID=${HOST_UID:-1000}
+      - HOST_GID=${HOST_GID:-1000}
+      - HOST_UID=${HOST_UID:-1000}
+    init: true
+    restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://hubmap-auth:3333" ]
+      test: [ "CMD", "curl", "--fail", "http://hubmap-auth:8888" ]
       interval: 1m30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    hostname: antibody-api
-    image: antibody-api:${ANTIBODY_API_VERSION:?err}
-    init: true
     networks:
       - gateway_hubmap
     ports:
       - '5000:5000'
-    restart: always
     volumes:
-      - ./instance:/app/var/antibodyapi-instance
+      # Flask configuration
+      - "./instance:/app/var/antibodyapi-instance"
+      # uWSGI log
+      - "./server/log:/app/server/log"
 
 networks:
   gateway_hubmap:
