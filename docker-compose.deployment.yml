@@ -4,7 +4,8 @@ services:
   antibody-api:
     hostname: antibody-api
     container_name: antibody-api
-    image: hubmap/antibody-api:${ANTIBODY_API_VERSION:?err}
+    # Will need to manually change the tag for deployment on PROD
+    image: hubmap/antibody-api:latest
     environment:
       - HOST_GID=${HOST_GID:-1000}
       - HOST_UID=${HOST_UID:-1000}
