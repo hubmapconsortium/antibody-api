@@ -1,3 +1,12 @@
+
+CREATE TABLE IF NOT EXISTS "public"."vendors" (
+    "id" serial,
+    "name" text NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS vendors_unique_index ON vendors(UPPER(name));
+
 DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM pg_type WHERE typname = 'clonality_types') THEN
@@ -15,7 +24,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "antibody_name" text NOT NULL,
     "host_organism" text NOT NULL,
     "clonality" clonality_types NOT NULL,
-    "vendor" text NOT NULL,
+    "vendor_id" integer REFERENCES vendors(id),
     "catalog_number" text NOT NULL,
     "lot_number" text NOT NULL,
     "recombinant" boolean NOT NULL,
