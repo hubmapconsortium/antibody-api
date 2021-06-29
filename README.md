@@ -34,3 +34,17 @@ For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by speci
 ````
 docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
+
+## Redeployment
+
+Will need to shut down the running container and remove the old image first:
+
+````
+docker-compose -f docker-compose.deployment.yml down --rmi all
+````
+
+Then download the new image and start up the container:
+
+````
+docker-compose -f docker-compose.deployment.yml up -d --no-build
+````
