@@ -22,8 +22,10 @@ services:
     ports:
       - '5000:5000'
     volumes:
+      # Flask configuration
       - "./instance:/app/var/antibodyapi-instance"
-      - "./server:/app/server"
+      # uWSGI log
+      - "./server/log:/app/server/log"
 
 networks:
   gateway_hubmap:
