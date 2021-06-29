@@ -19,17 +19,18 @@ def allowed_file(filename):
 def base_antibody_query():
     return '''
 SELECT
-    avr_url, protocols_io_doi,
-    uniprot_accession_number,
-    target_name, rrid,
-    antibody_name, host_organism,
-    clonality, vendor,
-    catalog_number, lot_number,
-    recombinant, organ_or_tissue,
-    hubmap_platform, submitter_orciid,
-    created_by_user_displayname, created_by_user_email,
-    created_by_user_sub, group_uuid
-FROM antibodies
+    a.avr_url, a.protocols_io_doi,
+    a.uniprot_accession_number,
+    a.target_name, a.rrid,
+    a.antibody_name, a.host_organism,
+    a.clonality, v.name,
+    a.catalog_number, a.lot_number,
+    a.recombinant, a.organ_or_tissue,
+    a.hubmap_platform, a.submitter_orciid,
+    a.created_by_user_displayname, a.created_by_user_email,
+    a.created_by_user_sub, a.group_uuid
+FROM antibodies a
+JOIN vendors v ON a.vendor_id = v.id
 '''
 
 def insert_query():
@@ -43,7 +44,7 @@ INSERT INTO antibodies (
     antibody_name,
     host_organism,
     clonality,
-    vendor,
+    vendor_id,
     catalog_number,
     lot_number,
     recombinant,
@@ -65,7 +66,7 @@ VALUES (
     %(antibody_name)s,
     %(host_organism)s,
     %(clonality)s,
-    %(vendor)s,
+    %(vendor_id)s,
     %(catalog_number)s,
     %(lot_number)s,
     %(recombinant)s,
@@ -92,9 +93,9 @@ def create_app(testing=False):
 
     @app.route('/')
     def hubmap():
-        return render_template('pages/base.html', test_var="hello, world!")
+        return render_template('pages/base.html', test_var='hello, world!')
 
-    @app.route("/antibodies/import", methods=['POST'])
+    @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies():
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
@@ -116,14 +117,21 @@ def create_app(testing=False):
                 cur = conn.cursor()
                 for row in antibodycsv:
                     try:
+                        row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
+                    except KeyError:
+                        abort(json_error('CSV fields are wrong', 406))
+                    del row['vendor']
+                    try:
                         cur.execute(insert_query(), row)
+                    except KeyError:
+                        abort(json_error('CSV fields are wrong', 406))
                     except UniqueViolation:
-                        abort(json_error("Antibody not unique", 406))
+                        abort(json_error('Antibody not unique', 406))
         else:
             abort(json_error('Filetype forbidden', 406))
         return ('', 204)
 
-    @app.route("/antibodies", methods=['GET'])
+    @app.route('/antibodies', methods=['GET'])
     def list_antibodies():
         conn = psycopg2.connect(
             dbname=app.config['DATABASE_NAME'],
@@ -133,7 +141,7 @@ def create_app(testing=False):
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
-        cur.execute(base_antibody_query() + ' ORDER BY id ASC')
+        cur.execute(base_antibody_query() + ' ORDER BY a.id ASC')
         results = []
         for antibody in cur:
             ant = {
@@ -160,7 +168,7 @@ def create_app(testing=False):
             results.append(ant)
         return make_response(jsonify(antibodies=results), 200)
 
-    @app.route("/antibodies", methods=['POST'])
+    @app.route('/antibodies', methods=['POST'])
     def save_antibody():
         required_properties = (
           'avr_url',
@@ -202,12 +210,22 @@ def create_app(testing=False):
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
+        antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
+        del antibody['vendor']
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
-            abort(json_error("Antibody not unique", 406))
+            abort(json_error('Antibody not unique', 406))
         return make_response(jsonify(id=cur.fetchone()[0]), 201)
     return app
 
 def json_error(message, error_code):
     return make_response(jsonify(message=message), error_code)
+
+def find_or_create_vendor(cursor, name):
+    cursor.execute('SELECT id FROM vendors WHERE name = %s', (name,))
+    try:
+        return cursor.fetchone()[0]
+    except TypeError:
+        cursor.execute('INSERT INTO vendors (name) VALUES (%s) RETURNING id', (name,))
+        return cursor.fetchone()[0]
