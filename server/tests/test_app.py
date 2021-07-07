@@ -278,6 +278,13 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         )
 
     @pytest.fixture
+    def add_vendor_uppercase(self, cursor, antibody_data):
+        cursor.execute(
+            'INSERT INTO vendors (name) VALUES (%s)',
+            (antibody_data['antibody']['vendor'].upper(),)
+        )
+
+    @pytest.fixture
     def response(self, client, antibody_data, headers, initial_antibodies_count):
         return client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
 
@@ -325,5 +332,10 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
 
     def test_api_should_not_create_vendor_if_it_exists_already(
         self, add_vendor, initial_vendor_count, response, final_vendor_count
+    ):
+        assert initial_vendor_count == final_vendor_count
+
+    def test_api_should_identify_vendor_regardless_of_case(
+        self, add_vendor_uppercase, initial_vendor_count, response, final_vendor_count
     ):
         assert initial_vendor_count == final_vendor_count
