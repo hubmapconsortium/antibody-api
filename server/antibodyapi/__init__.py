@@ -223,7 +223,7 @@ def json_error(message, error_code):
     return make_response(jsonify(message=message), error_code)
 
 def find_or_create_vendor(cursor, name):
-    cursor.execute('SELECT id FROM vendors WHERE name = %s', (name,))
+    cursor.execute('SELECT id FROM vendors WHERE UPPER(name) = %s', (name.upper(),))
     try:
         return cursor.fetchone()[0]
     except TypeError:
