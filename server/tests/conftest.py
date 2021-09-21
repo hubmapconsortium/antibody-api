@@ -5,6 +5,16 @@ from faker import Faker
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from antibodyapi import create_app
 
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call): # pylint: disable=unused-argument
+    outcome = yield
+    report = outcome.get_result()
+
+    test_fn = item.obj
+    docstring = getattr(test_fn, '__doc__')
+    if docstring:
+        report.nodeid = docstring
+
 def raw_antibody_data():
     faker = Faker()
     return {
