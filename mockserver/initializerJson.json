@@ -1,0 +1,61 @@
+
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/hmuuid",
+      "headers": {
+        "authorization": ["^Bearer [A-Z0-9]+$"]
+      },
+      "body": {
+        "contentType": "application/json",
+        "regex": "\\{\\s?entity_type:\\s?'.*'\\s?\\}"
+      }
+    },
+    "httpResponse": {
+      "body": {
+        "contentType": "application/json",
+        "json": "[ { uuid: 'd56cd6bf9221d7dfa8ca336080c27a64', hubmap_base_id: '972KSRG573', hubmap_id: 'HBM972.KSRG.573' } ]"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/file-upload",
+      "headers": {
+        "authorization": ["^Bearer [A-Z0-9]+$"]
+      },
+      "body": {
+        "contentType": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+        "type": "STRING",
+        "string": "----WebKitFormBoundary7MA4YWxkTrZu0gW\\nContent-Disposition: form-data; name=\"file\"; filename=\"example-avr-report.pdf\"\\nContent-Type: application/pdf\\n\\n(data)\\n----WebKitFormBoundary7MA4YWxkTrZu0gW\\n"
+      }
+    },
+    "httpResponse": {
+      "body": {
+        "contentType": "application/json",
+        "json": "{ temp_file_id: 'tmmmpedx255v6t885h7m' }"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/file-commit",
+      "headers": {
+        "authorization": ["^Bearer [A-Z0-9]+$"]
+      },
+      "body": {
+        "contentType": "application/json",
+        "json": "{ entity_uuid:'d56cd6bf9221d7dfa8ca336080c27a64', temp_file_id: 'tmmmpedx255v6t885h7m', user_token: 'AgBqjjg7BPYlblkK7k0kQpP8QaB9JEomVymgm9MGE8YWJQ73xWcyCavDVqeq5xedglWWxXobxEv3gDtk9M9eDuogVO' }"
+      }
+    },
+    "httpResponse": {
+      "body": {
+        "contentType": "application/json; charset=utf-8",
+        "json": "[ { file_uuid: 'adc81dd0782fc3e060f19ff351f82b80', filename: 'example-avr-report.pdf' } ]"
+      }
+    }
+  }
+]

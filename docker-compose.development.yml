@@ -10,6 +10,18 @@ services:
       - '5432:5432'
     volumes:
       - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
+  mockserver:
+    command: -serverPort 80
+    environment:
+      - MOCKSERVER_INITIALIZATION_JSON_PATH=/config/initializerJson.json
+    image: mockserver/mockserver
+    networks:
+      default:
+        aliases:
+          - ingestmock
+          - uuidmock
+    volumes:
+      - ./mockserver:/config
   web:
     build:
       args:
@@ -18,6 +30,7 @@ services:
       dockerfile: DockerfileDev
     depends_on:
       - db
+      - mockserver
     environment:
         - FLASK_APP=antibodyapi
         - FLASK_ENV=development
