@@ -15,7 +15,7 @@ pipelines:
             - pip install -r requirements-dev.txt
             - cd server
             - pip install -e .
-            - pytest -v
+            - pytest -v --random-order
           services:
             - postgres
 definitions:
