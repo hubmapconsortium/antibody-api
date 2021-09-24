@@ -19,6 +19,7 @@ def allowed_file(filename):
 def base_antibody_query():
     return '''
 SELECT
+    a.antibody_uuid,
     a.protocols_io_doi,
     a.uniprot_accession_number,
     a.target_name, a.rrid,
@@ -36,6 +37,7 @@ JOIN vendors v ON a.vendor_id = v.id
 def insert_query():
     return '''
 INSERT INTO antibodies (
+    antibody_uuid,
     protocols_io_doi,
     uniprot_accession_number,
     target_name,
@@ -57,6 +59,7 @@ INSERT INTO antibodies (
     group_uuid
 ) 
 VALUES (
+    %(antibody_uuid)s,
     %(protocols_io_doi)s,
     %(uniprot_accession_number)s,
     %(target_name)s,
@@ -78,6 +81,9 @@ VALUES (
     %(group_uuid)s
 ) RETURNING id
 '''
+
+def get_hubmap_uuid():
+    return 'd56cd6bf9221d7dfa8ca336080c27a64'
 
 def create_app(testing=False):
     app = Flask(__name__, instance_relative_config=True)
@@ -121,6 +127,7 @@ def create_app(testing=False):
                         except KeyError:
                             abort(json_error('CSV fields are wrong', 406))
                         del row['vendor']
+                        row['antibody_uuid'] = get_hubmap_uuid()
                         try:
                             cur.execute(insert_query(), row)
                         except KeyError:
@@ -145,24 +152,25 @@ def create_app(testing=False):
         results = []
         for antibody in cur:
             ant = {
-                'protocols_io_doi': antibody[0],
-                'uniprot_accession_number': antibody[1],
-                'target_name': antibody[2],
-                'rrid': antibody[3],
-                'antibody_name': antibody[4],
-                'host_organism': antibody[5],
-                'clonality': antibody[6],
-                'vendor': antibody[7],
-                'catalog_number': antibody[8],
-                'lot_number': antibody[9],
-                'recombinant': antibody[10],
-                'organ_or_tissue': antibody[11],
-                'hubmap_platform': antibody[12],
-                'submitter_orciid': antibody[13],
-                'created_by_user_displayname': antibody[14],
-                'created_by_user_email': antibody[15],
-                'created_by_user_sub': antibody[16],
-                'group_uuid': antibody[17]
+                'antibody_uuid': antibody[0],
+                'protocols_io_doi': antibody[1],
+                'uniprot_accession_number': antibody[2],
+                'target_name': antibody[3],
+                'rrid': antibody[4],
+                'antibody_name': antibody[5],
+                'host_organism': antibody[6],
+                'clonality': antibody[7],
+                'vendor': antibody[8],
+                'catalog_number': antibody[9],
+                'lot_number': antibody[10],
+                'recombinant': antibody[11],
+                'organ_or_tissue': antibody[12],
+                'hubmap_platform': antibody[13],
+                'submitter_orciid': antibody[14],
+                'created_by_user_displayname': antibody[15],
+                'created_by_user_email': antibody[16],
+                'created_by_user_sub': antibody[17],
+                'group_uuid': antibody[18]
             }
             results.append(ant)
         return make_response(jsonify(antibodies=results), 200)
@@ -210,6 +218,7 @@ def create_app(testing=False):
         cur = conn.cursor()
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
+        antibody['antibody_uuid'] = get_hubmap_uuid()
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:

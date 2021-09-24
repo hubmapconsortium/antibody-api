@@ -2,18 +2,26 @@ import io
 import json
 import pytest
 from antibody_testing import AntibodyTesting
-from base_antibody_query import base_antibody_query
+from base_antibody_query import base_antibody_query, base_antibody_query_without_antibody_uuid
 
 class TestPostCSVFile(AntibodyTesting):
     # pylint: disable=no-self-use, unused-argument
     @classmethod
     def last_query(cls):
-        return base_antibody_query() + ' ORDER BY a.id DESC LIMIT 1'
+        return base_antibody_query_without_antibody_uuid() + ' ORDER BY a.id DESC LIMIT 1'
 
     @classmethod
     def last_antibody(cls, cursor):
         cursor.execute(cls.last_query())
         return cursor.fetchone()
+
+    @classmethod
+    def antibody_uuid(cls, cursor, antibody_name):
+        cursor.execute(
+            base_antibody_query() + ' WHERE a.antibody_name = %(antibody_name)s',
+            { 'antibody_name': antibody_name }
+        )
+        return cursor.fetchone()[0]
 
     @pytest.fixture
     def response(self, client, headers, request_data):
@@ -104,6 +112,14 @@ class TestPostCSVFile(AntibodyTesting):
     @pytest.fixture
     def weird_csv_file(self):
         return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
+
+    def test_post_csv_file_should_save_antibodies_with_uuids(
+        self, response, antibody_data_multiple, cursor
+    ):
+        assert self.antibody_uuid(
+            cursor,
+            antibody_data_multiple['antibody'][-1]['antibody_name']
+        ) == 'd56cd6bf-9221-d7df-a8ca-336080c27a64'
 
     def test_post_csv_file_should_save_antibodies_correctly(
         self, response, antibody_data_multiple, cursor

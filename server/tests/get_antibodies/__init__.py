@@ -16,4 +16,6 @@ class TestGetAntibodies:
         self, response, antibody_data
     ):
         """GET /antibodies should return expected fields"""
-        assert antibody_data['antibody'] == json.loads(response.data)['antibodies'][-1]
+        received_antibody = json.loads(response.data)['antibodies'][-1]
+        del received_antibody['antibody_uuid']
+        assert antibody_data['antibody'] == received_antibody
