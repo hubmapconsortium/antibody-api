@@ -25,6 +25,15 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
+    def response_to_two_csv_files(self, client, headers, request_data_two_csv_files):
+        yield client.post(
+            '/antibodies/import',
+            content_type='multipart/form-data',
+            data=request_data_two_csv_files,
+            headers=headers
+        )
+
+    @pytest.fixture
     def response_to_empty_request(self, client, headers):
         return client.post('/antibodies/import', headers=headers)
 
@@ -60,10 +69,27 @@ class TestPostCSVFile(AntibodyTesting):
         return {'file': (io.BytesIO(csv_file), 'antibodies.csv')}
 
     @pytest.fixture
+    def request_data_two_csv_files(self, csv_file, another_csv_file):
+        return {
+            'file': [
+                (io.BytesIO(csv_file), 'antibodies.csv'),
+                (io.BytesIO(another_csv_file), 'more-antibodies.csv')
+            ]
+        }
+
+    @pytest.fixture
     def csv_file(self, antibody_data_multiple):
         fields = ','.join(antibody_data_multiple['antibody'][0].keys())
         values = ''
         for antibody in antibody_data_multiple['antibody']:
+            values += ','.join(str(v) for v in antibody.values()) + '\n'
+        return bytes(fields + '\n' + values, 'utf-8')
+
+    @pytest.fixture
+    def another_csv_file(self, antibody_data_multiple_again):
+        fields = ','.join(antibody_data_multiple_again['antibody'][0].keys())
+        values = ''
+        for antibody in antibody_data_multiple_again['antibody']:
             values += ','.join(str(v) for v in antibody.values()) + '\n'
         return bytes(fields + '\n' + values, 'utf-8')
 
@@ -78,6 +104,34 @@ class TestPostCSVFile(AntibodyTesting):
         assert tuple(
             antibody_data_multiple['antibody'][-1].values()
         ) == self.last_antibody(cursor)
+
+    def test_post_csv_file_should_return_a_204_response(self, response):
+        """Sending a CSV file should return 204 NO CONTENT if all goes well"""
+        assert response.status == '204 NO CONTENT'
+
+    def test_antibody_count_in_database_should_increase(
+        self, initial_antibodies_count, response, final_antibodies_count,
+        antibody_data_multiple
+    ):
+        """When sending a CSV file successfully, antibody count should increase"""
+        assert (
+            final_antibodies_count
+        ) >= len(antibody_data_multiple['antibody'])
+
+    def test_antibody_count_in_database_should_increase_when_sending_several_csvs(
+        self, initial_antibodies_count, response_to_two_csv_files,
+        final_antibodies_count, antibody_data_multiple,
+        antibody_data_multiple_again
+    ): # pylint: disable=too-many-arguments
+        """When sending two CSV files successfully, antibody count should increase"""
+        print(len(antibody_data_multiple['antibody']))
+        print(len(antibody_data_multiple_again['antibody']))
+        assert (
+            final_antibodies_count
+        ) >= (
+            len(antibody_data_multiple['antibody']) +
+            len(antibody_data_multiple_again['antibody'])
+        )
 
     def test_post_csv_file_should_return_406_if_weird_csv_file_was_sent(
         self, response_to_request_with_weird_csv_file
@@ -134,16 +188,3 @@ class TestPostCSVFile(AntibodyTesting):
         assert json.loads(response_to_request_with_wrong_extension.data) == {
             'message': 'Filetype forbidden'
         }
-
-    def test_post_csv_file_should_return_a_204_response(self, response):
-        """Sending a CSV file should return 204 NO CONTENT if all goes well"""
-        assert response.status == '204 NO CONTENT'
-
-    def test_antibody_count_in_database_should_increase(
-        self, initial_antibodies_count, response, final_antibodies_count,
-        antibody_data_multiple
-    ):
-        """When sending a CSV file successfully, antibody count should increase"""
-        assert (
-            final_antibodies_count
-        ) >= len(antibody_data_multiple['antibody'])

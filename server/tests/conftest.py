@@ -53,6 +53,13 @@ def antibody_data_multiple():
     return {'antibody': antibodies}
 
 @pytest.fixture(scope='class')
+def antibody_data_multiple_again():
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        antibodies.append(raw_antibody_data())
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
 def antibody_incomplete_data(antibody_data):
     removed_field = random.choice(list(antibody_data['antibody'].keys()))
     del antibody_data['antibody'][removed_field]

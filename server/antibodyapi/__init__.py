@@ -99,36 +99,38 @@ def create_app(testing=False):
     def import_antibodies():
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
-        file = request.files['file']
-        if file.filename == '':
-            abort(json_error('Filename missing', 406))
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
-                antibodycsv = csv.DictReader(csvfile, delimiter=',')
-                conn = psycopg2.connect(
-                    dbname=app.config['DATABASE_NAME'],
-                    user=app.config['DATABASE_USER'],
-                    password=app.config['DATABASE_PASSWORD'],
-                    host=app.config['DATABASE_HOST']
-                )
-                conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-                cur = conn.cursor()
-                for row in antibodycsv:
-                    try:
-                        row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
-                    del row['vendor']
-                    try:
-                        cur.execute(insert_query(), row)
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
-                    except UniqueViolation:
-                        abort(json_error('Antibody not unique', 406))
-        else:
-            abort(json_error('Filetype forbidden', 406))
+
+        conn = psycopg2.connect(
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+
+        for file in request.files.getlist('file'):
+            if file.filename == '':
+                abort(json_error('Filename missing', 406))
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
+                    antibodycsv = csv.DictReader(csvfile, delimiter=',')
+                    for row in antibodycsv:
+                        try:
+                            row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
+                        except KeyError:
+                            abort(json_error('CSV fields are wrong', 406))
+                        del row['vendor']
+                        try:
+                            cur.execute(insert_query(), row)
+                        except KeyError:
+                            abort(json_error('CSV fields are wrong', 406))
+                        except UniqueViolation:
+                            abort(json_error('Antibody not unique', 406))
+            else:
+                abort(json_error('Filetype forbidden', 406))
         return ('', 204)
 
     @app.route('/antibodies', methods=['GET'])
