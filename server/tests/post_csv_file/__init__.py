@@ -69,11 +69,11 @@ class TestPostCSVFile(AntibodyTesting):
         return {'file': (io.BytesIO(csv_file), 'antibodies.csv')}
 
     @pytest.fixture
-    def request_data_two_csv_files(self, csv_file, another_csv_file):
+    def request_data_two_csv_files(self, csv_file_once, csv_file_twice):
         return {
             'file': [
-                (io.BytesIO(csv_file), 'antibodies.csv'),
-                (io.BytesIO(another_csv_file), 'more-antibodies.csv')
+                (io.BytesIO(csv_file_once), 'antibodies.csv'),
+                (io.BytesIO(csv_file_twice), 'more-antibodies.csv')
             ]
         }
 
@@ -86,10 +86,18 @@ class TestPostCSVFile(AntibodyTesting):
         return bytes(fields + '\n' + values, 'utf-8')
 
     @pytest.fixture
-    def another_csv_file(self, antibody_data_multiple_again):
-        fields = ','.join(antibody_data_multiple_again['antibody'][0].keys())
+    def csv_file_once(self, antibody_data_multiple_once):
+        fields = ','.join(antibody_data_multiple_once['antibody'][0].keys())
         values = ''
-        for antibody in antibody_data_multiple_again['antibody']:
+        for antibody in antibody_data_multiple_once['antibody']:
+            values += ','.join(str(v) for v in antibody.values()) + '\n'
+        return bytes(fields + '\n' + values, 'utf-8')
+
+    @pytest.fixture
+    def csv_file_twice(self, antibody_data_multiple_twice):
+        fields = ','.join(antibody_data_multiple_twice['antibody'][0].keys())
+        values = ''
+        for antibody in antibody_data_multiple_twice['antibody']:
             values += ','.join(str(v) for v in antibody.values()) + '\n'
         return bytes(fields + '\n' + values, 'utf-8')
 
@@ -120,17 +128,15 @@ class TestPostCSVFile(AntibodyTesting):
 
     def test_antibody_count_in_database_should_increase_when_sending_several_csvs(
         self, initial_antibodies_count, response_to_two_csv_files,
-        final_antibodies_count, antibody_data_multiple,
-        antibody_data_multiple_again
+        final_antibodies_count, antibody_data_multiple_once,
+        antibody_data_multiple_twice
     ): # pylint: disable=too-many-arguments
         """When sending two CSV files successfully, antibody count should increase"""
-        print(len(antibody_data_multiple['antibody']))
-        print(len(antibody_data_multiple_again['antibody']))
         assert (
             final_antibodies_count
         ) >= (
-            len(antibody_data_multiple['antibody']) +
-            len(antibody_data_multiple_again['antibody'])
+            len(antibody_data_multiple_once['antibody']) +
+            len(antibody_data_multiple_twice['antibody'])
         )
 
     def test_post_csv_file_should_return_406_if_weird_csv_file_was_sent(

@@ -53,7 +53,14 @@ def antibody_data_multiple():
     return {'antibody': antibodies}
 
 @pytest.fixture(scope='class')
-def antibody_data_multiple_again():
+def antibody_data_multiple_once():
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        antibodies.append(raw_antibody_data())
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
+def antibody_data_multiple_twice():
     antibodies = []
     for _ in range(random.randint(2,8)):
         antibodies.append(raw_antibody_data())
