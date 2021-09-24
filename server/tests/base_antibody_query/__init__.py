@@ -1,7 +1,7 @@
 def base_antibody_query():
     return '''
 SELECT 
-    a.avr_url, a.protocols_io_doi,
+    a.protocols_io_doi,
     a.uniprot_accession_number,
     a.target_name, a.rrid,
     a.antibody_name, a.host_organism,

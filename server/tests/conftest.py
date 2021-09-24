@@ -18,7 +18,6 @@ def pytest_runtest_makereport(item, call): # pylint: disable=unused-argument
 def raw_antibody_data():
     faker = Faker()
     return {
-        'avr_url': faker.uri(),
         'protocols_io_doi': faker.uri(),
         'uniprot_accession_number': faker.uuid4(),
         'target_name': faker.first_name(),
