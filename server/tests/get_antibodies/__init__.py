@@ -17,5 +17,6 @@ class TestGetAntibodies:
     ):
         """GET /antibodies should return expected fields"""
         received_antibody = json.loads(response.data)['antibodies'][-1]
-        del received_antibody['antibody_uuid']
-        assert antibody_data['antibody'] == received_antibody
+        expected_data = { k: v for k, v in received_antibody.items() if k != 'antibody_uuid' }
+        sent_data = { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
+        assert sent_data == expected_data

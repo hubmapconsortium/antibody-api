@@ -21,6 +21,14 @@ class AntibodyTesting:
             return None
 
     @pytest.fixture
+    def last_antibody_uuid(self, cursor):
+        cursor.execute('SELECT antibody_uuid FROM antibodies ORDER BY id DESC LIMIT 1')
+        try:
+            return cursor.fetchone()[0]
+        except TypeError:
+            return None
+
+    @pytest.fixture
     def last_vendor_data(self, cursor):
         cursor.execute('SELECT name FROM vendors ORDER BY id DESC LIMIT 1')
         try:

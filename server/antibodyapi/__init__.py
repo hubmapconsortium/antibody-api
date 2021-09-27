@@ -1,5 +1,6 @@
 import csv
 import os
+import requests
 from flask import Flask, abort, jsonify, make_response, request, render_template
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
@@ -8,6 +9,17 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # pylint: disable=no-name-in-module
 from psycopg2.errors import UniqueViolation
 from . import default_config
+
+def get_hubmap_uuid():
+    r = requests.post(
+        'http://uuidmock/hmuuid',
+        headers={
+            'Content-Type': 'application/json',
+            'authorization': request.headers.get('authorization')
+        },
+        json={'entity_type': 'AVR'}
+    )
+    return r.json()[0]['uuid']
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -81,9 +93,6 @@ VALUES (
     %(group_uuid)s
 ) RETURNING id
 '''
-
-def get_hubmap_uuid():
-    return 'd56cd6bf9221d7dfa8ca336080c27a64'
 
 def create_app(testing=False):
     app = Flask(__name__, instance_relative_config=True)

@@ -3,6 +3,7 @@ import psycopg2
 import pytest
 from faker import Faker
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from uuid import uuid4
 from antibodyapi import create_app
 
 @pytest.hookimpl(hookwrapper=True)
@@ -18,6 +19,7 @@ def pytest_runtest_makereport(item, call): # pylint: disable=unused-argument
 def raw_antibody_data():
     faker = Faker()
     return {
+        '_antibody_uuid': str(uuid4()),
         'protocols_io_doi': faker.uri(),
         'uniprot_accession_number': faker.uuid4(),
         'target_name': faker.first_name(),
@@ -103,9 +105,11 @@ def flask_app():
 
 @pytest.fixture(scope='session')
 def headers(mimetype):
+    faker = Faker()
     return {
         'Content-Type': mimetype,
-        'Accept': mimetype
+        'Accept': mimetype,
+        'authorization': 'Bearer %s,1,2' % (faker.uuid4(),)
     }
 
 @pytest.fixture(scope='session')

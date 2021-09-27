@@ -113,20 +113,13 @@ class TestPostCSVFile(AntibodyTesting):
     def weird_csv_file(self):
         return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
 
-    def test_post_csv_file_should_save_antibodies_with_uuids(
-        self, response, antibody_data_multiple, cursor
-    ):
-        assert self.antibody_uuid(
-            cursor,
-            antibody_data_multiple['antibody'][-1]['antibody_name']
-        ) == 'd56cd6bf-9221-d7df-a8ca-336080c27a64'
-
     def test_post_csv_file_should_save_antibodies_correctly(
         self, response, antibody_data_multiple, cursor
     ):
         """Posting a CSV file should save antibodies correctly"""
+        sent_data = { k: v for k, v in antibody_data_multiple['antibody'][-1].items() if k[0] != '_' }
         assert tuple(
-            antibody_data_multiple['antibody'][-1].values()
+            sent_data.values()
         ) == self.last_antibody(cursor)
 
     def test_post_csv_file_should_return_a_204_response(self, response):

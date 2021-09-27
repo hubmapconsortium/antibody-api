@@ -5,18 +5,15 @@
       "method": "POST",
       "path": "/hmuuid",
       "headers": {
-        "authorization": ["^Bearer [A-Z0-9]+$"]
+        "?authorization": ["^Bearer [-A-Z0-9,]+$"]
       },
       "body": {
-        "contentType": "application/json",
-        "regex": "\\{\\s?entity_type:\\s?'.*'\\s?\\}"
+        "entity_type": "AVR"
       }
     },
-    "httpResponse": {
-      "body": {
-        "contentType": "application/json",
-        "json": "[ { uuid: 'd56cd6bf9221d7dfa8ca336080c27a64', hubmap_base_id: '972KSRG573', hubmap_id: 'HBM972.KSRG.573' } ]"
-      }
+    "httpResponseTemplate": {
+      "template": "return { headers: { contentType: [ 'application/json' ] }, body: JSON.stringify([{ uuid: request.headers[\"authorization\"][0].split(' ')[1].split(',')[0], hubmap_base_id: request.headers[\"authorization\"][0].split(' ')[1].split(',')[1], hubmap_id: request.headers[\"authorization\"][0].split(' ')[1].split(',')[2] }]) };",
+      "templateType": "JAVASCRIPT"
     }
   },
   {
