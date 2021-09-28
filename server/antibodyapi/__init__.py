@@ -1,7 +1,7 @@
 import csv
 import os
 import requests
-from flask import Flask, abort, jsonify, make_response, request, render_template
+from flask import Flask, abort, g, jsonify, make_response, request, render_template
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -201,6 +201,12 @@ def create_app(testing=False):
         except UniqueViolation:
             abort(json_error('Antibody not unique', 406))
         return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
+
+    @app.teardown_appcontext
+    def close_db(error): # pylint: disable=unused-argument
+        if 'connection' in g:
+            g.connection.close()
+
     return app
 
 def json_error(message, error_code):
@@ -215,14 +221,17 @@ def find_or_create_vendor(cursor, name):
         return cursor.fetchone()[0]
 
 def get_cursor(app):
-    conn = psycopg2.connect(
-        dbname=app.config['DATABASE_NAME'],
-        user=app.config['DATABASE_USER'],
-        password=app.config['DATABASE_PASSWORD'],
-        host=app.config['DATABASE_HOST']
-    )
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    return conn.cursor()
+    if 'connection' not in g:
+        conn = psycopg2.connect(
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
+        )
+        g.connection = conn # pylint: disable=assigning-non-slot
+
+    g.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    return g.connection.cursor()
 
 def get_hubmap_uuid(uuid_api_url):
     req = requests.post(
