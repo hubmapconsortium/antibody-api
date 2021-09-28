@@ -1,9 +1,9 @@
 import random
+from uuid import uuid4
 import psycopg2
 import pytest
 from faker import Faker
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from uuid import uuid4
 from antibodyapi import create_app
 
 @pytest.hookimpl(hookwrapper=True)

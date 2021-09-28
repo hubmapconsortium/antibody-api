@@ -117,7 +117,9 @@ class TestPostCSVFile(AntibodyTesting):
         self, response, antibody_data_multiple, cursor
     ):
         """Posting a CSV file should save antibodies correctly"""
-        sent_data = { k: v for k, v in antibody_data_multiple['antibody'][-1].items() if k[0] != '_' }
+        sent_data = {
+            k: v for k, v in antibody_data_multiple['antibody'][-1].items() if k[0] != '_'
+        }
         assert tuple(
             sent_data.values()
         ) == self.last_antibody(cursor)

@@ -11,7 +11,7 @@ from psycopg2.errors import UniqueViolation
 from . import default_config
 
 def get_hubmap_uuid():
-    r = requests.post(
+    req = requests.post(
         'http://uuidmock/hmuuid',
         headers={
             'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ def get_hubmap_uuid():
         },
         json={'entity_type': 'AVR'}
     )
-    return r.json()[0]['uuid']
+    return req.json()[0]['uuid']
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'csv'}

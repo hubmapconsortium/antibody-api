@@ -20,8 +20,14 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
 
     @pytest.fixture
     def response(self, client, antibody_data, headers, initial_antibodies_count):
-        data_to_send = { 'antibody': { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' } }
-        headers_to_send = headers | { 'authorization': 'Bearer %s,%s,%s' % (antibody_data['antibody']['_antibody_uuid'],1,1) }
+        data_to_send = {
+            'antibody': { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
+        }
+        headers_to_send = headers | {
+            'authorization': 'Bearer %s,%s,%s' % (
+                antibody_data['antibody']['_antibody_uuid'], 1, 1
+            )
+        }
         return client.post('/antibodies', data=json.dumps(data_to_send), headers=headers_to_send)
 
     def test_should_return_a_201_response(self, response):
