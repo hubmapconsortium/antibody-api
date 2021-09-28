@@ -230,7 +230,6 @@ def get_cursor(app):
         )
         g.connection = conn # pylint: disable=assigning-non-slot
         g.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    
     return g.connection.cursor()
 
 def get_hubmap_uuid(uuid_api_url):

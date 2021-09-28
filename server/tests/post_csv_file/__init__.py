@@ -1,6 +1,7 @@
 import io
 import json
 import pytest
+import requests
 from antibody_testing import AntibodyTesting
 from base_antibody_query import base_antibody_query, base_antibody_query_without_antibody_uuid
 
@@ -23,8 +24,59 @@ class TestPostCSVFile(AntibodyTesting):
         )
         return cursor.fetchone()[0]
 
+    @classmethod
+    def create_expectation(cls, flask_app, headers, antibody, idx):
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['UUID_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'POST',
+                    'path': '/hmuuid',
+                    'headers': {
+                        'authorization': [ headers['authorization'] ]
+                    },
+                    'body': {
+                        'entity_type': 'AVR'
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps([
+                            {
+                                'uuid': antibody['_antibody_uuid'],
+                                'hubmap_base_id': 2,
+                                'hubmap_id': 2
+                            }
+                        ])
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                },
+                'priority': 1000-idx
+            }
+        )
+
     @pytest.fixture
-    def response(self, client, headers, request_data):
+    def create_expectations(self, flask_app, headers, antibody_data_multiple):
+        for idx, antibody in enumerate(antibody_data_multiple['antibody']):
+            self.create_expectation(flask_app, headers, antibody, idx)
+
+    @pytest.fixture
+    def create_expectations_for_several_csv_files(
+        self, flask_app, headers,
+        antibody_data_multiple_once, antibody_data_multiple_twice
+    ):
+        for idx, antibody in enumerate(
+            antibody_data_multiple_once['antibody'] +
+            antibody_data_multiple_twice['antibody']
+        ):
+            self.create_expectation(flask_app, headers, antibody, idx)
+
+    @pytest.fixture
+    def response(self, client, headers, request_data, create_expectations):
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -33,7 +85,10 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
-    def response_to_two_csv_files(self, client, headers, request_data_two_csv_files):
+    def response_to_two_csv_files(
+        self, client, headers, request_data_two_csv_files,
+        create_expectations_for_several_csv_files
+    ):
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -129,8 +184,8 @@ class TestPostCSVFile(AntibodyTesting):
         assert response.status == '204 NO CONTENT'
 
     def test_antibody_count_in_database_should_increase(
-        self, initial_antibodies_count, response, final_antibodies_count,
-        antibody_data_multiple
+        self, initial_antibodies_count, response,
+        final_antibodies_count, antibody_data_multiple
     ):
         """When sending a CSV file successfully, antibody count should increase"""
         assert (
