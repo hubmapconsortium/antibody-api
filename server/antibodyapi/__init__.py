@@ -10,9 +10,9 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.errors import UniqueViolation
 from . import default_config
 
-def get_hubmap_uuid():
+def get_hubmap_uuid(uuid_api_url):
     req = requests.post(
-        'http://uuidmock/hmuuid',
+        '%s/hmuuid' % (uuid_api_url,),
         headers={
             'Content-Type': 'application/json',
             'authorization': request.headers.get('authorization')
@@ -136,7 +136,7 @@ def create_app(testing=False):
                         except KeyError:
                             abort(json_error('CSV fields are wrong', 406))
                         del row['vendor']
-                        row['antibody_uuid'] = get_hubmap_uuid()
+                        row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
                         try:
                             cur.execute(insert_query(), row)
                         except KeyError:
@@ -227,7 +227,7 @@ def create_app(testing=False):
         cur = conn.cursor()
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
-        antibody['antibody_uuid'] = get_hubmap_uuid()
+        antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:

@@ -31,3 +31,5 @@ class DefaultConfig:
     SECRET_KEY = 'should-be-overridden'
     APP_CLIENT_ID = 'should-be-overridden'
     APP_CLIENT_SECRET = 'should-be-overridden'
+
+    UUID_API_URL = 'http://uuidmock'
