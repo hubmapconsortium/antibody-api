@@ -41,10 +41,10 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         assert (initial_antibodies_count + 1) == final_antibodies_count
 
     def test_api_should_return_created_id_in_json_format(
-        self, response, last_antibody_id
+        self, response, last_antibody_id, last_antibody_uuid
     ):
         """POST /antibodies with a full JSON body should return id in JSON format"""
-        assert json.loads(response.data) == {'id': last_antibody_id}
+        assert json.loads(response.data) == {'id': last_antibody_id, 'uuid': last_antibody_uuid}
 
     def test_all_antibody_fields_are_saved_correctly(
         self, response, antibody_data, last_antibody_data

@@ -10,17 +10,6 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.errors import UniqueViolation
 from . import default_config
 
-def get_hubmap_uuid(uuid_api_url):
-    req = requests.post(
-        '%s/hmuuid' % (uuid_api_url,),
-        headers={
-            'Content-Type': 'application/json',
-            'authorization': request.headers.get('authorization')
-        },
-        json={'entity_type': 'AVR'}
-    )
-    return req.json()[0]['uuid']
-
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -113,14 +102,7 @@ def create_app(testing=False):
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
 
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
+        cur = get_cursor(app)
 
         for file in request.files.getlist('file'):
             if file.filename == '':
@@ -149,14 +131,7 @@ def create_app(testing=False):
 
     @app.route('/antibodies', methods=['GET'])
     def list_antibodies():
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
+        cur = get_cursor(app)
         cur.execute(base_antibody_query() + ' ORDER BY a.id ASC')
         results = []
         for antibody in cur:
@@ -217,14 +192,7 @@ def create_app(testing=False):
                     )
                 )
 
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
+        cur = get_cursor(app)
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
         antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
@@ -232,7 +200,7 @@ def create_app(testing=False):
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
             abort(json_error('Antibody not unique', 406))
-        return make_response(jsonify(id=cur.fetchone()[0]), 201)
+        return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
     return app
 
 def json_error(message, error_code):
@@ -245,3 +213,24 @@ def find_or_create_vendor(cursor, name):
     except TypeError:
         cursor.execute('INSERT INTO vendors (name) VALUES (%s) RETURNING id', (name,))
         return cursor.fetchone()[0]
+
+def get_cursor(app):
+    conn = psycopg2.connect(
+        dbname=app.config['DATABASE_NAME'],
+        user=app.config['DATABASE_USER'],
+        password=app.config['DATABASE_PASSWORD'],
+        host=app.config['DATABASE_HOST']
+    )
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    return conn.cursor()
+
+def get_hubmap_uuid(uuid_api_url):
+    req = requests.post(
+        '%s/hmuuid' % (uuid_api_url,),
+        headers={
+            'Content-Type': 'application/json',
+            'authorization': request.headers.get('authorization')
+        },
+        json={'entity_type': 'AVR'}
+    )
+    return req.json()[0]['uuid']
