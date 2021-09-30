@@ -18,6 +18,17 @@ services:
         aliases:
           - ingestmock
           - uuidmock
+  uuidserver:
+    build:
+      context: .
+      dockerfile: DockerfileUUIDServer
+    command: "ruby /app/uuid.rb"
+    networks:
+      default:
+        aliases:
+          - ingestserver
+    volumes:
+      - ./uuidserver:/app
   web:
     build:
       args:
@@ -27,6 +38,7 @@ services:
     depends_on:
       - db
       - mockserver
+      - uuidserver
     environment:
         - FLASK_APP=antibodyapi
         - FLASK_ENV=development
