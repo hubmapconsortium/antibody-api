@@ -3,7 +3,7 @@ import pytest
 from antibody_testing import AntibodyTesting
 
 class TestGetAntibodies(AntibodyTesting):
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use, unused-argument
     @pytest.fixture(scope='class')
     def create_uuid_expectation(self, flask_app, headers, antibody_data):
         self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)

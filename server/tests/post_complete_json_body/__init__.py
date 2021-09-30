@@ -3,7 +3,7 @@ import pytest
 from antibody_testing import AntibodyTesting
 
 class TestPostWithCompleteJSONBody(AntibodyTesting):
-    # pylint: disable=no-self-use, unused-argument
+    # pylint: disable=no-self-use, unused-argument, too-many-arguments
     @pytest.fixture
     def add_vendor(self, cursor, antibody_data):
         cursor.execute(
