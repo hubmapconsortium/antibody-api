@@ -17,6 +17,8 @@ END$$;
 CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "id" serial,
     "antibody_uuid" uuid NOT NULL,
+    "avr_filename" text,
+    "avr_uuid" uuid,
     "protocols_io_doi" text NOT NULL,
     "uniprot_accession_number" text NOT NULL,
     "target_name" text NOT NULL,

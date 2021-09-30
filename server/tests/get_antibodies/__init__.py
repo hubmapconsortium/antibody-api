@@ -1,10 +1,15 @@
 import json
 import pytest
+from antibody_testing import AntibodyTesting
 
-class TestGetAntibodies:
+class TestGetAntibodies(AntibodyTesting):
     # pylint: disable=no-self-use
     @pytest.fixture(scope='class')
-    def response(self, client, headers, antibody_data):
+    def create_uuid_expectation(self, flask_app, headers, antibody_data):
+        self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)
+
+    @pytest.fixture(scope='class')
+    def response(self, client, headers, antibody_data, create_uuid_expectation):
         client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
         return client.get('/antibodies', headers=headers)
 

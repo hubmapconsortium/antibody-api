@@ -25,30 +25,42 @@ class TestPostCSVFile(AntibodyTesting):
         return cursor.fetchone()[0]
 
     @classmethod
-    def create_expectation(cls, flask_app, headers, antibody, idx):
+    def get_antibody_file_name(cls, cursor, uuid):
+        cursor.execute(
+            'SELECT avr_filename FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
+            { 'antibody_uuid': uuid }
+        )
+        try:
+            avr_filename = cursor.fetchone()[0]
+        except: # pylint: disable=bare-except
+            avr_filename = None
+        return avr_filename
+
+    @classmethod
+    def get_antibody_file_uuid(cls, cursor, uuid):
+        cursor.execute(
+            'SELECT avr_uuid FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
+            { 'antibody_uuid': uuid }
+        )
+        return cursor.fetchone()[0]
+
+    @classmethod
+    def create_file_expectation(cls, flask_app, headers, antibody, idx):
         requests.put(
-            '%s/mockserver/expectation' % (flask_app.config['UUID_API_URL'],),
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
             json={
                 'httpRequest': {
                     'method': 'POST',
-                    'path': '/hmuuid',
+                    'path': '/file-upload',
                     'headers': {
-                        'authorization': [ headers['authorization'] ]
-                    },
-                    'body': {
-                        'entity_type': 'AVR'
+                        'authorization': [ headers['authorization'] ],
+                        'Content-Type': [ 'multipart/form-data' ]
                     }
                 },
                 'httpResponse': {
                     'body': {
                         'contentType': 'application/json',
-                        'json': json.dumps([
-                            {
-                                'uuid': antibody['_antibody_uuid'],
-                                'hubmap_base_id': 2,
-                                'hubmap_id': 2
-                            }
-                        ])
+                        'json': json.dumps({'temp_file_id': 'temp_file_id'})
                     }
                 },
                 'times': {
@@ -58,6 +70,42 @@ class TestPostCSVFile(AntibodyTesting):
                 'priority': 1000-idx
             }
         )
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'POST',
+                    'path': '/file-commit',
+                    'headers': {
+                        'authorization': [ headers['authorization'] ],
+                        'Content-Type': [ 'application/json' ]
+                    },
+                    'body': {
+                        'entity_uuid': antibody['_antibody_uuid'],
+                        'temp_file_id': 'temp_file_id',
+                        'user_token': headers['authorization'].split()[-1]
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps([{
+                            'file_uuid': antibody['_pdf_uuid'],
+                            'filename': antibody['avr_filename']
+                        }])
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                },
+                'priority': 1000-idx
+            }
+        )
+
+    @classmethod
+    def create_pdf(cls):
+        return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
 
     @pytest.fixture
     def create_expectations(self, flask_app, headers, antibody_data_multiple):
@@ -74,6 +122,14 @@ class TestPostCSVFile(AntibodyTesting):
             antibody_data_multiple_twice['antibody']
         ):
             self.create_expectation(flask_app, headers, antibody, idx)
+
+    @pytest.fixture
+    def create_expectations_for_several_pdf_files(
+        self, flask_app, headers, antibody_data_multiple_with_pdfs
+    ):
+        for idx, antibody in enumerate(antibody_data_multiple_with_pdfs['antibody']):
+            self.create_expectation(flask_app, headers, antibody, idx)
+            self.create_file_expectation(flask_app, headers, antibody, idx)
 
     @pytest.fixture
     def response(self, client, headers, request_data, create_expectations):
@@ -93,6 +149,18 @@ class TestPostCSVFile(AntibodyTesting):
             '/antibodies/import',
             content_type='multipart/form-data',
             data=request_data_two_csv_files,
+            headers=headers
+        )
+
+    @pytest.fixture
+    def response_to_csv_and_pdfs( # pylint: disable=too-many-arguments
+        self, client, headers, request_data_with_pdfs,
+        create_expectations_for_several_pdf_files
+    ):
+        yield client.post(
+            '/antibodies/import',
+            content_type='multipart/form-data',
+            data=request_data_with_pdfs,
             headers=headers
         )
 
@@ -141,6 +209,33 @@ class TestPostCSVFile(AntibodyTesting):
         }
 
     @pytest.fixture
+    def request_data_with_pdfs(
+        self, antibody_data_multiple_with_pdfs, csv_file_with_random_avr_filenames
+    ):
+        data = {'file': (io.BytesIO(csv_file_with_random_avr_filenames), 'antibodies.csv')}
+        pdf_files = []
+        for antibody in antibody_data_multiple_with_pdfs['antibody']:
+            pdf_files.append((io.BytesIO(self.create_pdf()), antibody['avr_filename']))
+        data['pdf'] = pdf_files
+        return data
+
+    @pytest.fixture
+    def csv_file_with_random_avr_filenames(self, antibody_data_multiple_with_pdfs):
+        relevant_keys = []
+        for k in antibody_data_multiple_with_pdfs['antibody'][0].keys():
+            if k[0] != '_':
+                relevant_keys.append(k)
+        fields = ','.join(relevant_keys)
+        values = ''
+        for antibody in antibody_data_multiple_with_pdfs['antibody']:
+            relevant_values = []
+            for k, val in antibody.items():
+                if k[0] != '_':
+                    relevant_values.append(val)
+            values += ','.join(str(v) for v in relevant_values) + '\n'
+        return bytes(fields + '\n' + values, 'utf-8')
+
+    @pytest.fixture
     def csv_file(self, antibody_data_multiple):
         fields = ','.join(antibody_data_multiple['antibody'][0].keys())
         values = ''
@@ -167,6 +262,18 @@ class TestPostCSVFile(AntibodyTesting):
     @pytest.fixture
     def weird_csv_file(self):
         return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
+
+    def test_post_csv_file_with_pdf_should_save_those_correctly(
+        self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor
+    ):
+        """ Posting PDF files should get them saved"""
+        for antibody in antibody_data_multiple_with_pdfs['antibody']:
+            assert antibody['avr_filename'] == self.get_antibody_file_name(
+                cursor, antibody['_antibody_uuid']
+            )
+            assert antibody['_pdf_uuid'] == self.get_antibody_file_uuid(
+                cursor, antibody['_antibody_uuid']
+            )
 
     def test_post_csv_file_should_save_antibodies_correctly(
         self, response, antibody_data_multiple, cursor

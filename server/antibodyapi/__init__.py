@@ -83,6 +83,58 @@ VALUES (
 ) RETURNING id
 '''
 
+def insert_query_with_avr_file_and_uuid():
+    return '''
+INSERT INTO antibodies (
+    antibody_uuid,
+    avr_uuid,
+    avr_filename,
+    protocols_io_doi,
+    uniprot_accession_number,
+    target_name,
+    rrid,
+    antibody_name,
+    host_organism,
+    clonality,
+    vendor_id,
+    catalog_number,
+    lot_number,
+    recombinant,
+    organ_or_tissue,
+    hubmap_platform,
+    submitter_orciid,
+    created_timestamp,
+    created_by_user_displayname,
+    created_by_user_email,
+    created_by_user_sub,
+    group_uuid
+) 
+VALUES (
+    %(antibody_uuid)s,
+    %(avr_uuid)s,
+    %(avr_filename)s,
+    %(protocols_io_doi)s,
+    %(uniprot_accession_number)s,
+    %(target_name)s,
+    %(rrid)s,
+    %(antibody_name)s,
+    %(host_organism)s,
+    %(clonality)s,
+    %(vendor_id)s,
+    %(catalog_number)s,
+    %(lot_number)s,
+    %(recombinant)s,
+    %(organ_or_tissue)s,
+    %(hubmap_platform)s,
+    %(submitter_orciid)s,
+    EXTRACT(epoch FROM NOW()),
+    %(created_by_user_displayname)s,
+    %(created_by_user_email)s,
+    %(created_by_user_sub)s,
+    %(group_uuid)s
+) RETURNING id
+'''
+
 def create_app(testing=False):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(default_config.DefaultConfig)
@@ -98,7 +150,7 @@ def create_app(testing=False):
         return render_template('pages/base.html', test_var='hello, world!')
 
     @app.route('/antibodies/import', methods=['POST'])
-    def import_antibodies():
+    def import_antibodies(): # pylint: disable=too-many-branches
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
 
@@ -119,8 +171,20 @@ def create_app(testing=False):
                             abort(json_error('CSV fields are wrong', 406))
                         del row['vendor']
                         row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+                        query = insert_query()
+                        if 'avr_filename' in row.keys():
+                            if 'pdf' in request.files:
+                                for avr_file in request.files.getlist('pdf'):
+                                    if avr_file.filename == row['avr_filename']:
+                                        row['avr_uuid'] = get_file_uuid(
+                                            app.config['INGEST_API_URL'],
+                                            app.config['UPLOAD_FOLDER'],
+                                            row['antibody_uuid'],
+                                            avr_file
+                                        )
+                                        query = insert_query_with_avr_file_and_uuid()
                         try:
-                            cur.execute(insert_query(), row)
+                            cur.execute(query, row)
                         except KeyError:
                             abort(json_error('CSV fields are wrong', 406))
                         except UniqueViolation:
@@ -242,3 +306,39 @@ def get_hubmap_uuid(uuid_api_url):
         json={'entity_type': 'AVR'}
     )
     return req.json()[0]['uuid']
+
+def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(upload_folder, filename))
+    req = requests.post(
+        '%s/file-upload' % (ingest_api_url,),
+        headers={
+            'Content-Type': 'multipart/form-data',
+            'authorization': request.headers.get('authorization')
+        },
+        files={'file':
+            (
+                file.filename,
+                open(os.path.join(upload_folder, filename)),
+                'application/pdf'
+            )
+        }
+    )
+    temp_file_id = req.json()['temp_file_id']
+
+    req2 = requests.post(
+        '%s/file-commit' % (ingest_api_url,),
+        headers={
+            'authorization': request.headers.get('authorization')
+        },
+        json={
+            'entity_uuid': antibody_uuid,
+            'temp_file_id': temp_file_id,
+            'user_token': request.headers.get('authorization').split()[-1]
+        }
+    )
+    try:
+        file_uuid = req2.json()[0]['file_uuid']
+    except: # pylint: disable=bare-except
+        file_uuid = None
+    return file_uuid

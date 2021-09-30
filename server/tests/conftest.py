@@ -54,6 +54,18 @@ def antibody_data_multiple():
     return {'antibody': antibodies}
 
 @pytest.fixture(scope='class')
+def antibody_data_multiple_with_pdfs():
+    faker = Faker()
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        pdf_data = {
+            'avr_filename': faker.file_name(extension='pdf'),
+            '_pdf_uuid': str(uuid4())
+        }
+        antibodies.append(raw_antibody_data() | pdf_data)
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
 def antibody_data_multiple_once():
     antibodies = []
     for _ in range(random.randint(2,8)):
@@ -110,7 +122,7 @@ def headers(mimetype):
     return {
         'Content-Type': mimetype,
         'Accept': mimetype,
-        'authorization': 'Bearer %s,1,2' % (faker.uuid4(),)
+        'authorization': 'Bearer %s' % (faker.uuid4(),)
     }
 
 @pytest.fixture(scope='session')

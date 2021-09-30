@@ -1,4 +1,6 @@
+import json
 import pytest
+import requests
 from base_antibody_query import base_antibody_query_without_antibody_uuid
 
 class AntibodyTesting:
@@ -61,3 +63,38 @@ class AntibodyTesting:
     def get_vendors_count(cls, cursor):
         cursor.execute('SELECT COUNT(*) AS count FROM vendors')
         return cursor.fetchone()[0]
+
+    @classmethod
+    def create_expectation(cls, flask_app, headers, antibody, idx):
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['UUID_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'POST',
+                    'path': '/hmuuid',
+                    'headers': {
+                        'authorization': [ headers['authorization'] ]
+                    },
+                    'body': {
+                        'entity_type': 'AVR'
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps([
+                            {
+                                'uuid': antibody['_antibody_uuid'],
+                                'hubmap_base_id': 2,
+                                'hubmap_id': 2
+                            }
+                        ])
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                },
+                'priority': 1000-idx
+            }
+        )
