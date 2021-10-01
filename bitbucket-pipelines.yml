@@ -17,6 +17,7 @@ pipelines:
             - pip install -e .
             - pytest -v
           services:
+            - mockserver
             - postgres
 definitions:
   services:
@@ -26,3 +27,11 @@ definitions:
         POSTGRES_DB: antibodydb_test
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: password
+    mockserver:
+      command: -serverPort 80
+      image: mockserver/mockserver
+      networks:
+        default:
+          aliases:
+            - ingestmock
+            - uuidmock
