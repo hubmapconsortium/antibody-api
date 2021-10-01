@@ -313,13 +313,12 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     req = requests.post(
         '%s/file-upload' % (ingest_api_url,),
         headers={
-            'Content-Type': 'multipart/form-data',
             'authorization': request.headers.get('authorization')
         },
         files={'file':
             (
                 file.filename,
-                open(os.path.join(upload_folder, filename)),
+                open(os.path.join(upload_folder, filename), 'rb'),
                 'application/pdf'
             )
         }
@@ -337,8 +336,4 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
             'user_token': request.headers.get('authorization').split()[-1]
         }
     )
-    try:
-        file_uuid = req2.json()[0]['file_uuid']
-    except: # pylint: disable=bare-except
-        file_uuid = None
-    return file_uuid
+    return req2.json()['file_uuid']
