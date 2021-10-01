@@ -17,13 +17,9 @@ pipelines:
             - pip install -e .
             - pytest -v
           services:
-            - ingestmock
-            - postgres
             - uuidmock
 definitions:
   services:
-    ingestmock:
-      image: mockserver/mockserver
     postgres:
       image: postgres
       environment:

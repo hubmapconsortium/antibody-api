@@ -33,4 +33,4 @@ class DefaultConfig:
     APP_CLIENT_SECRET = 'should-be-overridden'
 
     UUID_API_URL = 'http://uuidmock:1080'
-    INGEST_API_URL = 'http://ingestmock:1080'
+    INGEST_API_URL = 'http://uuidmock:1080'
