@@ -17,6 +17,7 @@ pipelines:
             - pip install -e .
             - pytest -v
           services:
+            - postgres
             - uuidmock
 definitions:
   services:
