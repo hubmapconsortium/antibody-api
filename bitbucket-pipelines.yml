@@ -17,21 +17,20 @@ pipelines:
             - pip install -e .
             - pytest -v
           services:
-            - mockserver
+            - ingestmock
             - postgres
+            - uuidmock
 definitions:
   services:
+    ingestmock:
+      command: -serverPort 80
+      image: mockserver/mockserver
     postgres:
       image: postgres
       environment:
         POSTGRES_DB: antibodydb_test
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: password
-    mockserver:
+    uuidmock:
       command: -serverPort 80
       image: mockserver/mockserver
-      networks:
-        default:
-          aliases:
-            - ingestmock
-            - uuidmock
