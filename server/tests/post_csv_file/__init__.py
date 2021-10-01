@@ -54,7 +54,7 @@ class TestPostCSVFile(AntibodyTesting):
                     'path': '/file-upload',
                     'headers': {
                         'authorization': [ headers['authorization'] ],
-                        'Content-Type': [ 'multipart/form-data' ]
+                        'Content-Type': [ '^multipart/form-data; boundary=.+?$' ]
                     }
                 },
                 'httpResponse': {
@@ -89,10 +89,10 @@ class TestPostCSVFile(AntibodyTesting):
                 'httpResponse': {
                     'body': {
                         'contentType': 'application/json',
-                        'json': json.dumps([{
+                        'json': json.dumps({
                             'file_uuid': antibody['_pdf_uuid'],
                             'filename': antibody['avr_filename']
-                        }])
+                        })
                     }
                 },
                 'times': {
