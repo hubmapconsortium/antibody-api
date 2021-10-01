@@ -16,7 +16,7 @@
           <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
         </div>
         <div class="lg:w-1/2 md:w-2/3 mx-auto">
-          <form enctype="multipart/form-data" action="/antibodies/import" method="post">
+          <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post">
           <div class="flex flex-wrap -m-2">
             <div class="p-2 w-full">
               <div class="relative">
@@ -29,7 +29,7 @@
                 <section class="flex flex-col w-full h-full p-1 overflow-auto">
                   <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
                   <header class="flex flex-col items-center justify-center py-12 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
-                    <input accept="application/pdf" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" required="">Upload a file</input>
+                    <input accept="pdf" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" >Upload a file</input>
                   </header>
                 </section>
               </div>
@@ -47,5 +47,36 @@
       </div>
     </div>
   </section>
+  <script type="text/javascript">
+"use strict";
+
+function ajaxSuccess () {
+  alert(JSON.parse(this.responseText).message);
+}
+
+function AJAXSubmit (oFormElement) {
+  if (!oFormElement.action) { return; }
+  var oReq = new XMLHttpRequest();
+  oReq.onload = ajaxSuccess;
+  if (oFormElement.method.toLowerCase() === "post") {
+    oReq.open("post", oFormElement.action, true);
+    oReq.send(new FormData(oFormElement));
+  } else {
+    var oField, sFieldType, nFile, sSearch = "";
+    for (var nItem = 0; nItem < oFormElement.elements.length; nItem++) {
+      oField = oFormElement.elements[nItem];
+      if (!oField.hasAttribute("name")) { continue; }
+      sFieldType = oField.nodeName.toUpperCase() === "INPUT" ? oField.getAttribute("type").toUpperCase() : "TEXT";
+      if (sFieldType === "FILE") {
+        for (nFile = 0; nFile < oField.files.length; sSearch += "&" + escape(oField.name) + "=" + escape(oField.files[nFile++].name));
+      } else if ((sFieldType !== "RADIO" && sFieldType !== "CHECKBOX") || oField.checked) {
+        sSearch += "&" + escape(oField.name) + "=" + escape(oField.value);
+      }
+    }
+    oReq.open("get", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
+    oReq.send(null);
+  }
+}
+</script>
 </body>
 </html>
