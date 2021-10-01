@@ -17,14 +17,10 @@ pipelines:
             - pip install -e .
             - pytest -v
           services:
-            - ingestmock
             - postgres
             - uuidmock
 definitions:
   services:
-    ingestmock:
-      command: -serverPort 80
-      image: mockserver/mockserver
     postgres:
       image: postgres
       environment:
