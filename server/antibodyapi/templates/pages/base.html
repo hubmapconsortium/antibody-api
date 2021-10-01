@@ -1,15 +1,51 @@
 <!doctype html>
-<html>
+  <html>
   <head>
     <title>HUBMAP starter template</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
   </head>
 
   <body>
-    <h1>Welcome to HUBMAP</h1>
-    <p>This is the beginning of it all...</p>
-    <hr>
-    <p>Test var value: {{ test_var }}</p>
-  </body>
+    <section class="text-gray-600 body-font relative">
+      <div class="container px-5 py-24 mx-auto">
+        <div class="flex flex-col text-center w-full mb-12">
+          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
+          <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
+        </div>
+        <div class="lg:w-1/2 md:w-2/3 mx-auto">
+          <form enctype="multipart/form-data" action="/antibodies/import" method="post">
+          <div class="flex flex-wrap -m-2">
+            <div class="p-2 w-full">
+              <div class="relative">
+                <section class="flex flex-col w-full h-full p-1 overflow-auto">
+                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
+                  <header class="flex flex-col items-center justify-center py-12 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
+                    <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" required="">Upload a file</input>
+                  </header>
+                </section>
+                <section class="flex flex-col w-full h-full p-1 overflow-auto">
+                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
+                  <header class="flex flex-col items-center justify-center py-12 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
+                    <input accept="application/pdf" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" required="">Upload a file</input>
+                  </header>
+                </section>
+              </div>
+            </div>
+            <div class="p-2 w-full">
+              <button type="submit" class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Submit</button>
+            </div>
+          </form>
+          <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
+            <a class="text-indigo-500">development@nurelm.com</a>
+            <p class="leading-normal my-5">NuRelm
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
 </html>
