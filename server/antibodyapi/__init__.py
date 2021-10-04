@@ -155,6 +155,7 @@ def create_app(testing=False):
             abort(json_error('CSV file missing', 406))
 
         cur = get_cursor(app)
+        uuids_and_names = []
 
         for file in request.files.getlist('file'):
             if file.filename == '':
@@ -185,13 +186,17 @@ def create_app(testing=False):
                                         query = insert_query_with_avr_file_and_uuid()
                         try:
                             cur.execute(query, row)
+                            uuids_and_names.append({
+                                'antibody_name': row['antibody_name'],
+                                'antibody_uuid': row['antibody_uuid']
+                            })
                         except KeyError:
                             abort(json_error('CSV fields are wrong', 406))
                         except UniqueViolation:
                             abort(json_error('Antibody not unique', 406))
             else:
                 abort(json_error('Filetype forbidden', 406))
-        return ('', 204)
+        return make_response(jsonify(antibodies=uuids_and_names), 201)
 
     @app.route('/antibodies', methods=['GET'])
     def list_antibodies():

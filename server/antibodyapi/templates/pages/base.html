@@ -5,11 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <section class="text-gray-600 body-font relative">
+    <section class="text-gray-600 body-font relative" id="form-block">
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-col text-center w-full mb-12">
           <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
@@ -47,11 +47,54 @@
       </div>
     </div>
   </section>
+  <section class="text-gray-600 body-font relative hidden" id="upload-results-block">
+    <div class="container px-5 py-24 mx-auto">
+      <div class="flex flex-col text-center w-full mb-12">
+        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
+      </div>
+      <div class="lg:w-1/2 md:w-2/3 mx-auto" id="upload-results">
+      </div>
+      <button onClick="downloadCsv();">Download CSV</button>
+      <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
+        <a class="text-indigo-500">development@nurelm.com</a>
+        <p class="leading-normal my-5">NuRelm
+        </p>
+      </div>
+  </section>
   <script type="text/javascript">
 "use strict";
 
+var csv_content;
+
 function ajaxSuccess () {
-  alert(JSON.parse(this.responseText).message);
+  jQuery('#form-block').addClass('hidden');
+  jQuery('#upload-results-block').removeClass('hidden');
+  var response = this.responseText;
+  var jsonresponse = JSON.parse(response);
+  var responsetable = '<table>';
+  csv_content = "antibody_name,antibody_uuid\n";
+  jQuery.each(jsonresponse.antibodies, function(name, value) {
+    responsetable += '<tr>';
+    responsetable += '<td>';
+    responsetable += value.antibody_name;
+    responsetable += '</td>';
+    responsetable += '<td>';
+    responsetable += value.antibody_uuid;
+    responsetable += '</td>';
+    responsetable += '</tr>';
+    csv_content += value.antibody_name + ',' + value.antibody_uuid + '\n';
+  })
+  responsetable += '</table>';
+  jQuery('#upload-results').html(responsetable);
+}
+
+function downloadCsv () {
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_content);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'antibodies_created.csv';
+  hiddenElement.click();
 }
 
 function AJAXSubmit (oFormElement) {

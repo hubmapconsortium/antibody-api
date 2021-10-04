@@ -112,7 +112,7 @@ class TestPostCSVFile(AntibodyTesting):
         pdf.cell(40, 10, 'This is a PDF')
         return pdf.output(dest='S').encode('latin-1')
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def create_expectations(self, flask_app, headers, antibody_data_multiple):
         for idx, antibody in enumerate(antibody_data_multiple['antibody']):
             self.create_expectation(flask_app, headers, antibody, idx)
@@ -136,7 +136,7 @@ class TestPostCSVFile(AntibodyTesting):
             self.create_expectation(flask_app, headers, antibody, idx)
             self.create_file_expectation(flask_app, headers, antibody, idx)
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def response(self, client, headers, request_data, create_expectations):
         yield client.post(
             '/antibodies/import',
@@ -200,7 +200,7 @@ class TestPostCSVFile(AntibodyTesting):
             headers=headers
         )
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def request_data(self, csv_file):
         return {'file': (io.BytesIO(csv_file), 'antibodies.csv')}
 
@@ -240,7 +240,7 @@ class TestPostCSVFile(AntibodyTesting):
             values += ','.join(str(v) for v in relevant_values) + '\n'
         return bytes(fields + '\n' + values, 'utf-8')
 
-    @pytest.fixture
+    @pytest.fixture(scope='class')
     def csv_file(self, antibody_data_multiple):
         fields = ','.join(antibody_data_multiple['antibody'][0].keys())
         values = ''
@@ -268,17 +268,22 @@ class TestPostCSVFile(AntibodyTesting):
     def weird_csv_file(self):
         return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
 
-    def test_post_csv_file_with_pdf_should_save_those_correctly(
-        self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor
+    def test_post_csv_file_should_return_a_201_response(self, response):
+        """Sending a CSV file should return 201 CREATED if all goes well"""
+        assert response.status == '201 CREATED'
+
+    def test_post_csv_file_should_return_uuids_and_antibody_names(
+        self, response, antibody_data_multiple
     ):
-        """ Posting PDF files should get them saved"""
-        for antibody in antibody_data_multiple_with_pdfs['antibody']:
-            assert antibody['avr_filename'] == self.get_antibody_file_name(
-                cursor, antibody['_antibody_uuid']
-            )
-            assert antibody['_pdf_uuid'] == self.get_antibody_file_uuid(
-                cursor, antibody['_antibody_uuid']
-            )
+        uuid_and_name = []
+        for antibody in antibody_data_multiple['antibody']:
+            uuid_and_name.append({
+                'antibody_name': antibody['antibody_name'],
+                'antibody_uuid': antibody['_antibody_uuid']
+            })
+        assert(
+            { 'antibodies': uuid_and_name } == json.loads(response.data)
+        )
 
     def test_post_csv_file_should_save_antibodies_correctly(
         self, response, antibody_data_multiple, cursor
@@ -291,18 +296,17 @@ class TestPostCSVFile(AntibodyTesting):
             sent_data.values()
         ) == self.last_antibody(cursor)
 
-    def test_post_csv_file_should_return_a_204_response(self, response):
-        """Sending a CSV file should return 204 NO CONTENT if all goes well"""
-        assert response.status == '204 NO CONTENT'
-
-    def test_antibody_count_in_database_should_increase(
-        self, initial_antibodies_count, response,
-        final_antibodies_count, antibody_data_multiple
+    def test_post_csv_file_with_pdf_should_save_those_correctly(
+        self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor
     ):
-        """When sending a CSV file successfully, antibody count should increase"""
-        assert (
-            final_antibodies_count
-        ) >= len(antibody_data_multiple['antibody'])
+        """ Posting PDF files should get them saved"""
+        for antibody in antibody_data_multiple_with_pdfs['antibody']:
+            assert antibody['avr_filename'] == self.get_antibody_file_name(
+                cursor, antibody['_antibody_uuid']
+            )
+            assert antibody['_pdf_uuid'] == self.get_antibody_file_uuid(
+                cursor, antibody['_antibody_uuid']
+            )
 
     def test_antibody_count_in_database_should_increase_when_sending_several_csvs(
         self, initial_antibodies_count, response_to_two_csv_files,
