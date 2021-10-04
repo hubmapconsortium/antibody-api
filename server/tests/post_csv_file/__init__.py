@@ -1,5 +1,6 @@
 import io
 import json
+from fpdf import FPDF
 import pytest
 import requests
 from antibody_testing import AntibodyTesting
@@ -105,7 +106,11 @@ class TestPostCSVFile(AntibodyTesting):
 
     @classmethod
     def create_pdf(cls):
-        return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 16)
+        pdf.cell(40, 10, 'This is a PDF')
+        return pdf.output(dest='S').encode('latin-1')
 
     @pytest.fixture
     def create_expectations(self, flask_app, headers, antibody_data_multiple):
