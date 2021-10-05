@@ -20,13 +20,15 @@ class TestPostIncompleteJSONBody:
     def test_post_with_incomplete_json_body_should_return_406(
             self, response
         ):
-        """POST /antibodies with incomplete JSON body should return 406 NOT ACCEPTABLE"""
+        """POST /antibodies with incomplete JSON body
+         should return 406 NOT ACCEPTABLE"""
         assert response.status == '406 NOT ACCEPTABLE'
 
     def test_post_with_incomplete_json_body_should_return_error_message(
             self, response, removed_field
         ):
-        """POST /antibodies with incomplete JSON body should return an error message about it"""
+        """POST /antibodies with incomplete JSON body
+        should return an error message about it"""
         assert json.loads(response.data) == {
             'message': 'Antibody data incomplete: missing %s parameter' % removed_field
         }

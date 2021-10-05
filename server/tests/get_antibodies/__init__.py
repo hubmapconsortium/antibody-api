@@ -1,10 +1,15 @@
 import json
 import pytest
+from antibody_testing import AntibodyTesting
 
-class TestGetAntibodies:
-    # pylint: disable=no-self-use
+class TestGetAntibodies(AntibodyTesting):
+    # pylint: disable=no-self-use, unused-argument
     @pytest.fixture(scope='class')
-    def response(self, client, headers, antibody_data):
+    def create_uuid_expectation(self, flask_app, headers, antibody_data):
+        self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)
+
+    @pytest.fixture(scope='class')
+    def response(self, client, headers, antibody_data, create_uuid_expectation):
         client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
         return client.get('/antibodies', headers=headers)
 
@@ -16,4 +21,7 @@ class TestGetAntibodies:
         self, response, antibody_data
     ):
         """GET /antibodies should return expected fields"""
-        assert antibody_data['antibody'] == json.loads(response.data)['antibodies'][-1]
+        received_antibody = json.loads(response.data)['antibodies'][-1]
+        expected_data = { k: v for k, v in received_antibody.items() if k != 'antibody_uuid' }
+        sent_data = { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
+        assert sent_data == expected_data

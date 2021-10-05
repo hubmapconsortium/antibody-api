@@ -11,17 +11,23 @@ services:
     volumes:
       - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
   mockserver:
-    command: -serverPort 80
-    environment:
-      - MOCKSERVER_INITIALIZATION_JSON_PATH=/config/initializerJson.json
     image: mockserver/mockserver
     networks:
       default:
         aliases:
           - ingestmock
           - uuidmock
+  uuidserver:
+    build:
+      context: .
+      dockerfile: DockerfileUUIDServer
+    command: "ruby /app/uuid.rb"
+    networks:
+      default:
+        aliases:
+          - ingestserver
     volumes:
-      - ./mockserver:/config
+      - ./uuidserver:/app
   web:
     build:
       args:
@@ -31,6 +37,7 @@ services:
     depends_on:
       - db
       - mockserver
+      - uuidserver
     environment:
         - FLASK_APP=antibodyapi
         - FLASK_ENV=development

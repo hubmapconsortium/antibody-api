@@ -1,4 +1,5 @@
 import random
+from uuid import uuid4
 import psycopg2
 import pytest
 from faker import Faker
@@ -18,7 +19,7 @@ def pytest_runtest_makereport(item, call): # pylint: disable=unused-argument
 def raw_antibody_data():
     faker = Faker()
     return {
-        'avr_url': faker.uri(),
+        '_antibody_uuid': str(uuid4()),
         'protocols_io_doi': faker.uri(),
         'uniprot_accession_number': faker.uuid4(),
         'target_name': faker.first_name(),
@@ -53,8 +54,35 @@ def antibody_data_multiple():
     return {'antibody': antibodies}
 
 @pytest.fixture(scope='class')
+def antibody_data_multiple_with_pdfs():
+    faker = Faker()
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        pdf_data = {
+            'avr_filename': faker.file_name(extension='pdf'),
+            '_pdf_uuid': str(uuid4())
+        }
+        antibodies.append(raw_antibody_data() | pdf_data)
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
+def antibody_data_multiple_once():
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        antibodies.append(raw_antibody_data())
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
+def antibody_data_multiple_twice():
+    antibodies = []
+    for _ in range(random.randint(2,8)):
+        antibodies.append(raw_antibody_data())
+    return {'antibody': antibodies}
+
+@pytest.fixture(scope='class')
 def antibody_incomplete_data(antibody_data):
-    removed_field = random.choice(list(antibody_data['antibody'].keys()))
+    antibody_fields = [x for x in list(antibody_data['antibody'].keys()) if x[0] != '_']
+    removed_field = random.choice(antibody_fields)
     del antibody_data['antibody'][removed_field]
     return (antibody_data, removed_field)
 
@@ -90,9 +118,11 @@ def flask_app():
 
 @pytest.fixture(scope='session')
 def headers(mimetype):
+    faker = Faker()
     return {
         'Content-Type': mimetype,
-        'Accept': mimetype
+        'Accept': mimetype,
+        'authorization': 'Bearer %s' % (faker.uuid4(),)
     }
 
 @pytest.fixture(scope='session')
