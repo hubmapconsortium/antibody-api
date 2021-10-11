@@ -334,11 +334,14 @@ def create_app(testing=False):
 
         # build the logout URI with query params
         # there is no tool to help build this (yet!)
+        redirect_uri = url_for('login', _external=True)
+
         globus_logout_url = (
             'https://auth.globus.org/v2/web/logout' +
             '?client={}'.format(app.config['APP_CLIENT_ID']) +
-            '&redirect_uri={}'.format(app.config['GLOBUS_CLIENT_APP_URI']) +
-            '&redirect_name={}'.format(app.config['GLOBUS_CLIENT_APP_NAME']))
+            '&redirect_uri={}'.format(redirect_uri) +
+            '&redirect_name={}'.format('hubmap')
+        )
 
         # Redirect the user to the Globus Auth logout page
         return redirect(globus_logout_url)
