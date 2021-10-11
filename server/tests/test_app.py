@@ -1,5 +1,6 @@
 # pylint: disable=unused-import
 from get_antibodies import TestGetAntibodies
+from login import TestLogin
 from post_csv_file import TestPostCSVFile
 from post_empty_json_body import TestPostEmptyJSONBody
 from post_incomplete_json_body import TestPostIncompleteJSONBody

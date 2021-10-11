@@ -1,7 +1,11 @@
 import csv
 import os
+import globus_sdk
 import requests
-from flask import Flask, abort, g, jsonify, make_response, request, render_template
+from flask import (
+    Flask, abort, g, jsonify, make_response, redirect,
+    session, request, render_template, url_for
+)
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -270,6 +274,24 @@ def create_app(testing=False):
         except UniqueViolation:
             abort(json_error('Antibody not unique', 406))
         return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
+
+    @app.route('/login')
+    def login():
+        redirect_uri = url_for('login', _external=True)
+        client = globus_sdk.ConfidentialAppAuthClient(
+            app.config['APP_CLIENT_ID'],
+            app.config['APP_CLIENT_SECRET']
+        )
+        client.oauth2_start_flow(redirect_uri)
+
+        if 'code' not in request.args: # pylint: disable=no-else-return
+            auth_uri = client.oauth2_get_authorize_url()
+            return redirect(auth_uri)
+        else:
+            code = request.args.get('code')
+            tokens = client.oauth2_exchange_code_for_tokens(code)
+            session.update(tokens=tokens.by_resource_server, is_authenticated=True)
+            return redirect(url_for('login'))
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
