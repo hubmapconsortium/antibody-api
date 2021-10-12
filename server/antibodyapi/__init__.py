@@ -309,7 +309,7 @@ def create_app(testing=False):
             code = request.args.get('code')
             tokens = client.oauth2_exchange_code_for_tokens(code)
             session.update(tokens=tokens.by_resource_server, is_authenticated=True)
-            return redirect(url_for('/'))
+            return redirect(url_for('hubmap'))
 
     @app.route('/logout')
     def logout():

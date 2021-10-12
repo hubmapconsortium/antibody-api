@@ -29,7 +29,7 @@ class TestLogin:
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
         response = client.get('/login', query_string={'code': 123})
         assert response.status == '302 FOUND'
-        assert response.location == 'http://localhost%s' % (url_for('login'),)
+        assert response.location == 'http://localhost%s' % (url_for('hubmap'),)
 
     def test_request_with_code_should_save_tokens_in_session(self, client, mocker):
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
