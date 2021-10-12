@@ -149,12 +149,30 @@ def create_app(testing=False):
         # We should not load the gitignored app.conf during tests.
         app.config.from_pyfile('app.conf')
 
+
+    @app.route('/set_authenticated')
+    def fake_is_auth():
+        # remove this method when auth complete.
+        session.update(is_authenticated=True)
+        return redirect(url_for("hubmap"))
+
     @app.route('/')
     def hubmap():
+        #replace by the correct way to check token validity.
+        authenticated = session.get('is_authenticated')
+        if not authenticated:
+            return redirect(url_for('login'))
+        
         return render_template('pages/base.html', test_var='hello, world!')
 
     @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies(): # pylint: disable=too-many-branches
+        #replace by the correct way to check token validity.
+        authenticated = session.get('authenticated')
+        if not authenticated:
+            return redirect(url_for('login'))
+        # return render_template('pages/base.html', test_var='hello, world!')
+
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
 
@@ -291,7 +309,43 @@ def create_app(testing=False):
             code = request.args.get('code')
             tokens = client.oauth2_exchange_code_for_tokens(code)
             session.update(tokens=tokens.by_resource_server, is_authenticated=True)
-            return redirect(url_for('login'))
+            return redirect(url_for('/'))
+
+    @app.route('/logout')
+    def logout():
+        """
+        - Revoke the tokens with Globus Auth.
+        - Destroy the session state.
+        - Redirect the user to the Globus Auth logout page.
+        """
+        client = globus_sdk.ConfidentialAppAuthClient(
+            app.config['APP_CLIENT_ID'], 
+            app.config['APP_CLIENT_SECRET']
+        )
+
+        # Revoke the tokens with Globus Auth
+        if 'tokens' in session:    
+            for token in (token_info['access_token']
+                for token_info in session['tokens'].values()):
+                    client.oauth2_revoke_token(token)
+
+        # Destroy the session state
+        session.clear()
+
+        # build the logout URI with query params
+        # there is no tool to help build this (yet!)
+        redirect_uri = url_for('login', _external=True)
+
+        globus_logout_url = (
+            'https://auth.globus.org/v2/web/logout' +
+            '?client={}'.format(app.config['APP_CLIENT_ID']) +
+            '&redirect_uri={}'.format(redirect_uri) +
+            '&redirect_name={}'.format('hubmap')
+        )
+
+        # Redirect the user to the Globus Auth logout page
+        return redirect(globus_logout_url)
+
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
