@@ -162,7 +162,7 @@ def create_app(testing=False):
         authenticated = session.get('is_authenticated')
         if not authenticated:
             return redirect(url_for('login'))
-        
+
         return render_template('pages/base.html', test_var='hello, world!')
 
     @app.route('/antibodies/import', methods=['POST'])
@@ -319,15 +319,15 @@ def create_app(testing=False):
         - Redirect the user to the Globus Auth logout page.
         """
         client = globus_sdk.ConfidentialAppAuthClient(
-            app.config['APP_CLIENT_ID'], 
+            app.config['APP_CLIENT_ID'],
             app.config['APP_CLIENT_SECRET']
         )
 
         # Revoke the tokens with Globus Auth
-        if 'tokens' in session:    
+        if 'tokens' in session:
             for token in (token_info['access_token']
                 for token_info in session['tokens'].values()):
-                    client.oauth2_revoke_token(token)
+                client.oauth2_revoke_token(token)
 
         # Destroy the session state
         session.clear()
