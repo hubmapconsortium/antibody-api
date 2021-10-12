@@ -1,7 +1,8 @@
-from flask import url_for
+from flask import session, url_for
 import globus_sdk
 import pytest
 from .mockclient import MockClient
+from .mocktoken import MockToken
 
 class TestLogin:
     # pylint: disable=no-self-use, no-member
@@ -26,6 +27,12 @@ class TestLogin:
 
     def test_request_with_code_should_return_redirection_to_index(self, client, mocker):
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
-        response = client.get('/login?code=123')
+        response = client.get('/login', query_string={'code': 123})
         assert response.status == '302 FOUND'
-        assert response.location == url_for('login')
+        assert response.location == 'http://localhost%s' % (url_for('login'),)
+
+    def test_request_with_code_should_save_tokens_in_session(self, client, mocker):
+        mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
+        client.get('/login', query_string={'code': 123})
+        assert session['tokens'] == MockToken().get_resource_server()
+        assert session['is_authenticated'] is True
