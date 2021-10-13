@@ -41,3 +41,5 @@ services:
     environment:
         - FLASK_APP=antibodyapi
         - FLASK_ENV=development
+    ports:
+      - '5000:5000'
