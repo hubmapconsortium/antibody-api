@@ -279,7 +279,7 @@ def create_app(testing=False):
         for prop in required_properties:
             if prop not in antibody:
                 abort(json_error(
-                    'Antibody data incomplete: missing %s parameter' % prop, 406
+                    'Antibody data incomplete: missing %s parameter' % prop, 400
                     )
                 )
 
@@ -290,7 +290,7 @@ def create_app(testing=False):
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
-            abort(json_error('Antibody not unique', 406))
+            abort(json_error('Antibody not unique', 400))
         return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
 
     @app.route('/login')

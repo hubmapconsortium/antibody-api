@@ -63,14 +63,14 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         print(last_antibody_uuid)
         assert antibody_data['antibody']['_antibody_uuid'] == last_antibody_uuid
 
-    def test_if_antibody_fails_uniqueness_index_it_should_return_a_406_response(
+    def test_if_antibody_fails_uniqueness_index_it_should_return_a_400_response(
         self, response, antibody_data, client, headers, flask_app
     ):
-        """POST /antibodies should return 406 NOT ACCEPTABLE if it fails uniqueness index"""
+        """POST /antibodies should return 400 BAD REQUEST if it fails uniqueness index"""
         self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)
         assert client.post(
             '/antibodies', data=json.dumps(antibody_data), headers=headers
-        ).status == '406 NOT ACCEPTABLE'
+        ).status == '400 BAD REQUEST'
 
     def test_if_antibody_fails_uniqueness_index_it_should_inform_it_in_message(
         self, response, antibody_data, client, headers, flask_app
