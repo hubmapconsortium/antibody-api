@@ -2,6 +2,7 @@ import csv
 import os
 import globus_sdk
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
 from flask import (
     Flask, abort, g, jsonify, make_response, redirect,
     session, request, render_template, url_for
@@ -16,6 +17,8 @@ from . import default_config
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'csv'}
+
+requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -168,7 +171,7 @@ def create_app(testing=False):
     @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies(): # pylint: disable=too-many-branches
         #replace by the correct way to check token validity.
-        authenticated = session.get('authenticated')
+        authenticated = session.get('is_authenticated')
         if not authenticated:
             return redirect(url_for('login'))
         # return render_template('pages/base.html', test_var='hello, world!')
@@ -303,7 +306,7 @@ def create_app(testing=False):
         client.oauth2_start_flow(redirect_uri)
 
         if 'code' not in request.args: # pylint: disable=no-else-return
-            auth_uri = client.oauth2_get_authorize_url()
+            auth_uri = client.oauth2_get_authorize_url(query_params={"scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups" }) # pylint: disable=line-too-long
             return redirect(auth_uri)
         else:
             code = request.args.get('code')
@@ -382,9 +385,10 @@ def get_hubmap_uuid(uuid_api_url):
         '%s/hmuuid' % (uuid_api_url,),
         headers={
             'Content-Type': 'application/json',
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
-        json={'entity_type': 'AVR'}
+        json={'entity_type': 'AVR'},
+        verify=False
     )
     return req.json()[0]['uuid']
 
@@ -394,7 +398,7 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     req = requests.post(
         '%s/file-upload' % (ingest_api_url,),
         headers={
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
         files={'file':
             (
@@ -402,19 +406,21 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
                 open(os.path.join(upload_folder, filename), 'rb'),
                 'application/pdf'
             )
-        }
+        },
+        verify=False
     )
     temp_file_id = req.json()['temp_file_id']
 
     req2 = requests.post(
         '%s/file-commit' % (ingest_api_url,),
         headers={
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
         json={
             'entity_uuid': antibody_uuid,
             'temp_file_id': temp_file_id,
-            'user_token': request.headers.get('authorization').split()[-1]
-        }
+            'user_token': session['tokens']['nexus.api.globus.org']['access_token']
+        },
+        verify=False
     )
     return req2.json()['file_uuid']
