@@ -10,6 +10,24 @@ services:
       - '5432:5432'
     volumes:
       - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
+  mockserver:
+    image: mockserver/mockserver
+    networks:
+      default:
+        aliases:
+          - ingestmock
+          - uuidmock
+  uuidserver:
+    build:
+      context: .
+      dockerfile: DockerfileUUIDServer
+    command: "ruby /app/uuid.rb"
+    networks:
+      default:
+        aliases:
+          - ingestserver
+    volumes:
+      - ./uuidserver:/app
   web:
     build:
       args:
@@ -18,6 +36,8 @@ services:
       dockerfile: DockerfileDev
     depends_on:
       - db
+      - mockserver
+      - uuidserver
     environment:
         - FLASK_APP=antibodyapi
         - FLASK_ENV=development

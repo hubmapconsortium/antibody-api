@@ -1,15 +1,126 @@
 <!doctype html>
-<html>
+  <html>
   <head>
-    <title>HUBMAP starter template</title>
+    <title>HuBMAP starter template</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <h1>Welcome to HUBMAP</h1>
-    <p>This is the beginning of it all...</p>
-    <hr>
-    <p>Test var value: {{ test_var }}</p>
-  </body>
+    <section class="text-gray-600 body-font relative" id="form-block">
+      <div class="container px-5 py-24 mx-auto">
+        <div class="flex flex-col text-center w-full mb-12">
+          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HuBMAP</h1>
+          <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
+        </div>
+        <div class="lg:w-1/2 md:w-2/3 mx-auto">
+          <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post">
+          <div class="flex flex-wrap -m-2">
+            <div class="p-2 w-full">
+              <div class="relative">
+                <section class="flex flex-col w-full h-full p-1 overflow-auto">
+                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
+                  <header class="flex flex-col items-center justify-center py-12 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
+                    <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" required="">Upload a file</input>
+                  </header>
+                </section>
+                <section class="flex flex-col w-full h-full p-1 overflow-auto">
+                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
+                  <header class="flex flex-col items-center justify-center py-12 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
+                    <input accept="pdf" name="pdf" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" >Upload a file</input>
+                  </header>
+                </section>
+              </div>
+            </div>
+            <div class="p-2 w-full">
+              <button type="submit" class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Submit</button>
+            </div>
+          </form>
+          <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
+            <a class="text-indigo-500">development@nurelm.com</a>
+            <p class="leading-normal my-5">NuRelm
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="text-gray-600 body-font relative hidden" id="upload-results-block">
+    <div class="container px-5 py-24 mx-auto">
+      <div class="flex flex-col text-center w-full mb-12">
+        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
+      </div>
+      <div class="lg:w-1/2 md:w-2/3 mx-auto" id="upload-results">
+      </div>
+      <button onClick="downloadCsv();">Download CSV</button>
+      <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
+        <a class="text-indigo-500">development@nurelm.com</a>
+        <p class="leading-normal my-5">NuRelm
+        </p>
+      </div>
+  </section>
+  <script type="text/javascript">
+"use strict";
+
+var csv_content;
+
+function ajaxSuccess () {
+  jQuery('#form-block').addClass('hidden');
+  jQuery('#upload-results-block').removeClass('hidden');
+  var response = this.responseText;
+  var jsonresponse = JSON.parse(response);
+  var responsetable = '<table>';
+  csv_content = "antibody_name,antibody_uuid\n";
+  jQuery.each(jsonresponse.antibodies, function(name, value) {
+    responsetable += '<tr>';
+    responsetable += '<td>';
+    responsetable += value.antibody_name;
+    responsetable += '</td>';
+    responsetable += '<td>';
+    responsetable += value.antibody_uuid;
+    responsetable += '</td>';
+    responsetable += '</tr>';
+    csv_content += value.antibody_name + ',' + value.antibody_uuid + '\n';
+  })
+  responsetable += '</table>';
+  jQuery('#upload-results').html(responsetable);
+}
+
+function downloadCsv () {
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_content);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'antibodies_created.csv';
+  hiddenElement.click();
+}
+
+function AJAXSubmit (oFormElement) {
+  if (!oFormElement.action) { return; }
+  var oReq = new XMLHttpRequest();
+  oReq.onload = ajaxSuccess;
+  if (oFormElement.method.toLowerCase() === "post") {
+    oReq.open("post", oFormElement.action, true);
+    oReq.setRequestHeader("authorization", "Bearer Whatever");
+    oReq.send(new FormData(oFormElement));
+  } else {
+    var oField, sFieldType, nFile, sSearch = "";
+    for (var nItem = 0; nItem < oFormElement.elements.length; nItem++) {
+      oField = oFormElement.elements[nItem];
+      if (!oField.hasAttribute("name")) { continue; }
+      sFieldType = oField.nodeName.toUpperCase() === "INPUT" ? oField.getAttribute("type").toUpperCase() : "TEXT";
+      if (sFieldType === "FILE") {
+        for (nFile = 0; nFile < oField.files.length; sSearch += "&" + escape(oField.name) + "=" + escape(oField.files[nFile++].name));
+      } else if ((sFieldType !== "RADIO" && sFieldType !== "CHECKBOX") || oField.checked) {
+        sSearch += "&" + escape(oField.name) + "=" + escape(oField.value);
+      }
+    }
+    oReq.open("get", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
+    oReq.send(null);
+  }
+}
+</script>
+</body>
 </html>

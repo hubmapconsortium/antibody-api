@@ -1,6 +1,7 @@
 import csv
 import os
-from flask import Flask, abort, jsonify, make_response, request, render_template
+import requests
+from flask import Flask, abort, g, jsonify, make_response, request, render_template
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -19,7 +20,8 @@ def allowed_file(filename):
 def base_antibody_query():
     return '''
 SELECT
-    a.avr_url, a.protocols_io_doi,
+    a.antibody_uuid,
+    a.protocols_io_doi,
     a.uniprot_accession_number,
     a.target_name, a.rrid,
     a.antibody_name, a.host_organism,
@@ -36,7 +38,7 @@ JOIN vendors v ON a.vendor_id = v.id
 def insert_query():
     return '''
 INSERT INTO antibodies (
-    avr_url,
+    antibody_uuid,
     protocols_io_doi,
     uniprot_accession_number,
     target_name,
@@ -58,7 +60,59 @@ INSERT INTO antibodies (
     group_uuid
 ) 
 VALUES (
-    %(avr_url)s,
+    %(antibody_uuid)s,
+    %(protocols_io_doi)s,
+    %(uniprot_accession_number)s,
+    %(target_name)s,
+    %(rrid)s,
+    %(antibody_name)s,
+    %(host_organism)s,
+    %(clonality)s,
+    %(vendor_id)s,
+    %(catalog_number)s,
+    %(lot_number)s,
+    %(recombinant)s,
+    %(organ_or_tissue)s,
+    %(hubmap_platform)s,
+    %(submitter_orciid)s,
+    EXTRACT(epoch FROM NOW()),
+    %(created_by_user_displayname)s,
+    %(created_by_user_email)s,
+    %(created_by_user_sub)s,
+    %(group_uuid)s
+) RETURNING id
+'''
+
+def insert_query_with_avr_file_and_uuid():
+    return '''
+INSERT INTO antibodies (
+    antibody_uuid,
+    avr_uuid,
+    avr_filename,
+    protocols_io_doi,
+    uniprot_accession_number,
+    target_name,
+    rrid,
+    antibody_name,
+    host_organism,
+    clonality,
+    vendor_id,
+    catalog_number,
+    lot_number,
+    recombinant,
+    organ_or_tissue,
+    hubmap_platform,
+    submitter_orciid,
+    created_timestamp,
+    created_by_user_displayname,
+    created_by_user_email,
+    created_by_user_sub,
+    group_uuid
+) 
+VALUES (
+    %(antibody_uuid)s,
+    %(avr_uuid)s,
+    %(avr_filename)s,
     %(protocols_io_doi)s,
     %(uniprot_accession_number)s,
     %(target_name)s,
@@ -96,56 +150,62 @@ def create_app(testing=False):
         return render_template('pages/base.html', test_var='hello, world!')
 
     @app.route('/antibodies/import', methods=['POST'])
-    def import_antibodies():
+    def import_antibodies(): # pylint: disable=too-many-branches
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
-        file = request.files['file']
-        if file.filename == '':
-            abort(json_error('Filename missing', 406))
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
-                antibodycsv = csv.DictReader(csvfile, delimiter=',')
-                conn = psycopg2.connect(
-                    dbname=app.config['DATABASE_NAME'],
-                    user=app.config['DATABASE_USER'],
-                    password=app.config['DATABASE_PASSWORD'],
-                    host=app.config['DATABASE_HOST']
-                )
-                conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-                cur = conn.cursor()
-                for row in antibodycsv:
-                    try:
-                        row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
-                    del row['vendor']
-                    try:
-                        cur.execute(insert_query(), row)
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
-                    except UniqueViolation:
-                        abort(json_error('Antibody not unique', 406))
-        else:
-            abort(json_error('Filetype forbidden', 406))
-        return ('', 204)
+
+        cur = get_cursor(app)
+        uuids_and_names = []
+
+        for file in request.files.getlist('file'):
+            if file.filename == '':
+                abort(json_error('Filename missing', 406))
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
+                    antibodycsv = csv.DictReader(csvfile, delimiter=',')
+                    for row in antibodycsv:
+                        try:
+                            row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
+                        except KeyError:
+                            abort(json_error('CSV fields are wrong', 406))
+                        del row['vendor']
+                        row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+                        query = insert_query()
+                        if 'avr_filename' in row.keys():
+                            if 'pdf' in request.files:
+                                for avr_file in request.files.getlist('pdf'):
+                                    if avr_file.filename == row['avr_filename']:
+                                        row['avr_uuid'] = get_file_uuid(
+                                            app.config['INGEST_API_URL'],
+                                            app.config['UPLOAD_FOLDER'],
+                                            row['antibody_uuid'],
+                                            avr_file
+                                        )
+                                        query = insert_query_with_avr_file_and_uuid()
+                        try:
+                            cur.execute(query, row)
+                            uuids_and_names.append({
+                                'antibody_name': row['antibody_name'],
+                                'antibody_uuid': row['antibody_uuid']
+                            })
+                        except KeyError:
+                            abort(json_error('CSV fields are wrong', 406))
+                        except UniqueViolation:
+                            abort(json_error('Antibody not unique', 406))
+            else:
+                abort(json_error('Filetype forbidden', 406))
+        return make_response(jsonify(antibodies=uuids_and_names), 201)
 
     @app.route('/antibodies', methods=['GET'])
     def list_antibodies():
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
+        cur = get_cursor(app)
         cur.execute(base_antibody_query() + ' ORDER BY a.id ASC')
         results = []
         for antibody in cur:
             ant = {
-                'avr_url': antibody[0],
+                'antibody_uuid': antibody[0],
                 'protocols_io_doi': antibody[1],
                 'uniprot_accession_number': antibody[2],
                 'target_name': antibody[3],
@@ -171,7 +231,6 @@ def create_app(testing=False):
     @app.route('/antibodies', methods=['POST'])
     def save_antibody():
         required_properties = (
-          'avr_url',
           'protocols_io_doi',
           'uniprot_accession_number',
           'target_name',
@@ -198,34 +257,88 @@ def create_app(testing=False):
         for prop in required_properties:
             if prop not in antibody:
                 abort(json_error(
-                    'Antibody data incomplete: missing %s parameter' % prop, 406
+                    'Antibody data incomplete: missing %s parameter' % prop, 400
                     )
                 )
 
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
+        cur = get_cursor(app)
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
+        antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
-            abort(json_error('Antibody not unique', 406))
-        return make_response(jsonify(id=cur.fetchone()[0]), 201)
+            abort(json_error('Antibody not unique', 400))
+        return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
+
+    @app.teardown_appcontext
+    def close_db(error): # pylint: disable=unused-argument
+        if 'connection' in g:
+            g.connection.close()
+
     return app
 
 def json_error(message, error_code):
     return make_response(jsonify(message=message), error_code)
 
 def find_or_create_vendor(cursor, name):
-    cursor.execute('SELECT id FROM vendors WHERE name = %s', (name,))
+    cursor.execute('SELECT id FROM vendors WHERE UPPER(name) = %s', (name.upper(),))
     try:
         return cursor.fetchone()[0]
     except TypeError:
         cursor.execute('INSERT INTO vendors (name) VALUES (%s) RETURNING id', (name,))
         return cursor.fetchone()[0]
+
+def get_cursor(app):
+    if 'connection' not in g:
+        conn = psycopg2.connect(
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
+        )
+        g.connection = conn # pylint: disable=assigning-non-slot
+        g.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    return g.connection.cursor()
+
+def get_hubmap_uuid(uuid_api_url):
+    req = requests.post(
+        '%s/hmuuid' % (uuid_api_url,),
+        headers={
+            'Content-Type': 'application/json',
+            'authorization': request.headers.get('authorization')
+        },
+        json={'entity_type': 'AVR'}
+    )
+    return req.json()[0]['uuid']
+
+def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(upload_folder, filename))
+    req = requests.post(
+        '%s/file-upload' % (ingest_api_url,),
+        headers={
+            'authorization': request.headers.get('authorization')
+        },
+        files={'file':
+            (
+                file.filename,
+                open(os.path.join(upload_folder, filename), 'rb'),
+                'application/pdf'
+            )
+        }
+    )
+    temp_file_id = req.json()['temp_file_id']
+
+    req2 = requests.post(
+        '%s/file-commit' % (ingest_api_url,),
+        headers={
+            'authorization': request.headers.get('authorization')
+        },
+        json={
+            'entity_uuid': antibody_uuid,
+            'temp_file_id': temp_file_id,
+            'user_token': request.headers.get('authorization').split()[-1]
+        }
+    )
+    return req2.json()['file_uuid']
