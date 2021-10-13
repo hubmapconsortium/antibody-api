@@ -54,7 +54,7 @@ class TestPostCSVFile(AntibodyTesting):
                     'method': 'POST',
                     'path': '/file-upload',
                     'headers': {
-                        'authorization': [ headers['authorization'] ],
+                        'authorization': [ 'Bearer woot' ],
                         'Content-Type': [ '^multipart/form-data; boundary=.+?$' ]
                     }
                 },
@@ -78,7 +78,7 @@ class TestPostCSVFile(AntibodyTesting):
                     'method': 'POST',
                     'path': '/file-commit',
                     'headers': {
-                        'authorization': [ headers['authorization'] ],
+                        'authorization': [ 'Bearer woot' ],
                         'Content-Type': [ 'application/json' ]
                     },
                     'body': {
@@ -138,6 +138,9 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture(scope='class')
     def response(self, client, headers, request_data, create_expectations):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -150,6 +153,9 @@ class TestPostCSVFile(AntibodyTesting):
         self, client, headers, request_data_two_csv_files,
         create_expectations_for_several_csv_files
     ):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -162,6 +168,9 @@ class TestPostCSVFile(AntibodyTesting):
         self, client, headers, request_data_with_pdfs,
         create_expectations_for_several_pdf_files
     ):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -171,10 +180,16 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture
     def response_to_empty_request(self, client, headers):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         return client.post('/antibodies/import', headers=headers)
 
     @pytest.fixture
     def response_to_request_without_filename(self, client, headers, csv_file):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -184,6 +199,9 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture
     def response_to_request_with_wrong_extension(self, client, headers, csv_file):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -193,6 +211,9 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture
     def response_to_request_with_weird_csv_file(self, client, headers, weird_csv_file):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -270,6 +291,7 @@ class TestPostCSVFile(AntibodyTesting):
 
     def test_post_csv_file_should_return_a_201_response(self, response):
         """Sending a CSV file should return 201 CREATED if all goes well"""
+        print(response.status)
         assert response.status == '201 CREATED'
 
     def test_post_csv_file_should_return_uuids_and_antibody_names(
@@ -281,6 +303,8 @@ class TestPostCSVFile(AntibodyTesting):
                 'antibody_name': antibody['antibody_name'],
                 'antibody_uuid': antibody['_antibody_uuid']
             })
+        print({ 'antibodies': uuid_and_name })
+        print(json.loads(response.data))
         assert(
             { 'antibodies': uuid_and_name } == json.loads(response.data)
         )

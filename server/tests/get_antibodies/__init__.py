@@ -10,6 +10,9 @@ class TestGetAntibodies(AntibodyTesting):
 
     @pytest.fixture(scope='class')
     def response(self, client, headers, antibody_data, create_uuid_expectation):
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
         client.post('/antibodies', data=json.dumps(antibody_data), headers=headers)
         return client.get('/antibodies', headers=headers)
 

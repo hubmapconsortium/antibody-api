@@ -9,7 +9,7 @@ class TestLogout:
     def logout_response(self, client, mocker):
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
         with client.session_transaction() as sess:
-            sess['authenticated'] = True
+            sess['is_authenticated'] = True
         return client.get('/logout')
 
     def test_should_clear_the_session(self, logout_response):

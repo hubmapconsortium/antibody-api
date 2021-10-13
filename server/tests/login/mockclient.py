@@ -6,7 +6,7 @@ class MockClient:
         pass
     def oauth2_exchange_code_for_tokens(self, *_):
         return MockToken()
-    def oauth2_get_authorize_url(self):
+    def oauth2_get_authorize_url(self, **kwargs):
         return 'http://http.cat'
     def oauth2_start_flow(self, *_):
         pass
