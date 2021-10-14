@@ -30,6 +30,9 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = {'nexus.api.globus.org': {'access_token': 'woot'}}
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         data_to_send = {
             'antibody': { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
         }
@@ -61,8 +64,15 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         self, response, antibody_data, last_antibody_data
     ):
         """POST /antibodies with a full JSON body should save all fields correctly"""
-        expected_data = { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
-        assert tuple(expected_data.values()) == last_antibody_data
+        sent_data = { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
+        additional_fields = (
+            'Name',
+            'name@example.com',
+            '1234567890',
+            '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
+        )
+        expected_data = tuple(sent_data.values()) + additional_fields
+        assert expected_data == last_antibody_data
 
     def test_api_should_create_a_new_vendor_if_it_does_not_exist_already(
         self, initial_vendor_count, response, final_vendor_count

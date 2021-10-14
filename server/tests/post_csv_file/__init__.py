@@ -141,6 +141,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -156,6 +159,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -171,6 +177,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -183,6 +192,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         return client.post('/antibodies/import', headers=headers)
 
     @pytest.fixture
@@ -190,6 +202,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -202,6 +217,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -214,6 +232,9 @@ class TestPostCSVFile(AntibodyTesting):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -316,9 +337,14 @@ class TestPostCSVFile(AntibodyTesting):
         sent_data = {
             k: v for k, v in antibody_data_multiple['antibody'][-1].items() if k[0] != '_'
         }
-        assert tuple(
-            sent_data.values()
-        ) == self.last_antibody(cursor)
+        additional_fields = (
+            'Name',
+            'name@example.com',
+            '1234567890',
+            '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
+        )
+        sent_fields = tuple(sent_data.values()) + additional_fields
+        assert sent_fields == self.last_antibody(cursor)
 
     def test_post_csv_file_with_pdf_should_save_those_correctly(
         self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor

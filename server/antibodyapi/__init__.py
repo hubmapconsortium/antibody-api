@@ -170,11 +170,9 @@ def create_app(testing=False):
 
     @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies(): # pylint: disable=too-many-branches
-        #replace by the correct way to check token validity.
         authenticated = session.get('is_authenticated')
         if not authenticated:
             return redirect(url_for('login'))
-        # return render_template('pages/base.html', test_var='hello, world!')
 
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
@@ -197,6 +195,10 @@ def create_app(testing=False):
                             abort(json_error('CSV fields are wrong', 406))
                         del row['vendor']
                         row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+                        row['created_by_user_displayname'] = session['name']
+                        row['created_by_user_email'] = session['email']
+                        row['created_by_user_sub'] = session['sub']
+                        row['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
                         query = insert_query()
                         if 'avr_filename' in row.keys():
                             if 'pdf' in request.files:
@@ -269,11 +271,7 @@ def create_app(testing=False):
           'recombinant',
           'organ_or_tissue',
           'hubmap_platform',
-          'submitter_orciid',
-          'created_by_user_displayname',
-          'created_by_user_email',
-          'created_by_user_sub',
-          'group_uuid'
+          'submitter_orciid'
         )
         try:
             antibody = request.get_json()['antibody']
@@ -290,6 +288,10 @@ def create_app(testing=False):
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
         antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+        antibody['created_by_user_displayname'] = session['name']
+        antibody['created_by_user_email'] = session['email']
+        antibody['created_by_user_sub'] = session['sub']
+        antibody['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
@@ -311,7 +313,14 @@ def create_app(testing=False):
         else:
             code = request.args.get('code')
             tokens = client.oauth2_exchange_code_for_tokens(code)
-            session.update(tokens=tokens.by_resource_server, is_authenticated=True)
+            user_info = get_user_info(tokens)
+            session.update(
+                name=user_info['name'],
+                email=user_info['email'],
+                sub=user_info['sub'],
+                tokens=tokens.by_resource_server,
+                is_authenticated=True
+            )
             return redirect(url_for('hubmap'))
 
     @app.route('/logout')
@@ -424,3 +433,7 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         verify=False
     )
     return req2.json()['file_uuid']
+
+def get_user_info(token):
+    auth_client = globus_sdk.AuthClient(authorizer=globus_sdk.AccessTokenAuthorizer(token))
+    return auth_client.oauth2_userinfo()

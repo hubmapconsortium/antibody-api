@@ -28,6 +28,8 @@ class TestLogin:
     @pytest.fixture
     def login_with_code(self, client, mocker):
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
+        mocker.patch('globus_sdk.AuthClient', new=MockClient)
+        mocker.patch('globus_sdk.AccessTokenAuthorizer', new=MockClient)
         return client.get('/login', query_string={'code': 123})
 
     def test_request_with_code_should_return_redirection_to_index(self, login_with_code):

@@ -33,11 +33,7 @@ def raw_antibody_data():
         'recombinant': faker.pybool(),
         'organ_or_tissue': faker.first_name(),
         'hubmap_platform': faker.first_name(),
-        'submitter_orciid': faker.uuid4(),
-        'created_by_user_displayname': faker.first_name(),
-        'created_by_user_email': faker.ascii_email(),
-        'created_by_user_sub': faker.last_name(),
-        'group_uuid': faker.uuid4()
+        'submitter_orciid': faker.uuid4()
     }
 
 @pytest.fixture(scope='class')
@@ -118,7 +114,6 @@ def flask_app():
 
 @pytest.fixture(scope='session')
 def headers(mimetype):
-    faker = Faker()
     return {
         'Content-Type': mimetype,
         'Accept': mimetype
