@@ -435,5 +435,6 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     return req2.json()['file_uuid']
 
 def get_user_info(token):
-    auth_client = globus_sdk.AuthClient(authorizer=globus_sdk.AccessTokenAuthorizer(token))
+    auth_token = token.by_resource_server['auth.globus.org']['access_token']
+    auth_client = globus_sdk.AuthClient(authorizer=globus_sdk.AccessTokenAuthorizer(auth_token))
     return auth_client.oauth2_userinfo()
