@@ -27,10 +27,19 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         self, client, antibody_data, headers,
         initial_antibodies_count, create_uuid_expectation
     ):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = {'nexus.api.globus.org': {'access_token': 'woot'}}
         data_to_send = {
             'antibody': { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
         }
         return client.post('/antibodies', data=json.dumps(data_to_send), headers=headers)
+
+    def test_antibody_gets_uuid_saved(
+        self, response, antibody_data, last_antibody_uuid
+    ):
+        """POST /antibodies with a full JSON body should save a UUID for the new antibody"""
+        assert antibody_data['antibody']['_antibody_uuid'] == last_antibody_uuid
 
     def test_should_return_a_201_response(self, response):
         """POST /antibodies with a full JSON body should return 201 CREATED"""
@@ -54,32 +63,6 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         """POST /antibodies with a full JSON body should save all fields correctly"""
         expected_data = { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
         assert tuple(expected_data.values()) == last_antibody_data
-
-    def test_antibody_gets_uuid_saved(
-        self, response, antibody_data, last_antibody_uuid
-    ):
-        """POST /antibodies with a full JSON body should save a UUID for the new antibody"""
-        print(antibody_data['antibody']['_antibody_uuid'])
-        print(last_antibody_uuid)
-        assert antibody_data['antibody']['_antibody_uuid'] == last_antibody_uuid
-
-    def test_if_antibody_fails_uniqueness_index_it_should_return_a_400_response(
-        self, response, antibody_data, client, headers, flask_app
-    ):
-        """POST /antibodies should return 400 BAD REQUEST if it fails uniqueness index"""
-        self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)
-        assert client.post(
-            '/antibodies', data=json.dumps(antibody_data), headers=headers
-        ).status == '400 BAD REQUEST'
-
-    def test_if_antibody_fails_uniqueness_index_it_should_inform_it_in_message(
-        self, response, antibody_data, client, headers, flask_app
-    ):
-        """POST /antibodies should return a message about it if it fails the uniqueness index"""
-        self.create_expectation(flask_app, headers, antibody_data['antibody'], 0)
-        assert json.loads(client.post(
-            '/antibodies', data=json.dumps(antibody_data), headers=headers
-        ).data) == {'message': 'Antibody not unique'}
 
     def test_api_should_create_a_new_vendor_if_it_does_not_exist_already(
         self, initial_vendor_count, response, final_vendor_count

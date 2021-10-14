@@ -84,7 +84,7 @@ class TestPostCSVFile(AntibodyTesting):
                     'body': {
                         'entity_uuid': antibody['_antibody_uuid'],
                         'temp_file_id': 'temp_file_id',
-                        'user_token': headers['authorization'].split()[-1]
+                        'user_token': 'woot'
                     }
                 },
                 'httpResponse': {

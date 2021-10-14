@@ -121,8 +121,7 @@ def headers(mimetype):
     faker = Faker()
     return {
         'Content-Type': mimetype,
-        'Accept': mimetype,
-        'authorization': 'Bearer %s' % (faker.uuid4(),)
+        'Accept': mimetype
     }
 
 @pytest.fixture(scope='session')
