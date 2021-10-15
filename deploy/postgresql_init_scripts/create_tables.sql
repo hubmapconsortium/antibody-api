@@ -16,7 +16,9 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "id" serial,
-    "avr_url" text NOT NULL,
+    "antibody_uuid" uuid NOT NULL,
+    "avr_filename" text,
+    "avr_uuid" uuid,
     "protocols_io_doi" text NOT NULL,
     "uniprot_accession_number" text NOT NULL,
     "target_name" text NOT NULL,
@@ -38,5 +40,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "group_uuid" uuid NOT NULL,
     PRIMARY KEY ("id")
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS antibody_uuid_index ON antibodies(antibody_uuid);
 
 CREATE UNIQUE INDEX IF NOT EXISTS antibodies_unique_index ON antibodies(UPPER(uniprot_accession_number), UPPER(rrid), UPPER(lot_number), UPPER(target_name), UPPER(hubmap_platform));
