@@ -1,7 +1,7 @@
 <!doctype html>
   <html>
   <head>
-    <title>HUBMAP starter template</title>
+    <title>HuBMAP starter template</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
@@ -12,11 +12,11 @@
     <section class="text-gray-600 body-font relative" id="form-block">
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-col text-center w-full mb-12">
-          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
+          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HuBMAP</h1>
           <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
         </div>
         <div class="lg:w-1/2 md:w-2/3 mx-auto">
-          <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post">
+          <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post" id="antibody-form">
           <div class="flex flex-wrap -m-2">
             <div class="p-2 w-full">
               <div class="relative">
@@ -47,20 +47,39 @@
       </div>
     </div>
   </section>
-  <section class="text-gray-600 body-font relative hidden" id="upload-results-block">
+  <section class="text-gray-600 body-font relative hidden" id="loading-screen">
     <div class="container px-5 py-24 mx-auto">
       <div class="flex flex-col text-center w-full mb-12">
-        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HubMap</h1>
+        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HuBMAP</h1>
         <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
       </div>
-      <div class="lg:w-1/2 md:w-2/3 mx-auto" id="upload-results">
+      <div class="lg:w-1/2 md:w-2/3 mx-auto">
+        <h1>Loading antibodies... Please wait...</h1>
       </div>
-      <button onClick="downloadCsv();">Download CSV</button>
       <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
         <a class="text-indigo-500">development@nurelm.com</a>
         <p class="leading-normal my-5">NuRelm
         </p>
       </div>
+    </div>
+  </section>
+  <section class="text-gray-600 body-font relative hidden" id="upload-results-block">
+    <div class="container px-5 py-24 mx-auto">
+      <div class="flex flex-col text-center w-full mb-12">
+        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">HuBMAP</h1>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Files upload demo.</p>
+      </div>
+      <div class="lg:w-1/2 md:w-2/3 mx-auto" id="upload-results">
+      </div>
+      <button onClick="downloadCsv();">Download CSV</button>
+      <br/>
+      <button onClick="resetForm();">Reset form</button>
+      <div class="p-2 w-full pt-8 mt-8 border-t border-gray-200 text-center">
+        <a class="text-indigo-500">development@nurelm.com</a>
+        <p class="leading-normal my-5">NuRelm
+        </p>
+      </div>
+    </div>
   </section>
   <script type="text/javascript">
 "use strict";
@@ -68,7 +87,7 @@
 var csv_content;
 
 function ajaxSuccess () {
-  jQuery('#form-block').addClass('hidden');
+  jQuery('#loading-screen').addClass('hidden');
   jQuery('#upload-results-block').removeClass('hidden');
   var response = this.responseText;
   var jsonresponse = JSON.parse(response);
@@ -97,10 +116,19 @@ function downloadCsv () {
   hiddenElement.click();
 }
 
+function resetForm () {
+  jQuery('#form-block').removeClass('hidden');
+  jQuery('#upload-results-block').addClass('hidden');
+  jQuery('#upload-results').html('');
+  jQuery('#antibody-form').trigger('reset');
+}
+
 function AJAXSubmit (oFormElement) {
   if (!oFormElement.action) { return; }
   var oReq = new XMLHttpRequest();
   oReq.onload = ajaxSuccess;
+  jQuery('#form-block').addClass('hidden');
+  jQuery('#loading-screen').removeClass('hidden');
   if (oFormElement.method.toLowerCase() === "post") {
     oReq.open("post", oFormElement.action, true);
     oReq.setRequestHeader("authorization", "Bearer Whatever");
