@@ -73,7 +73,7 @@ class AntibodyTesting:
                     'method': 'POST',
                     'path': '/hmuuid',
                     'headers': {
-                        'authorization': [ headers['authorization'] ]
+                        'authorization': [ 'Bearer woot' ]
                     },
                     'body': {
                         'entity_type': 'AVR'
