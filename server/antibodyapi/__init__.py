@@ -35,13 +35,6 @@ def create_app(testing=False):
         # We should not load the gitignored app.conf during tests.
         app.config.from_pyfile('app.conf')
 
-
-    @app.route('/set_authenticated')
-    def fake_is_auth():
-        # remove this method when auth complete.
-        session.update(is_authenticated=True)
-        return redirect(url_for("hubmap"))
-
     @app.route('/')
     def hubmap():
         #replace by the correct way to check token validity.
