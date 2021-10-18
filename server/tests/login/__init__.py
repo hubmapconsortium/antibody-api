@@ -23,7 +23,7 @@ class TestLogin:
         mock = mocker.patch.object(MockClient,'oauth2_start_flow')
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
         client.get('/login')
-        mock.assert_called_once_with(url_for('login', _external=True))
+        mock.assert_called_once_with(url_for('login.login', _external=True))
 
     @pytest.fixture
     def login_with_code(self, client, mocker):
