@@ -6,5 +6,5 @@ def hubmap():
     #replace by the correct way to check token validity.
     authenticated = session.get('is_authenticated')
     if not authenticated:
-        return redirect(url_for('login'))
+        return redirect(url_for('login.login'))
     return render_template('base.html')
