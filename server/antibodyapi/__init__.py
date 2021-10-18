@@ -25,6 +25,7 @@ from antibodyapi.hubmap import hubmap_blueprint
 from antibodyapi.import_antibodies import import_antibodies_blueprint
 from antibodyapi.list_antibodies import list_antibodies_blueprint
 from antibodyapi.login import login_blueprint
+from antibodyapi.logout import logout_blueprint
 from antibodyapi.save_antibody import save_antibody_blueprint
 
 UPLOAD_FOLDER = '/tmp'
@@ -45,43 +46,8 @@ def create_app(testing=False):
     app.register_blueprint(import_antibodies_blueprint)
     app.register_blueprint(list_antibodies_blueprint)
     app.register_blueprint(login_blueprint)
+    app.register_blueprint(logout_blueprint)
     app.register_blueprint(save_antibody_blueprint)
-
-    @app.route('/logout')
-    def logout():
-        """
-        - Revoke the tokens with Globus Auth.
-        - Destroy the session state.
-        - Redirect the user to the Globus Auth logout page.
-        """
-        client = globus_sdk.ConfidentialAppAuthClient(
-            app.config['APP_CLIENT_ID'],
-            app.config['APP_CLIENT_SECRET']
-        )
-
-        # Revoke the tokens with Globus Auth
-        if 'tokens' in session:
-            for token in (token_info['access_token']
-                for token_info in session['tokens'].values()):
-                client.oauth2_revoke_token(token)
-
-        # Destroy the session state
-        session.clear()
-
-        # build the logout URI with query params
-        # there is no tool to help build this (yet!)
-        redirect_uri = url_for('login.login', _external=True)
-
-        globus_logout_url = (
-            'https://auth.globus.org/v2/web/logout' +
-            '?client={}'.format(app.config['APP_CLIENT_ID']) +
-            '&redirect_uri={}'.format(redirect_uri) +
-            '&redirect_name={}'.format('hubmap')
-        )
-
-        # Redirect the user to the Globus Auth logout page
-        return redirect(globus_logout_url)
-
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
