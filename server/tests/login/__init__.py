@@ -34,7 +34,7 @@ class TestLogin:
 
     def test_request_with_code_should_return_redirection_to_index(self, login_with_code):
         assert login_with_code.status == '302 FOUND'
-        assert login_with_code.location == 'http://localhost%s' % (url_for('hubmap'),)
+        assert login_with_code.location == 'http://localhost%s' % (url_for('hubmap.hubmap'),)
 
     def test_request_with_code_should_save_tokens_in_session(self, login_with_code):
         assert session['tokens'] == MockToken().get_resource_server()

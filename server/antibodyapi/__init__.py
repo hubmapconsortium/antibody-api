@@ -21,6 +21,8 @@ from antibodyapi.utils import (
 
 from . import default_config
 
+from antibodyapi.hubmap import hubmap_blueprint
+
 UPLOAD_FOLDER = '/tmp'
 
 requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
@@ -35,14 +37,7 @@ def create_app(testing=False):
         # We should not load the gitignored app.conf during tests.
         app.config.from_pyfile('app.conf')
 
-    @app.route('/')
-    def hubmap():
-        #replace by the correct way to check token validity.
-        authenticated = session.get('is_authenticated')
-        if not authenticated:
-            return redirect(url_for('login'))
-
-        return render_template('pages/base.html', test_var='hello, world!')
+    app.register_blueprint(hubmap_blueprint)
 
     @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies(): # pylint: disable=too-many-branches
@@ -197,7 +192,7 @@ def create_app(testing=False):
                 tokens=tokens.by_resource_server,
                 is_authenticated=True
             )
-            return redirect(url_for('hubmap'))
+            return redirect(url_for('hubmap.hubmap'))
 
     @app.route('/logout')
     def logout():
