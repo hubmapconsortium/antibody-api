@@ -2,15 +2,15 @@ import csv
 import os
 from flask import (
     abort, Blueprint, current_app, jsonify, make_response,
-    redirect, request, session
+    redirect, request, session, url_for
 )
+from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
+from werkzeug.utils import secure_filename
 from antibodyapi.utils import (
-    allowed_file, base_antibody_query, find_or_create_vendor, get_cursor,
-    get_file_uuid, get_hubmap_uuid, get_user_info, insert_query,
+    allowed_file, find_or_create_vendor, get_cursor,
+    get_file_uuid, get_hubmap_uuid, insert_query,
     insert_query_with_avr_file_and_uuid, json_error
 )
-from psycopg2.errors import UniqueViolation
-from werkzeug.utils import secure_filename
 
 import_antibodies_blueprint = Blueprint('import_antibodies', __name__)
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])

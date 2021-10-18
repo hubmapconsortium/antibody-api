@@ -1,13 +1,6 @@
 import globus_sdk
-from flask import (
-    abort, Blueprint, current_app, jsonify, make_response,
-    redirect, render_template, request, session, url_for
-)
-from antibodyapi.utils import (
-    allowed_file, base_antibody_query, find_or_create_vendor, get_cursor,
-    get_file_uuid, get_hubmap_uuid, get_user_info, insert_query,
-    insert_query_with_avr_file_and_uuid, json_error
-)
+from flask import Blueprint, current_app, redirect, request, session, url_for
+from antibodyapi.utils import get_user_info
 
 login_blueprint = Blueprint('login', __name__)
 @login_blueprint.route('/login')

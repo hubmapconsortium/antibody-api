@@ -1,12 +1,5 @@
-from flask import (
-    Blueprint, current_app, jsonify, make_response,
-    redirect, render_template, session, url_for
-)
-from antibodyapi.utils import (
-    allowed_file, base_antibody_query, find_or_create_vendor, get_cursor,
-    get_file_uuid, get_hubmap_uuid, get_user_info, insert_query,
-    insert_query_with_avr_file_and_uuid, json_error
-)
+from flask import Blueprint, current_app, jsonify, make_response
+from antibodyapi.utils import base_antibody_query, get_cursor
 
 list_antibodies_blueprint = Blueprint('list_antibodies', __name__)
 @list_antibodies_blueprint.route('/antibodies')

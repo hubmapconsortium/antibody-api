@@ -1,11 +1,8 @@
-from flask import (
-    abort, Blueprint, current_app, jsonify, make_response,
-    redirect, render_template, request, session, url_for
-)
+from flask import abort, Blueprint, current_app, jsonify, make_response, request, session
+from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
 from antibodyapi.utils import (
-    allowed_file, base_antibody_query, find_or_create_vendor, get_cursor,
-    get_file_uuid, get_hubmap_uuid, get_user_info, insert_query,
-    insert_query_with_avr_file_and_uuid, json_error
+    find_or_create_vendor, get_cursor,
+    get_hubmap_uuid, insert_query, json_error
 )
 
 save_antibody_blueprint = Blueprint('save_antibody', __name__)
