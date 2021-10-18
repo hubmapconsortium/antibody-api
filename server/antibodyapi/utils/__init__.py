@@ -2,7 +2,6 @@
 import os
 import globus_sdk
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
 from flask import (
     Flask, abort, g, jsonify, make_response, redirect,
     session, request, render_template, url_for
@@ -13,6 +12,9 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # pylint: disable=no-name-in-module
 from psycopg2.errors import UniqueViolation
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
+requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
 
 ALLOWED_EXTENSIONS = {'csv'}
 
