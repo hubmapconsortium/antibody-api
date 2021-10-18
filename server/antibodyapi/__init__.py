@@ -1,7 +1,12 @@
 import csv
 import os
+import globus_sdk
 import requests
-from flask import Flask, abort, g, jsonify, make_response, request, render_template
+from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
+from flask import (
+    Flask, abort, g, jsonify, make_response, redirect,
+    session, request, render_template, url_for
+)
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -12,6 +17,8 @@ from . import default_config
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'csv'}
+
+requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -145,12 +152,28 @@ def create_app(testing=False):
         # We should not load the gitignored app.conf during tests.
         app.config.from_pyfile('app.conf')
 
+
+    @app.route('/set_authenticated')
+    def fake_is_auth():
+        # remove this method when auth complete.
+        session.update(is_authenticated=True)
+        return redirect(url_for("hubmap"))
+
     @app.route('/')
     def hubmap():
+        #replace by the correct way to check token validity.
+        authenticated = session.get('is_authenticated')
+        if not authenticated:
+            return redirect(url_for('login'))
+
         return render_template('pages/base.html', test_var='hello, world!')
 
     @app.route('/antibodies/import', methods=['POST'])
     def import_antibodies(): # pylint: disable=too-many-branches
+        authenticated = session.get('is_authenticated')
+        if not authenticated:
+            return redirect(url_for('login'))
+
         if 'file' not in request.files:
             abort(json_error('CSV file missing', 406))
 
@@ -172,6 +195,10 @@ def create_app(testing=False):
                             abort(json_error('CSV fields are wrong', 406))
                         del row['vendor']
                         row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+                        row['created_by_user_displayname'] = session['name']
+                        row['created_by_user_email'] = session['email']
+                        row['created_by_user_sub'] = session['sub']
+                        row['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
                         query = insert_query()
                         if 'avr_filename' in row.keys():
                             if 'pdf' in request.files:
@@ -244,11 +271,7 @@ def create_app(testing=False):
           'recombinant',
           'organ_or_tissue',
           'hubmap_platform',
-          'submitter_orciid',
-          'created_by_user_displayname',
-          'created_by_user_email',
-          'created_by_user_sub',
-          'group_uuid'
+          'submitter_orciid'
         )
         try:
             antibody = request.get_json()['antibody']
@@ -265,11 +288,76 @@ def create_app(testing=False):
         antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
         del antibody['vendor']
         antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+        antibody['created_by_user_displayname'] = session['name']
+        antibody['created_by_user_email'] = session['email']
+        antibody['created_by_user_sub'] = session['sub']
+        antibody['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
         try:
             cur.execute(insert_query(), antibody)
         except UniqueViolation:
             abort(json_error('Antibody not unique', 400))
         return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
+
+    @app.route('/login')
+    def login():
+        redirect_uri = url_for('login', _external=True)
+        client = globus_sdk.ConfidentialAppAuthClient(
+            app.config['APP_CLIENT_ID'],
+            app.config['APP_CLIENT_SECRET']
+        )
+        client.oauth2_start_flow(redirect_uri)
+
+        if 'code' not in request.args: # pylint: disable=no-else-return
+            auth_uri = client.oauth2_get_authorize_url(query_params={"scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups" }) # pylint: disable=line-too-long
+            return redirect(auth_uri)
+        else:
+            code = request.args.get('code')
+            tokens = client.oauth2_exchange_code_for_tokens(code)
+            user_info = get_user_info(tokens)
+            session.update(
+                name=user_info['name'],
+                email=user_info['email'],
+                sub=user_info['sub'],
+                tokens=tokens.by_resource_server,
+                is_authenticated=True
+            )
+            return redirect(url_for('hubmap'))
+
+    @app.route('/logout')
+    def logout():
+        """
+        - Revoke the tokens with Globus Auth.
+        - Destroy the session state.
+        - Redirect the user to the Globus Auth logout page.
+        """
+        client = globus_sdk.ConfidentialAppAuthClient(
+            app.config['APP_CLIENT_ID'],
+            app.config['APP_CLIENT_SECRET']
+        )
+
+        # Revoke the tokens with Globus Auth
+        if 'tokens' in session:
+            for token in (token_info['access_token']
+                for token_info in session['tokens'].values()):
+                client.oauth2_revoke_token(token)
+
+        # Destroy the session state
+        session.clear()
+
+        # build the logout URI with query params
+        # there is no tool to help build this (yet!)
+        redirect_uri = url_for('login', _external=True)
+
+        globus_logout_url = (
+            'https://auth.globus.org/v2/web/logout' +
+            '?client={}'.format(app.config['APP_CLIENT_ID']) +
+            '&redirect_uri={}'.format(redirect_uri) +
+            '&redirect_name={}'.format('hubmap')
+        )
+
+        # Redirect the user to the Globus Auth logout page
+        return redirect(globus_logout_url)
+
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
@@ -306,9 +394,10 @@ def get_hubmap_uuid(uuid_api_url):
         '%s/hmuuid' % (uuid_api_url,),
         headers={
             'Content-Type': 'application/json',
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
-        json={'entity_type': 'AVR'}
+        json={'entity_type': 'AVR'},
+        verify=False
     )
     return req.json()[0]['uuid']
 
@@ -318,7 +407,7 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     req = requests.post(
         '%s/file-upload' % (ingest_api_url,),
         headers={
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
         files={'file':
             (
@@ -326,19 +415,26 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
                 open(os.path.join(upload_folder, filename), 'rb'),
                 'application/pdf'
             )
-        }
+        },
+        verify=False
     )
     temp_file_id = req.json()['temp_file_id']
 
     req2 = requests.post(
         '%s/file-commit' % (ingest_api_url,),
         headers={
-            'authorization': request.headers.get('authorization')
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
         },
         json={
             'entity_uuid': antibody_uuid,
             'temp_file_id': temp_file_id,
-            'user_token': request.headers.get('authorization').split()[-1]
-        }
+            'user_token': session['tokens']['nexus.api.globus.org']['access_token']
+        },
+        verify=False
     )
     return req2.json()['file_uuid']
+
+def get_user_info(token):
+    auth_token = token.by_resource_server['auth.globus.org']['access_token']
+    auth_client = globus_sdk.AuthClient(authorizer=globus_sdk.AccessTokenAuthorizer(auth_token))
+    return auth_client.oauth2_userinfo()
