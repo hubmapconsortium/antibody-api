@@ -24,6 +24,7 @@ from . import default_config
 from antibodyapi.hubmap import hubmap_blueprint
 from antibodyapi.import_antibodies import import_antibodies_blueprint
 from antibodyapi.list_antibodies import list_antibodies_blueprint
+from antibodyapi.save_antibody import save_antibody_blueprint
 
 UPLOAD_FOLDER = '/tmp'
 
@@ -42,49 +43,7 @@ def create_app(testing=False):
     app.register_blueprint(hubmap_blueprint)
     app.register_blueprint(import_antibodies_blueprint)
     app.register_blueprint(list_antibodies_blueprint)
-
-    @app.route('/antibodies', methods=['POST'])
-    def save_antibody():
-        required_properties = (
-          'protocols_io_doi',
-          'uniprot_accession_number',
-          'target_name',
-          'rrid',
-          'antibody_name',
-          'host_organism',
-          'clonality',
-          'vendor',
-          'catalog_number',
-          'lot_number',
-          'recombinant',
-          'organ_or_tissue',
-          'hubmap_platform',
-          'submitter_orciid'
-        )
-        try:
-            antibody = request.get_json()['antibody']
-        except KeyError:
-            abort(json_error('Antibody missing', 406))
-        for prop in required_properties:
-            if prop not in antibody:
-                abort(json_error(
-                    'Antibody data incomplete: missing %s parameter' % prop, 400
-                    )
-                )
-
-        cur = get_cursor(app)
-        antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
-        del antibody['vendor']
-        antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
-        antibody['created_by_user_displayname'] = session['name']
-        antibody['created_by_user_email'] = session['email']
-        antibody['created_by_user_sub'] = session['sub']
-        antibody['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
-        try:
-            cur.execute(insert_query(), antibody)
-        except UniqueViolation:
-            abort(json_error('Antibody not unique', 400))
-        return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
+    app.register_blueprint(save_antibody_blueprint)
 
     @app.route('/login')
     def login():
