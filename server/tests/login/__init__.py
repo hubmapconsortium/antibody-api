@@ -23,7 +23,7 @@ class TestLogin:
         mock = mocker.patch.object(MockClient,'oauth2_start_flow')
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
         client.get('/login')
-        mock.assert_called_once_with(url_for('login', _external=True))
+        mock.assert_called_once_with(url_for('login.login', _external=True))
 
     @pytest.fixture
     def login_with_code(self, client, mocker):
@@ -34,7 +34,7 @@ class TestLogin:
 
     def test_request_with_code_should_return_redirection_to_index(self, login_with_code):
         assert login_with_code.status == '302 FOUND'
-        assert login_with_code.location == 'http://localhost%s' % (url_for('hubmap'),)
+        assert login_with_code.location == 'http://localhost%s' % (url_for('hubmap.hubmap'),)
 
     def test_request_with_code_should_save_tokens_in_session(self, login_with_code):
         assert session['tokens'] == MockToken().get_resource_server()

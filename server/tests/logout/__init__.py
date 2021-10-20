@@ -20,7 +20,7 @@ class TestLogout:
         assert logout_response.location == (
             'https://auth.globus.org/v2/web/logout' +
             '?client={}'.format('should-be-overridden') +
-            '&redirect_uri={}'.format(url_for('login', _external=True)) +
+            '&redirect_uri={}'.format(url_for('login.login', _external=True)) +
             '&redirect_name={}'.format('hubmap')
         )
 
