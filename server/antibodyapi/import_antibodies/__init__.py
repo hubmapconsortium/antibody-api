@@ -11,6 +11,7 @@ from antibodyapi.utils import (
     get_file_uuid, get_hubmap_uuid, insert_query,
     insert_query_with_avr_file_and_uuid, json_error
 )
+from antibodyapi.utils.elasticsearch import index_antibody
 
 import_antibodies_blueprint = Blueprint('import_antibodies', __name__)
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
@@ -39,6 +40,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
                         abort(json_error('CSV fields are wrong', 406))
+                    vendor = row['vendor']
                     del row['vendor']
                     row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
                     row['created_by_user_displayname'] = session['name']
@@ -63,6 +65,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                             'antibody_name': row['antibody_name'],
                             'antibody_uuid': row['antibody_uuid']
                         })
+                        index_antibody(row | {'vendor': vendor})
                     except KeyError:
                         abort(json_error('CSV fields are wrong', 406))
                     except UniqueViolation:
