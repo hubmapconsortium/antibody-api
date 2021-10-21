@@ -4,6 +4,7 @@ from antibodyapi.utils import (
     find_or_create_vendor, get_cursor,
     get_hubmap_uuid, insert_query, json_error
 )
+from antibodyapi.utils.elasticsearch import index_antibody
 
 save_antibody_blueprint = Blueprint('save_antibody', __name__)
 @save_antibody_blueprint.route('/antibodies', methods=['POST'])
@@ -38,6 +39,7 @@ def save_antibody():
     app = current_app
     cur = get_cursor(app)
     antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
+    vendor = antibody['vendor']
     del antibody['vendor']
     antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
     antibody['created_by_user_displayname'] = session['name']
@@ -46,6 +48,7 @@ def save_antibody():
     antibody['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
     try:
         cur.execute(insert_query(), antibody)
+        index_antibody(antibody | {'vendor': vendor})
     except UniqueViolation:
         abort(json_error('Antibody not unique', 400))
     return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
