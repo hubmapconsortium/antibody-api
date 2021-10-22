@@ -20,4 +20,4 @@ def index_antibody(antibody):
         'hubmap_platform': antibody['hubmap_platform'],
         'submitter_orciid': antibody['submitter_orciid']
     }
-    es_conn.index(index='hm_antibodies', document=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+    es_conn.index(index='hm_antibodies', body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
