@@ -1,7 +1,8 @@
 import elasticsearch
+from flask import current_app
 
 def index_antibody(antibody):
-    es_conn = elasticsearch.Elasticsearch()
+    es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
     doc = {
         'antibody_uuid': antibody['antibody_uuid'],
         'protocols_io_doi': antibody['protocols_io_doi'],
