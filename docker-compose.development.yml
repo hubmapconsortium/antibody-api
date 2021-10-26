@@ -10,6 +10,17 @@ services:
       - '5432:5432'
     volumes:
       - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
+  elasticsearch:
+    environment:
+      - discovery.type=single-node
+    image: elasticsearch:7.4.2
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+  kibana:
+    image: kibana:7.4.2
+    ports:
+      - '5601:5601'
   mockserver:
     image: mockserver/mockserver
     networks:
@@ -25,6 +36,7 @@ services:
       dockerfile: DockerfileDev
     depends_on:
       - db
+      - elasticsearch
       - mockserver
     environment:
         - FLASK_APP=antibodyapi
