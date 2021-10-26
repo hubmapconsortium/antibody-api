@@ -137,13 +137,16 @@ class TestPostCSVFile(AntibodyTesting):
             self.create_file_expectation(flask_app, headers, antibody, idx)
 
     @pytest.fixture(scope='class')
-    def response(self, client, headers, request_data, create_expectations):
+    def response( # pylint: disable=too-many-arguments
+        self, client, headers, request_data, create_expectations, class_mocker
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
+        class_mocker.patch('elasticsearch.Elasticsearch')
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -152,9 +155,9 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
-    def response_to_two_csv_files(
+    def response_to_two_csv_files( # pylint: disable=too-many-arguments
         self, client, headers, request_data_two_csv_files,
-        create_expectations_for_several_csv_files
+        create_expectations_for_several_csv_files, mocker
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
@@ -162,6 +165,7 @@ class TestPostCSVFile(AntibodyTesting):
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
+        mocker.patch('elasticsearch.Elasticsearch')
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -172,7 +176,7 @@ class TestPostCSVFile(AntibodyTesting):
     @pytest.fixture
     def response_to_csv_and_pdfs( # pylint: disable=too-many-arguments
         self, client, headers, request_data_with_pdfs,
-        create_expectations_for_several_pdf_files
+        create_expectations_for_several_pdf_files, mocker
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
@@ -180,6 +184,7 @@ class TestPostCSVFile(AntibodyTesting):
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
+        mocker.patch('elasticsearch.Elasticsearch')
         yield client.post(
             '/antibodies/import',
             content_type='multipart/form-data',
@@ -198,13 +203,14 @@ class TestPostCSVFile(AntibodyTesting):
         return client.post('/antibodies/import', headers=headers)
 
     @pytest.fixture
-    def response_to_request_without_filename(self, client, headers, csv_file):
+    def response_to_request_without_filename(self, client, headers, csv_file, mocker):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
+        mocker.patch('elasticsearch.Elasticsearch')
         return client.post(
             '/antibodies/import',
             content_type='multipart/form-data',

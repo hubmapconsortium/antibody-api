@@ -34,3 +34,4 @@ class DefaultConfig:
 
     UUID_API_URL = 'http://uuidmock:1080'
     INGEST_API_URL = 'http://uuidmock:1080'
+    ELASTICSEARCH_SERVER = 'http://elasticsearch'

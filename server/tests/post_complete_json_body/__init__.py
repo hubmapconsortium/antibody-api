@@ -25,7 +25,7 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
     @pytest.fixture
     def response(
         self, client, antibody_data, headers,
-        initial_antibodies_count, create_uuid_expectation
+        initial_antibodies_count, create_uuid_expectation, mocker
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
@@ -36,6 +36,7 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         data_to_send = {
             'antibody': { k: v for k, v in antibody_data['antibody'].items() if k[0] != '_' }
         }
+        mocker.patch('elasticsearch.Elasticsearch')
         return client.post('/antibodies', data=json.dumps(data_to_send), headers=headers)
 
     def test_antibody_gets_uuid_saved(
