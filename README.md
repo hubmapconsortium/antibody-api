@@ -22,7 +22,7 @@ docker push hubmap/antibody-api:latest
 For a released version of the image, specify the version tag:
 
 ````
-docker build -t hubmap/antibody-api:0.1.0 .
+docker push -t hubmap/antibody-api:0.1.0 .
 ````
 
 ## Deployment
