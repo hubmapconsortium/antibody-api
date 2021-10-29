@@ -29,6 +29,7 @@ services:
           - ingestmock
           - uuidmock
   web:
+    command: sh -c "yarn webpack --mode development --watch & flask run --host=0.0.0.0"
     build:
       args:
         - DEVELOPMENT=1
