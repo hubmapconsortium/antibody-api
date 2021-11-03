@@ -2,9 +2,9 @@ import Search from "./components/Search";
 import React from "react";
 import ReactDOM from "react-dom";
 
-const SomePage = () => {
+const SearchPage = () => {
     return <Search />;
 };
 
-ReactDOM.render(<SomePage />, document.getElementById("render-react-here"));
+ReactDOM.render(<SearchPage />, document.getElementById("render-react-here"));
 
