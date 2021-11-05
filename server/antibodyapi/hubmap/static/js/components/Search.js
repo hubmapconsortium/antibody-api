@@ -19,6 +19,7 @@ const Search = () => (
         searchOnChange={true}
         prefixQueryFields={["actors^1","type^2","languages","title^10"]}/>
     </TopBar>
+
     <LayoutBody>
       <SideBar>
         <HierarchicalMenuFilter
