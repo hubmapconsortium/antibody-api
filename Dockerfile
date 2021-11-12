@@ -24,14 +24,15 @@ ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
 WORKDIR /app/server
 
-COPY server/antibodyapi .
+COPY server/antibodyapi antibodyapi
 COPY server/package.json .
 COPY server/yarn.lock .
-RUN yarn && yarn webpack --mode production
+COPY server/babel.config.js .
+COPY server/webpack.config.js .
+RUN yarn
+RUN yarn webpack --mode production
 
 COPY server/uwsgi.ini .
 COPY server/wsgi.py .
-# Copy the antibodyapi directory and all contents
-ADD server/antibodyapi antibodyapi
 
 CMD [ "uwsgi", "--ini", "/app/server/uwsgi.ini" ]
