@@ -21,6 +21,12 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
 WORKDIR /app/server
+
+COPY server/antibodyapi .
+COPY server/package.json .
+COPY server/yarn.lock .
+RUN yarn && yarn webpack --mode production
+
 COPY server/uwsgi.ini .
 COPY server/wsgi.py .
 # Copy the antibodyapi directory and all contents
