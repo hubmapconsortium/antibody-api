@@ -18,7 +18,7 @@ const Search = () => (
       <SearchBox
         autofocus={true}
         searchOnChange={true}
-        prefixQueryFields={["antibody_name.keyword^3","target_name.keyword^2","uniprot_accession_number", "catalog_number", "organ_or_tissue.keyword"]}/>
+        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor"]}/>
     </TopBar>
 
     <LayoutBody>
