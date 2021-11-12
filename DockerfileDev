@@ -19,7 +19,6 @@ RUN if [ -z $DEVELOPMENT ] ; then apk --purge del build-base postgresql-dev ; fi
 
 WORKDIR /app/server
 COPY server/antibodyapi .
+COPY server/package.json .
+COPY server/yarn.lock .
 RUN yarn
-
-
-CMD ["flask", "run", "--host=0.0.0.0"]
