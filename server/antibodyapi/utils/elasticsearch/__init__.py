@@ -21,3 +21,10 @@ def index_antibody(antibody):
         'submitter_orciid': antibody['submitter_orciid']
     }
     es_conn.index(index='hm_antibodies', body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+
+
+def execute_query(query):
+    es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
+
+    # Return the elasticsearch resulting json data as json string
+    return es_conn.search(index="hm_antibodies", body=query)

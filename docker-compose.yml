@@ -6,3 +6,4 @@ services:
     volumes:
       - ./instance:/app/var/antibodyapi-instance
       - ./server:/app/server
+      - /app/server/node_modules
