@@ -106,6 +106,8 @@ def get_group_id(ingest_api_url, group_id=None):
     if group_id:
         if groups.get(group_id):
             return group_id
+        else:
+            return None
 
     if list(groups.values()).count(True) != 1:
         return None

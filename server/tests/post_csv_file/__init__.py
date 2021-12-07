@@ -147,6 +147,49 @@ class TestPostCSVFile(AntibodyTesting):
             }
         )
 
+    @classmethod
+    def create_no_data_provider_group_expectation(cls, flask_app):
+        response = {
+            'groups': [
+                {
+                    'data_provider': False,
+                    'displayname': 'HuBMAP Read',
+                    'generateuuid': False,
+                    'name': 'hubmap-read',
+                    'uuid': 'whatevs'
+                },
+                {
+                    'data_provider': False,
+                    'displayname': 'HuBMAP Read II',
+                    'generateuuid': False,
+                    'name': 'hubmap-read-ii',
+                    'uuid': 'nevermind'
+                }
+            ]
+        }
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'GET',
+                    'path': '/metadata/usergroups',
+                    'headers': {
+                        'authorization': [ 'Bearer woot' ]
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps(response)
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                }
+            }
+        )
+
 
     @classmethod
     def create_pdf(cls):
@@ -167,6 +210,12 @@ class TestPostCSVFile(AntibodyTesting):
         self, flask_app
     ):
         self.create_wrong_group_id_expectation(flask_app)
+
+    @pytest.fixture
+    def create_group_expectation_with_no_data_provider(
+        self, flask_app
+    ):
+        self.create_no_data_provider_group_expectation(flask_app)
 
     @pytest.fixture
     def create_group_expectations_default_scope(
@@ -457,10 +506,14 @@ class TestPostCSVFile(AntibodyTesting):
             'message': 'Not a member of a data provider group or no group_id provided'
         }
 
-    # def test_post_csv_file_should_return_406_if_user_lacks_data_provider(
-    #     self, response
-    # ):
-    #     pass
+    def test_post_csv_file_should_return_406_if_user_lacks_data_provider(
+        self, create_group_expectation_with_no_data_provider,
+        response_with_wrong_group_expectations
+    ):
+        assert response_with_wrong_group_expectations.status == '406 NOT ACCEPTABLE'
+        assert json.loads(response_with_wrong_group_expectations.data) == {
+            'message': 'Not a member of a data provider group or no group_id provided'
+        }
 
     def test_post_csv_file_with_pdf_should_save_those_correctly(
         self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor
