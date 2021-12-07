@@ -9,7 +9,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./deploy/postgresql_init_scripts:/docker-entrypoint-initdb.d
+      - ./development_environment/postgresql_init_scripts:/docker-entrypoint-initdb.d
   elasticsearch:
     environment:
       - discovery.type=single-node
