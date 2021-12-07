@@ -93,6 +93,29 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     )
     return req2.json()['file_uuid']
 
+def get_group_id(ingest_api_url, group_id=None):
+    req = requests.get(
+        '%s/metadata/usergroups' % (ingest_api_url,),
+        headers={
+            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
+        },
+        verify=False
+    )
+    groups = {g['uuid']: g['data_provider'] for g in req.json()['groups']}
+
+    if group_id:
+        if groups.get(group_id):
+            return group_id
+
+    if list(groups.values()).count(True) != 1:
+        return None
+
+    for uuid, data_provider in groups.items():
+        if data_provider:
+            return uuid
+
+    return None
+
 def get_hubmap_uuid(uuid_api_url):
     req = requests.post(
         '%s/hmuuid' % (uuid_api_url,),

@@ -37,6 +37,10 @@ def raw_antibody_data():
     }
 
 @pytest.fixture(scope='class')
+def group_id():
+    return str(uuid4())
+
+@pytest.fixture(scope='class')
 def antibody_data():
     return {
         'antibody': raw_antibody_data()
