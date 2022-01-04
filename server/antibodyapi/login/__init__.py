@@ -14,7 +14,7 @@ def login():
     client.oauth2_start_flow(redirect_uri)
 
     if 'code' not in request.args: # pylint: disable=no-else-return
-        auth_uri = client.oauth2_get_authorize_url(query_params={"scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups" }) # pylint: disable=line-too-long
+        auth_uri = client.oauth2_get_authorize_url(query_params={"scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups urn:globus:auth:scope:groups.api.globus.org:all" }) # pylint: disable=line-too-long
         return redirect(auth_uri)
     else:
         code = request.args.get('code')
@@ -25,6 +25,7 @@ def login():
             email=user_info['email'],
             sub=user_info['sub'],
             tokens=tokens.by_resource_server,
+            groups_access_token=tokens.by_resource_server['groups.api.globus.org']['access_token'],
             is_authenticated=True
         )
         return redirect(url_for('hubmap.hubmap'))
