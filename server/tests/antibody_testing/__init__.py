@@ -98,3 +98,39 @@ class AntibodyTesting:
                 'priority': 1000-idx
             }
         )
+
+    @classmethod
+    def create_group_id_expectation(cls, flask_app, group_id):
+        response = {
+            'groups': [
+                {
+                    'data_provider': True,
+                    'displayname': 'HuBMAP Read',
+                    'generateuuid': False,
+                    'name': 'hubmap-read',
+                    'uuid': group_id
+                }
+            ]
+        }
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'GET',
+                    'path': '/metadata/usergroups',
+                    'headers': {
+                        'authorization': [ 'Bearer woot' ]
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps(response)
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                }
+            }
+        )

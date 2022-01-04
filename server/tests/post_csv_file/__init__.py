@@ -105,6 +105,93 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @classmethod
+    def create_wrong_group_id_expectation(cls, flask_app):
+        response = {
+            'groups': [
+                {
+                    'data_provider': True,
+                    'displayname': 'HuBMAP Read',
+                    'generateuuid': False,
+                    'name': 'hubmap-read',
+                    'uuid': 'whatevs'
+                },
+                {
+                    'data_provider': True,
+                    'displayname': 'HuBMAP Read II',
+                    'generateuuid': False,
+                    'name': 'hubmap-read-ii',
+                    'uuid': 'nevermind'
+                }
+            ]
+        }
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'GET',
+                    'path': '/metadata/usergroups',
+                    'headers': {
+                        'authorization': [ 'Bearer woot' ]
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps(response)
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                }
+            }
+        )
+
+    @classmethod
+    def create_no_data_provider_group_expectation(cls, flask_app):
+        response = {
+            'groups': [
+                {
+                    'data_provider': False,
+                    'displayname': 'HuBMAP Read',
+                    'generateuuid': False,
+                    'name': 'hubmap-read',
+                    'uuid': 'whatevs'
+                },
+                {
+                    'data_provider': False,
+                    'displayname': 'HuBMAP Read II',
+                    'generateuuid': False,
+                    'name': 'hubmap-read-ii',
+                    'uuid': 'nevermind'
+                }
+            ]
+        }
+        requests.put(
+            '%s/mockserver/expectation' % (flask_app.config['INGEST_API_URL'],),
+            json={
+                'httpRequest': {
+                    'method': 'GET',
+                    'path': '/metadata/usergroups',
+                    'headers': {
+                        'authorization': [ 'Bearer woot' ]
+                    }
+                },
+                'httpResponse': {
+                    'body': {
+                        'contentType': 'application/json',
+                        'json': json.dumps(response)
+                    }
+                },
+                'times': {
+                    'remainingTimes': 1,
+                    'unlimited': False
+                }
+            }
+        )
+
+
+    @classmethod
     def create_pdf(cls):
         pdf = FPDF()
         pdf.add_page()
@@ -113,13 +200,39 @@ class TestPostCSVFile(AntibodyTesting):
         return pdf.output(dest='S').encode('latin-1')
 
     @pytest.fixture(scope='class')
-    def create_expectations(self, flask_app, headers, antibody_data_multiple):
+    def create_group_expectations(
+        self, flask_app, group_id
+    ):
+        self.create_group_id_expectation(flask_app, group_id)
+
+    @pytest.fixture
+    def create_wrong_group_expectations(
+        self, flask_app
+    ):
+        self.create_wrong_group_id_expectation(flask_app)
+
+    @pytest.fixture
+    def create_group_expectation_with_no_data_provider(
+        self, flask_app
+    ):
+        self.create_no_data_provider_group_expectation(flask_app)
+
+    @pytest.fixture
+    def create_group_expectations_default_scope(
+        self, flask_app, group_id
+    ):
+        self.create_group_id_expectation(flask_app, group_id)
+
+    @pytest.fixture(scope='class')
+    def create_expectations(
+        self, flask_app, headers, antibody_data_multiple, group_id
+    ):
         for idx, antibody in enumerate(antibody_data_multiple['antibody']):
             self.create_expectation(flask_app, headers, antibody, idx)
 
     @pytest.fixture
-    def create_expectations_for_several_csv_files(
-        self, flask_app, headers,
+    def create_expectations_for_several_csv_files( # pylint: disable=too-many-arguments
+        self, flask_app, headers, group_id,
         antibody_data_multiple_once, antibody_data_multiple_twice
     ):
         for idx, antibody in enumerate(
@@ -130,7 +243,7 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture
     def create_expectations_for_several_pdf_files(
-        self, flask_app, headers, antibody_data_multiple_with_pdfs
+        self, flask_app, headers, antibody_data_multiple_with_pdfs, group_id
     ):
         for idx, antibody in enumerate(antibody_data_multiple_with_pdfs['antibody']):
             self.create_expectation(flask_app, headers, antibody, idx)
@@ -138,7 +251,8 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture(scope='class')
     def response( # pylint: disable=too-many-arguments
-        self, client, headers, request_data, create_expectations, class_mocker
+        self, client, headers, request_data,
+        create_expectations, class_mocker
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
@@ -151,6 +265,23 @@ class TestPostCSVFile(AntibodyTesting):
             '/antibodies/import',
             content_type='multipart/form-data',
             data=request_data,
+            headers=headers
+        )
+
+    @pytest.fixture
+    def response_with_wrong_group_expectations( # pylint: disable=too-many-arguments
+        self, client, headers, weird_csv_file
+    ):
+        with client.session_transaction() as sess:
+            sess['is_authenticated'] = True
+            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['name'] = 'Name'
+            sess['email'] = 'name@example.com'
+            sess['sub'] = '1234567890'
+        return client.post(
+            '/antibodies/import',
+            content_type='multipart/form-data',
+            data={'file': (io.BytesIO(weird_csv_file), 'antibodies.csv')},
             headers=headers
         )
 
@@ -175,7 +306,7 @@ class TestPostCSVFile(AntibodyTesting):
 
     @pytest.fixture
     def response_to_csv_and_pdfs( # pylint: disable=too-many-arguments
-        self, client, headers, request_data_with_pdfs,
+        self, client, headers, request_data_with_pdfs, create_group_expectations_default_scope,
         create_expectations_for_several_pdf_files, mocker
     ):
         with client.session_transaction() as sess:
@@ -193,7 +324,9 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
-    def response_to_empty_request(self, client, headers):
+    def response_to_empty_request(
+        self, client, headers, create_group_expectations_default_scope
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['groups_access_token'] = 'woot'
@@ -203,7 +336,9 @@ class TestPostCSVFile(AntibodyTesting):
         return client.post('/antibodies/import', headers=headers)
 
     @pytest.fixture
-    def response_to_request_without_filename(self, client, headers, csv_file, mocker):
+    def response_to_request_without_filename( # pylint: disable=too-many-arguments
+        self, client, headers, csv_file, create_group_expectations_default_scope, mocker
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['groups_access_token'] = 'woot'
@@ -219,7 +354,9 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
-    def response_to_request_with_wrong_extension(self, client, headers, csv_file):
+    def response_to_request_with_wrong_extension(
+        self, client, headers, create_group_expectations_default_scope, csv_file
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['groups_access_token'] = 'woot'
@@ -234,7 +371,9 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture
-    def response_to_request_with_weird_csv_file(self, client, headers, weird_csv_file):
+    def response_to_request_with_weird_csv_file(
+        self, client, headers, create_group_expectations_default_scope, weird_csv_file
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['groups_access_token'] = 'woot'
@@ -249,8 +388,11 @@ class TestPostCSVFile(AntibodyTesting):
         )
 
     @pytest.fixture(scope='class')
-    def request_data(self, csv_file):
-        return {'file': (io.BytesIO(csv_file), 'antibodies.csv')}
+    def request_data(self, csv_file, group_id):
+        return {
+            'file': (io.BytesIO(csv_file), 'antibodies.csv'),
+            'group_id': group_id
+        }
 
     @pytest.fixture
     def request_data_two_csv_files(self, csv_file_once, csv_file_twice):
@@ -316,13 +458,15 @@ class TestPostCSVFile(AntibodyTesting):
     def weird_csv_file(self):
         return bytes('a,b,c,d\n1,2,1,1\n1,2,1,4\n', 'utf-8')
 
-    def test_post_csv_file_should_return_a_201_response(self, response):
+    def test_post_csv_file_should_return_a_201_response(
+        self, create_group_expectations, response
+    ):
         """Sending a CSV file should return 201 CREATED if all goes well"""
         print(response.status)
         assert response.status == '201 CREATED'
 
     def test_post_csv_file_should_return_uuids_and_antibody_names(
-        self, response, antibody_data_multiple
+        self, create_group_expectations, response, antibody_data_multiple
     ):
         uuid_and_name = []
         for antibody in antibody_data_multiple['antibody']:
@@ -336,8 +480,9 @@ class TestPostCSVFile(AntibodyTesting):
             { 'antibodies': uuid_and_name } == json.loads(response.data)
         )
 
-    def test_post_csv_file_should_save_antibodies_correctly(
-        self, response, antibody_data_multiple, cursor
+    def test_post_csv_file_should_save_antibodies_correctly( # pylint: disable=too-many-arguments
+        self, create_group_expectations, response,
+        antibody_data_multiple, cursor, group_id
     ):
         """Posting a CSV file should save antibodies correctly"""
         sent_data = {
@@ -347,10 +492,28 @@ class TestPostCSVFile(AntibodyTesting):
             'Name',
             'name@example.com',
             '1234567890',
-            '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
+            group_id
         )
         sent_fields = tuple(sent_data.values()) + additional_fields
         assert sent_fields == self.last_antibody(cursor)
+
+    def test_post_csv_file_should_return_406_if_more_than_one_group_id(
+        self, create_wrong_group_expectations,
+        response_with_wrong_group_expectations
+    ):
+        assert response_with_wrong_group_expectations.status == '406 NOT ACCEPTABLE'
+        assert json.loads(response_with_wrong_group_expectations.data) == {
+            'message': 'Not a member of a data provider group or no group_id provided'
+        }
+
+    def test_post_csv_file_should_return_406_if_user_lacks_data_provider(
+        self, create_group_expectation_with_no_data_provider,
+        response_with_wrong_group_expectations
+    ):
+        assert response_with_wrong_group_expectations.status == '406 NOT ACCEPTABLE'
+        assert json.loads(response_with_wrong_group_expectations.data) == {
+            'message': 'Not a member of a data provider group or no group_id provided'
+        }
 
     def test_post_csv_file_with_pdf_should_save_those_correctly(
         self, response_to_csv_and_pdfs, antibody_data_multiple_with_pdfs, cursor
@@ -365,7 +528,9 @@ class TestPostCSVFile(AntibodyTesting):
             )
 
     def test_antibody_count_in_database_should_increase_when_sending_several_csvs(
-        self, initial_antibodies_count, response_to_two_csv_files,
+        self, initial_antibodies_count,
+        create_group_expectations_default_scope,
+        response_to_two_csv_files,
         final_antibodies_count, antibody_data_multiple_once,
         antibody_data_multiple_twice
     ): # pylint: disable=too-many-arguments

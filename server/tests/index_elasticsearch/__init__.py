@@ -32,7 +32,10 @@ class TestElasticsearchIndexing(AntibodyTesting):
         response_single_json_body.assert_called()
 
     @pytest.fixture(scope='class')
-    def response_csv_file(self, client, headers, request_data, create_expectations, class_mocker):
+    def response_csv_file(
+        self, client, headers, request_data, create_group_expectations,
+        create_expectations, class_mocker
+    ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
             sess['groups_access_token'] = 'woot'
@@ -53,6 +56,12 @@ class TestElasticsearchIndexing(AntibodyTesting):
     def create_expectations(self, flask_app, headers, antibody_data_multiple):
         for idx, antibody in enumerate(antibody_data_multiple['antibody']):
             self.create_expectation(flask_app, headers, antibody, idx)
+
+    @pytest.fixture(scope='class')
+    def create_group_expectations(
+        self, flask_app, group_id
+    ):
+        self.create_group_id_expectation(flask_app, group_id)
 
     @pytest.fixture(scope='class')
     def request_data(self, csv_file):

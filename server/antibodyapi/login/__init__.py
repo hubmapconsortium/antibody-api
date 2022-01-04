@@ -1,6 +1,6 @@
 import globus_sdk
 from flask import Blueprint, current_app, redirect, request, session, url_for
-from antibodyapi.utils import get_user_info
+from antibodyapi.utils import get_data_provider_groups, get_user_info
 
 login_blueprint = Blueprint('login', __name__)
 @login_blueprint.route('/login')
@@ -27,5 +27,8 @@ def login():
             tokens=tokens.by_resource_server,
             groups_access_token=tokens.by_resource_server['groups.api.globus.org']['access_token'],
             is_authenticated=True
+        )
+        session.update(
+            data_provider_groups=get_data_provider_groups(app.config['INGEST_API_URL'])
         )
         return redirect(url_for('hubmap.hubmap'))

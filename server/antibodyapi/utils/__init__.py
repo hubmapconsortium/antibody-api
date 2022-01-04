@@ -1,4 +1,3 @@
-
 import os
 import globus_sdk
 import requests
@@ -92,6 +91,47 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         verify=False
     )
     return req2.json()['file_uuid']
+
+def get_group_id(ingest_api_url, group_id=None):
+    req = requests.get(
+        '%s/metadata/usergroups' % (ingest_api_url,),
+        headers={
+            'authorization': 'Bearer %s' % session['groups_access_token']
+        },
+        verify=False
+    )
+    groups = {g['uuid']: g['data_provider'] for g in req.json()['groups']}
+
+    if group_id:
+        if groups.get(group_id):
+            return group_id
+        return None
+
+    if list(groups.values()).count(True) != 1:
+        return None
+
+    for uuid, data_provider in groups.items():
+        if data_provider:
+            return uuid
+
+    return None
+
+def get_data_provider_groups(ingest_api_url):
+    req = requests.get(
+        '%s/metadata/usergroups' % (ingest_api_url,),
+        headers={
+            'authorization': 'Bearer %s' % session['groups_access_token']
+        },
+        verify=False
+    )
+    groups = {g['uuid']: { 'displayname': g['displayname'], 'data_provider': g['data_provider'] } for g in req.json()['groups']}
+
+    data_provider_groups = []
+    for uuid, group_info in groups.items():
+        if group_info['data_provider']:
+            data_provider_groups.append([uuid, group_info['displayname']])
+
+    return data_provider_groups
 
 def get_hubmap_uuid(uuid_api_url):
     req = requests.post(

@@ -8,8 +8,9 @@ from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
 from werkzeug.utils import secure_filename
 from antibodyapi.utils import (
     allowed_file, find_or_create_vendor, get_cursor,
-    get_file_uuid, get_hubmap_uuid, insert_query,
-    insert_query_with_avr_file_and_uuid, json_error
+    get_file_uuid, get_group_id, get_hubmap_uuid,
+    insert_query, insert_query_with_avr_file_and_uuid,
+    json_error
 )
 from antibodyapi.utils.elasticsearch import index_antibody
 
@@ -26,6 +27,13 @@ def import_antibodies(): # pylint: disable=too-many-branches
     app = current_app
     cur = get_cursor(app)
     uuids_and_names = []
+
+    group_id = get_group_id(
+        app.config['INGEST_API_URL'], request.form.get('group_id')
+    )
+
+    if group_id is None:
+        abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
     for file in request.files.getlist('file'):
         if file.filename == '':
@@ -46,7 +54,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['created_by_user_displayname'] = session['name']
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
-                    row['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
+                    row['group_uuid'] = group_id
                     query = insert_query()
                     if 'avr_filename' in row.keys():
                         if 'pdf' in request.files:

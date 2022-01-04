@@ -11,8 +11,14 @@ def hubmap():
     authenticated = session.get('is_authenticated')
     if not authenticated:
         return redirect(url_for('login.login'))
-    return render_template('base.html')
-
+    data_provider_groups = session.get('data_provider_groups')
+    if data_provider_groups is not None and len(data_provider_groups) == 1:
+        data_provider_groups = None
+    return render_template(
+        'base.html',
+        token=session['tokens'],
+        data_provider_groups=data_provider_groups
+    )
 
 @hubmap_blueprint.route('/')
 def hubmap_search():
