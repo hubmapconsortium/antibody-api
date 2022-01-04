@@ -142,7 +142,7 @@ class TestPostCSVFile(AntibodyTesting):
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -161,7 +161,7 @@ class TestPostCSVFile(AntibodyTesting):
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -180,7 +180,7 @@ class TestPostCSVFile(AntibodyTesting):
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -196,7 +196,7 @@ class TestPostCSVFile(AntibodyTesting):
     def response_to_empty_request(self, client, headers):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -206,7 +206,7 @@ class TestPostCSVFile(AntibodyTesting):
     def response_to_request_without_filename(self, client, headers, csv_file, mocker):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -222,7 +222,7 @@ class TestPostCSVFile(AntibodyTesting):
     def response_to_request_with_wrong_extension(self, client, headers, csv_file):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
@@ -237,7 +237,7 @@ class TestPostCSVFile(AntibodyTesting):
     def response_to_request_with_weird_csv_file(self, client, headers, weird_csv_file):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = { 'nexus.api.globus.org' : { 'access_token': 'woot' } }
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
