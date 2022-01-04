@@ -66,7 +66,7 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     req = requests.post(
         '%s/file-upload' % (ingest_api_url,),
         headers={
-            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
+            'authorization': 'Bearer %s' % session['groups_access_token']
         },
         files={'file':
             (
@@ -82,12 +82,12 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     req2 = requests.post(
         '%s/file-commit' % (ingest_api_url,),
         headers={
-            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
+            'authorization': 'Bearer %s' % session['groups_access_token']
         },
         json={
             'entity_uuid': antibody_uuid,
             'temp_file_id': temp_file_id,
-            'user_token': session['tokens']['nexus.api.globus.org']['access_token']
+            'user_token': session['groups_access_token']
         },
         verify=False
     )
@@ -98,7 +98,7 @@ def get_hubmap_uuid(uuid_api_url):
         '%s/hmuuid' % (uuid_api_url,),
         headers={
             'Content-Type': 'application/json',
-            'authorization': 'Bearer %s' % session['tokens']['nexus.api.globus.org']['access_token']
+            'authorization': 'Bearer %s' % session['groups_access_token']
         },
         json={'entity_type': 'AVR'},
         verify=False
