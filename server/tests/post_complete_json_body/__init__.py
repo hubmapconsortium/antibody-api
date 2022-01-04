@@ -29,7 +29,7 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
-            sess['tokens'] = {'nexus.api.globus.org': {'access_token': 'woot'}}
+            sess['groups_access_token'] = 'woot'
             sess['name'] = 'Name'
             sess['email'] = 'name@example.com'
             sess['sub'] = '1234567890'
