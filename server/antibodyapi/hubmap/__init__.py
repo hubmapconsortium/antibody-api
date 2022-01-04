@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, session, url_for, request
+from flask import abort, Blueprint, redirect, render_template, session, url_for, request
 from antibodyapi.utils.elasticsearch import execute_query
 
 def bad_request_error(err_msg):
