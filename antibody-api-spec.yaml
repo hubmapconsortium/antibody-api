@@ -20,9 +20,6 @@ components:
     Antibody:
       type: object
       properties:
-        avr_url:
-          type: string
-          description: "The URL of the AVR PDF."
         protocols_io_doi:
           type: string
           description: "The protocols.io doi pointing the protocol under wich the sample was obtained and/or prepared."
@@ -64,22 +61,43 @@ components:
         submitter_orciid:
           type: string
           description: "The ORCID iD of the submitter."
-        created_by_user_displayname:
-          type: string
-          description: "The name of the person or process authenticated when creating the object"
-        created_by_user_email:
-          type: string
-          description: "The email address of the person or process authenticated when creating the object."
-        created_by_user_sub:
-          type: string
-          description: "The subject id as provided by the authorization mechanism for the person or process authenticated when creating the object."
-        group_uuid:
-          type: string
-          description: "The uuid of globus group which the user who created this antibody is a member of."
+    AntibodyListed:
+      allOf:
+        - $ref: '#/components/schemas/Antibody'
+        - type: object
+          properties:
+            antibody_uuid:
+              type: string
+              description: "The unique identifier for the antibody."
+            created_by_user_displayname:
+              type: string
+              description: "The name of the person or process authenticated when creating the object."
+            created_by_user_email:
+              type: string
+              description: "The email address of the person or process authenticated when creating the object."
+            created_by_user_sub:
+              type: string
+              description: "The subject id as provided by the authorization mechanism for the person or process authenticated when creating the object."
+            group_uuid:
+              type: string
+              description: "The unique identifier for the group for the person or process authenticated when creating the object."
 security:
   - bearerAuth: []
 paths:
   '/antibodies':
+    get:
+      summary: List antibodies
+      responses:
+        '200':
+          description: List the existing antibodies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AntibodyListed'
+        '500':
+          description: Internal error
     post:
       summary: Create an antibody
       parameters:
@@ -104,12 +122,12 @@ paths:
                     type: integer
                     description: "The ID of the Antibody just created."
         '400':
-          description: No JSON body supplied
+          description: The antibody data submitted did not pass validation
         '401':
           description: The user's token has expired or the user did not supply a valid token
         '403':
           description: The user is not authorized to create the entity
         '406':
-          description: The antibody data submitted did not pass validation
+          description: No JSON body supplied
         '500':
           description: Internal error
