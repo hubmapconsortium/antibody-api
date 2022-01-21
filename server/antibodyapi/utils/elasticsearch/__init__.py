@@ -67,4 +67,7 @@ def execute_query_through_search_api(query):
 
 def execute_query(query):
     logger.info(f"*** Elastic Search Query: {query}")
-    return execute_query_elasticsearch_directly(query)
+    query_directly: str = current_app.config['QUERY_ELASTICSEARCH_DIRECTLY']
+    if query_directly is True:
+        return execute_query_elasticsearch_directly(query)
+    return execute_query_through_search_api(query)

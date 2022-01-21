@@ -1,7 +1,7 @@
 # Scripts
 
 These scripts package the docker "magic".
-They must be run from the repo root
+They must be run from the repo root folder.
 
 They all startup Docker containers locally, and so they all need Docker to be running locally.
 
@@ -12,12 +12,17 @@ This will run the python linter over the python code and displays the quality.
 ## Local
 
 This will start the service locally.
-The server will be available on [http://localhost:5000](http://localhost:5000)
+The server will be available on [http://localhost:5000](http://localhost:5000).
+Before it can be run the 'instance/app.conf' file must be configured (see ./README.md) as the server makes connections to the services to get a UUID and also to store the .pdf (see ./scrpts/README.md).
 
-This local script also has a default command that allows you to run any command that yuo want.
+While many containers are created by the 'docker-compose.development.yml' file, the local environment depends on services mentioned in the '/instance/app.conf' file (see ./README.md); to get a UUID and also to store the .pdf (see ./scrpts/README.md).
+In particular, the UUID_API_URL is used to get the unique identifier for the antibodies, and
+the INGEST_API_URL is used to store the .pdf files.
+
+This local script also has a default command that allows you to run any command that you want.
 If you add a parameter to the end then it will run that parameter.
-By default it will run 'up -d' which deamonizes it and hides it from your view.
-Scenario, './scripts/run_local.sh up' will not deamonize (add the '-d').
+By default, it will run 'up -d' which daemonizes it and hides it from your view.
+Scenario, './scripts/run_local.sh up' will not daemonize (add the '-d').
 You can also bring the server down with  './scripts/run_local.sh down'
 
 ## Terminal
@@ -28,6 +33,6 @@ The use case for this is, if you want to add a library inside a container to get
 
 ## Tests
 
-This (./scripts/run_tests.sh) will run the tests (all without any parametes) in './server/tests' and display the results.
+This (./scripts/run_tests.sh) will run the tests (all without any parameters) in './server/tests' and display the results.
 
 This is what you add to select a test: "-k test_post_csv_file_with_pdf_should_save_those_correctly"

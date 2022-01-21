@@ -1,5 +1,10 @@
 # Help for Manual Test Files
 
+There are only two scenarios. The first is uploading just a .csv file without a .pdf file.
+The second is uploading a .csv and corresponding .pdf file.
+It is possible to upload multiple files, and the second scenario below tests that.
+If you don't give the .pdf file mentioned in the .csv file, it will be processed in a manner where no .pdf file exists (e.g., it won't give an error).
+
 Need to	be in a	'dataprovider group' to	do [http://localhost:5000/upload](http://localhost:5000/upload) or you will see:
 ```
 Response:

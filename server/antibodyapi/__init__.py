@@ -17,6 +17,7 @@ def create_app(testing=False):
         app.config['TESTING'] = True
     else:
         # We should not load the gitignored app.conf during tests.
+        # this file lives in '/instance/app.conf'
         app.config.from_pyfile('app.conf')
 
     app.register_blueprint(hubmap_blueprint)
