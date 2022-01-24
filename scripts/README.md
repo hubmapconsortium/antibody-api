@@ -1,15 +1,23 @@
 # Scripts
 
-These scripts package the docker "magic".
-They must be run from the repo root folder.
+There are scripts for running, testing, linting, and establishing a shell to a Docker container.
+There is also a script for building/updating the API generated from the OpenAPI spec.
+
+## OpenAPI Script
+
+The script './scripts/build_openapi_client.sh' will create/update the client API from the OpenAPI
+specification located at './antibody-api-spec.yml'. The client will be built in the 'hu-bap-antibody-api-client' directory.
+
+## Docker Scripts
+These scripts package the docker "magic".  They must be run from the repo root folder.
 
 They all startup Docker containers locally, and so they all need Docker to be running locally.
 
-## Linter
+### Linter
 
 This will run the python linter over the python code and displays the quality.
 
-## Local
+### Local
 
 This will start the service locally.
 The server will be available on [http://localhost:5000](http://localhost:5000).
@@ -25,13 +33,13 @@ By default, it will run 'up -d' which daemonizes it and hides it from your view.
 Scenario, './scripts/run_local.sh up' will not daemonize (add the '-d').
 You can also bring the server down with  './scripts/run_local.sh down'
 
-## Terminal
+### Terminal
 
 This will create a container for the web service ONLY and will open a terminal session for it.
 
 The use case for this is, if you want to add a library inside a container to get a new requirements file (i.e. with 'pip freese').
 
-## Tests
+### Tests
 
 This (./scripts/run_tests.sh) will run the tests (all without any parameters) in './server/tests' and display the results.
 
