@@ -3,9 +3,10 @@
 There are only two scenarios. The first is uploading just a .csv file without a .pdf file.
 The second is uploading a .csv and corresponding .pdf file.
 It is possible to upload multiple files, and the second scenario below tests that.
-If you don't give the .pdf file mentioned in the .csv file, it will be processed in a manner where no .pdf file exists (e.g., it won't give an error).
+If you don't give the .pdf file mentioned in the .csv file, it will be processed in
+a manner where no .pdf file exists (e.g., it won't give an error).
 
-Need to	be in a	'dataprovider group' to	do [http://localhost:5000/upload](http://localhost:5000/upload) or you will see:
+You need to be in a 'dataprovider group' to do [http://localhost:5000/upload](http://localhost:5000/upload) or you will see:
 ```
 Response:
 {
@@ -16,7 +17,7 @@ Response:
 The reason that there is a .csv and .pdf upload is because the .csv file makes reference (optional) to a pdf.
 
 Go to [https://app.globus.org/groups](https://app.globus.org/groups).
-You need to be added to a group that has 'data provider' capabilities.
+You need to be added to a group that has 'data provider' capabilities (i.e., the HuBMAP-Testing-Group).
 If you are in more than one group you need to specify which one you are going to use.
 
 ```
