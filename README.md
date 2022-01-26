@@ -128,41 +128,10 @@ If False then UI search queries will take place through the Search API.
 
 The following describes how to set this up for testing.
 
-### Setup to use the Search API
+### Search API Configuration Changes
 
-Set the following variable in './server/antibodyapi/default_config.py' as follows:
-```commandline
-    QUERY_ELASTICSEARCH_DIRECTLY = False
-```
-
-Make sure that both 'antibody-api:/instance/app.conf' and 'search-api/src/instance/app.cfg'
-are using the same environment ('test' is suggested).
-
-search-api/src/instance/app.cfg: use the Elastic Search in the container, and Entity Api in test.
-```commandline
-    ELASTICSEARCH_URL =      'http://localhost:9200'
-    ENTITY_API_URL =         'https://entity-api.test.hubmapconsortium.org'
-```
-
-When you start the SearchAPI it will tell you what port it's running on in the console logs:
-```commandline
-[2022-01-25 13:45:19] INFO in _internal:225:  * Running on http://10.0.0.14:5005/ (Press CTRL+C to quit)
-```
-
-antibody-api:/instance/app.conf: use the local Search API, Entity API and UUID_API in test.
-Use 'host.docker.internal' on the above port to access the Search API.
-```commandline
-    SEARCH_API_BASE =        'http://host.docker.internal:5005'
-    ENTITY_API_BASE =        'https://entity-api.test.hubmapconsortium.org'
-    UUID_API_URL =           'https://uuid-api.test.hubmapconsortium.org'
-    ELASTICSEARCH_SERVER =   'http://elasticsearch'
-    ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
-    QUERY_ELASTICSEARCH_DIRECTLY = False
-```
-
-### Add the Antibody API Elastic Search index to Search API
-
-Add the following to the end of the file 'search-api:src/instance/search-config.yaml'.
+search-api:src/instance/search-config.yaml: Add the following to the end of the file.
+This will add the Antibody API Elastic Search index to Search API
 ```commandline
   hm_antibodies:
     active: true
@@ -176,12 +145,48 @@ Add the following to the end of the file 'search-api:src/instance/search-config.
       module: elasticsearch.addl_index_transformations.portal
 ```
 
+serch-api:/src/instance/app.cfg: The Elastic Search server should point to the instance running in Docker,
+and the Entity API should be in the same space as the Antibody API; in this case 'test'.
+You will also have to set the APP_CLIENT_ID, and APP_CLIENT_SECRET appropriately.
+These are not saved in GitHub for security reasons.
+```commandline
+ELASTICSEARCH_URL = 'http://localhost:9200'
+ENTITY_API_URL = 'https://entity-api.test.hubmapconsortium.org'
+```
+
 ### Startup the Search API on localhost
 
 In the Search API repository consult the file './local-development-instructions.md'.
 ```commandline
 source venv-hm-search-api/bin/activate
 python3 src/app.py
+```
+
+When you start the SearchAPI on localhost it will tell you what port it's running on in the console logs.
+You will need this information to set the Search API SEARCH_API_BASE below. 
+```commandline
+[2022-01-25 13:45:19] INFO in _internal:225:  * Running on http://10.0.0.14:5005/ (Press CTRL+C to quit)
+```
+
+### Antibody API Configuration Changes
+
+antibody-api:/server/antibodyapi/default_config.py: Contains the variable 'QUERY_ELASTICSEARCH_DIRECTLY'.
+If this variable is set to True, then searches from the UI will use Elastic Search directly.
+If False then UI search queries will take place through the Search API.
+
+Use the local Search API, Entity API and UUID_API in test.
+Use 'host.docker.internal' on the above port to access the Search API running on localhost.
+Use the port from the INFO line above when the Search API is started (e.g., "Running on" port).
+
+Make sure that both 'antibody-api:/instance/app.conf' and 'search-api/src/instance/app.cfg'
+are using the same environment ('test' is suggested).
+```commandline
+    SEARCH_API_BASE =        'http://host.docker.internal:5005'
+    ENTITY_API_BASE =        'https://entity-api.test.hubmapconsortium.org'
+    UUID_API_URL =           'https://uuid-api.test.hubmapconsortium.org'
+    ELASTICSEARCH_SERVER =   'http://elasticsearch'
+    ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
+    QUERY_ELASTICSEARCH_DIRECTLY = False
 ```
 
 ### Accessing the Search API from the container
