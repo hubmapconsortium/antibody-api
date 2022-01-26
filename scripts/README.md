@@ -33,6 +33,10 @@ By default, it will run 'up -d' which daemonizes it and hides it from your view.
 Scenario, './scripts/run_local.sh up' will not daemonize (add the '-d').
 You can also bring the server down with  './scripts/run_local.sh down'
 
+You should note that the database tables need to be created before the first
+time that you access the GUI. For setup from scratch, please see 'README.md'
+section 'Deployment Locally'.
+
 ### Terminal
 
 This will create a container for the web service ONLY and will open a terminal session for it.

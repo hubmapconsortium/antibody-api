@@ -28,7 +28,7 @@ class DefaultConfig:
     GROUP_ID = 'should-be-overridden'
 
     # TODO: ELASTICSEARCH_ENDPOINT is not used but ELASTICSEARCH_SERVER is used. This is confusing and should be resolved as only one should be used.
-    ELASTICSEARCH_ENDPOINT = 'should-be-overridden'
+#    ELASTICSEARCH_ENDPOINT = 'should-be-overridden'
     ASSETS_ENDPOINT = 'should-be-overridden'
     CELLS_API_ENDPOINT = 'should-be-overridden'
 
@@ -41,4 +41,4 @@ class DefaultConfig:
     # This is the name of the container in the docker-compose file.
     ELASTICSEARCH_SERVER = 'http://elasticsearch'
     ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
-    QUERY_ELASTICSEARCH_DIRECTLY = True
+    QUERY_ELASTICSEARCH_DIRECTLY = False

@@ -13,6 +13,7 @@ import logging
 #   Better yet, use the Neo4j Admin import to load the data into the index.
 # Search UI https://antibody-api.dev.hubmapconsortium.org/
 
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +57,7 @@ def execute_query_through_search_api(query):
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     # https://smart-api.info/ui/7aaf02b838022d564da776b03f357158#/search_by_index/search-post-by-index
     url: str = f"{searchapi_base_url}/{antibody_elasticsearch_index}/search"
-    response = requests.post(url, header="{'Content-Type': 'application/json'}", data=query)
+    response = requests.post(url, headers={"Content-Type": "application/json"}, json=query)
 
     if response.status_code != 200:
         logger.error(f"The search-api has returned status_code {response.status_code}: {response.text}")
@@ -66,7 +67,7 @@ def execute_query_through_search_api(query):
 
 
 def execute_query(query):
-    logger.info(f"*** Elastic Search Query: {query}")
+    logger.debug(f"*** Elastic Search Query: {query}")
     query_directly: str = current_app.config['QUERY_ELASTICSEARCH_DIRECTLY']
     if query_directly is True:
         return execute_query_elasticsearch_directly(query)
