@@ -5,6 +5,7 @@ from antibodyapi.import_antibodies import import_antibodies_blueprint
 from antibodyapi.list_antibodies import list_antibodies_blueprint
 from antibodyapi.login import login_blueprint
 from antibodyapi.logout import logout_blueprint
+from antibodyapi.restore_elasticsearch import restore_elasticsearch_blueprint
 from antibodyapi.save_antibody import save_antibody_blueprint
 
 from . import default_config
@@ -17,6 +18,7 @@ def create_app(testing=False):
         app.config['TESTING'] = True
     else:
         # We should not load the gitignored app.conf during tests.
+        # this file lives in '/instance/app.conf'
         app.config.from_pyfile('app.conf')
 
     app.register_blueprint(hubmap_blueprint)
@@ -24,6 +26,7 @@ def create_app(testing=False):
     app.register_blueprint(list_antibodies_blueprint)
     app.register_blueprint(login_blueprint)
     app.register_blueprint(logout_blueprint)
+    app.register_blueprint(restore_elasticsearch_blueprint)
     app.register_blueprint(save_antibody_blueprint)
 
     @app.teardown_appcontext

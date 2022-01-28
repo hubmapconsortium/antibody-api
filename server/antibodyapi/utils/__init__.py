@@ -21,6 +21,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Missing: avr_filename, avr_uuid
 def base_antibody_query():
     return '''
 SELECT
@@ -33,11 +34,37 @@ SELECT
     a.catalog_number, a.lot_number,
     a.recombinant, a.organ_or_tissue,
     a.hubmap_platform, a.submitter_orciid,
+    a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
+
+def base_antibody_query_result_to_json(antibody) -> dict:
+    ant = {
+        'antibody_uuid': antibody[0],
+        'protocols_io_doi': antibody[1],
+        'uniprot_accession_number': antibody[2],
+        'target_name': antibody[3],
+        'rrid': antibody[4],
+        'antibody_name': antibody[5],
+        'host_organism': antibody[6],
+        'clonality': antibody[7],
+        'vendor': antibody[8],
+        'catalog_number': antibody[9],
+        'lot_number': antibody[10],
+        'recombinant': antibody[11],
+        'organ_or_tissue': antibody[12],
+        'hubmap_platform': antibody[13],
+        'submitter_orciid': antibody[14],
+        # 'created_timestamp': antibody[15]
+        'created_by_user_displayname': antibody[16],
+        'created_by_user_email': antibody[17],
+        'created_by_user_sub': antibody[18],
+        'group_uuid': antibody[19]
+    }
+    return ant
 
 def find_or_create_vendor(cursor, name):
     cursor.execute('SELECT id FROM vendors WHERE UPPER(name) = %s', (name.upper(),))
@@ -156,23 +183,15 @@ INSERT INTO antibodies (
     antibody_uuid,
     protocols_io_doi,
     uniprot_accession_number,
-    target_name,
-    rrid,
-    antibody_name,
-    host_organism,
-    clonality,
-    vendor_id,
-    catalog_number,
-    lot_number,
-    recombinant,
-    organ_or_tissue,
-    hubmap_platform,
-    submitter_orciid,
+    target_name, rrid,
+    antibody_name, host_organism,
+    clonality, vendor_id,
+    catalog_number, lot_number,
+    recombinant, organ_or_tissue,
+    hubmap_platform, submitter_orciid,
     created_timestamp,
-    created_by_user_displayname,
-    created_by_user_email,
-    created_by_user_sub,
-    group_uuid
+    created_by_user_displayname, created_by_user_email,
+    created_by_user_sub, group_uuid
 ) 
 VALUES (
     %(antibody_uuid)s,
