@@ -9,7 +9,7 @@ import elasticsearch
 
 
 restore_elasticsearch_blueprint = Blueprint('restore_elasticsearch', __name__)
-@restore_elasticsearch_blueprint.route('/restore', methods=['PUT'])
+@restore_elasticsearch_blueprint.route('/restore_elasticsearch', methods=['PUT'])
 def restore_elasticsearch():
     # Delete the index...
     server: str = current_app.config['ELASTICSEARCH_SERVER']
