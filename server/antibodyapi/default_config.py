@@ -15,30 +15,22 @@ class DefaultConfig:
     PORTAL_INDEX_PATH = '/portal/search'
     CCF_INDEX_PATH = '/entities/search'
 
+    # Everything else should be overridden in app.conf:
+
+    APP_CLIENT_ID = 'should-be-overridden'
+    APP_CLIENT_SECRET = 'should-be-overridden'
+    
+    GROUP_ID = 'should-be-overridden'
+
+    ELASTICSEARCH_SERVER = 'should-be-overridden'
+    SEARCH_API_BASE = 'should-be-overridden'
+    UUID_API_URL = 'http://uuidmock:1080'
+    INGEST_API_URL = 'http://uuidmock:1080'
+
+    ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
+    QUERY_ELASTICSEARCH_DIRECTLY = False
+
     DATABASE_HOST = 'db'
     DATABASE_NAME = 'antibodydb_test'
     DATABASE_USER = 'postgres'
     DATABASE_PASSWORD = 'password'
-
-    # Everything else should be overridden in app.conf:
-
-    ENTITY_API_BASE = 'should-be-overridden'
-    SEARCH_API_BASE = 'should-be-overridden'
-
-    GROUP_ID = 'should-be-overridden'
-
-    # TODO: ELASTICSEARCH_ENDPOINT is not used but ELASTICSEARCH_SERVER is used. This is confusing and should be resolved as only one should be used.
-#    ELASTICSEARCH_ENDPOINT = 'should-be-overridden'
-    ASSETS_ENDPOINT = 'should-be-overridden'
-    CELLS_API_ENDPOINT = 'should-be-overridden'
-
-    SECRET_KEY = 'should-be-overridden'
-    APP_CLIENT_ID = 'should-be-overridden'
-    APP_CLIENT_SECRET = 'should-be-overridden'
-
-    UUID_API_URL = 'http://uuidmock:1080'
-    INGEST_API_URL = 'http://uuidmock:1080'
-    # This is the name of the container in the docker-compose file.
-    ELASTICSEARCH_SERVER = 'http://elasticsearch'
-    ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
-    QUERY_ELASTICSEARCH_DIRECTLY = False

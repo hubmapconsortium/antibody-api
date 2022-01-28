@@ -38,7 +38,7 @@ You will need to go to [http://localhost:5000/upload](http://localhost:5000/uplo
 and click on "Choose Files" button in "Antibody Files" box.
 Select the './server/manual_test_files/upload/antibodieswithoutpdf.csv' file.
 Then click on "Submit" button at the bottom of the page.
-You should see something similar to 'successful_upload.png'.
+You should see something similar to './server/manual_test_files/upload/successful_upload.png'.
 
 This will enter the antibodies in the database and also add them to the elastic search index.
 
@@ -76,7 +76,7 @@ Second, click on "Choose Files" in "Antibody PDFs", you will see all files.
 Then CMD-click on both .pdf files. Then click 'submit'.
 
 If it succeeds you get back two columns of information: the antibody name,
-and the unique identifier of the antibodies just uploaded (see uoloadWithPDF.png file).
+and the unique identifier of the antibodies just uploaded (see ./server/manual_test_files/upload/uploadWithPDF.png).
 If you do this multiple times it will make one entry for each upload (it will NOT overwrite).
 
 You can use similar methods to the above to check the database and ElasticSearch.
