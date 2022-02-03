@@ -2,6 +2,7 @@
 
 import argparse, csv, sys, psycopg2, elasticsearch, json
 from urllib.parse import urlparse
+from enum import IntEnum, unique
 
 
 class RawTextArgumentDefaultsHelpFormatter(
@@ -63,6 +64,32 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
     return f" {condition} {column} LIKE '{value}'"
 
 
+@unique
+class SI(IntEnum):
+    ANTIBODY_UUID = 0
+    AVR_FILENAME = 1
+    AVR_UUID = 2
+    PROTOCOLS_IO_DOI = 3
+    UNIPROT_ACCESSION_NUMBER = 4
+    TARGET_NAME = 5
+    RRID = 6
+    ANTIBODY_NAME = 7
+    HOST_ORGANISM = 8
+    CLONALITY = 9
+    VENDOR_NAME = 10
+    CATALOG_NUMBER = 11
+    LOT_NUMBER = 12
+    RECOMBINATE = 13
+    ORGAN_OR_TISSSUE = 14
+    HUBMAP_PLATFORM = 15
+    SUBMITTER_ORCIID = 16
+    CREATED_TIMESTAMP = 17
+    CREATED_BY_USER_DISPLAYNAME = 18
+    CREATED_BY_USER_EMAIL = 19
+    CREATED_BY_USER_SUB = 20
+    GROUP_UUID = 21
+
+
 def base_antibody_query(csv_row: dict):
     select = '''
 SELECT
@@ -111,7 +138,7 @@ def check_hit(es_hit: dict, ds_key: str, db_row, db_row_index: int, antibody_uui
 
 
 def check_es_entry_to_db_row(es_conn, db_row) -> None:
-    antibody_uuid: str = db_row[0].replace('-', '')
+    antibody_uuid: str = db_row[SI.ANTIBODY_UUID].replace('-', '')
     query: dict = json.loads('{"match": {"antibody_uuid": "%s"}}' % antibody_uuid)
     es_resp = es_conn.search(index=args.elasticsearch_index, query=query)
     if es_resp['hits']['total']['value'] == 0:
@@ -119,33 +146,33 @@ def check_es_entry_to_db_row(es_conn, db_row) -> None:
     if es_resp['hits']['total']['value'] > 1:
         eprint(f"ERROR: ElasticSearch query: {query}; multiple rows found")
     source: dict = es_resp['hits']['hits'][0]['_source']
-    check_hit(source, 'protocols_io_doi', db_row, 2, antibody_uuid)
-    check_hit(source, 'uniprot_accession_number', db_row, 3, antibody_uuid)
-    check_hit(source, 'target_name', db_row, 4, antibody_uuid)
-    check_hit(source, 'rrid', db_row, 5, antibody_uuid)
-    check_hit(source, 'antibody_name', db_row, 6, antibody_uuid)
-    check_hit(source, 'host_organism', db_row, 7, antibody_uuid)
-    check_hit(source, 'clonality', db_row, 8, antibody_uuid)
-    check_hit(source, 'vendor', db_row, 9, antibody_uuid)
-    check_hit(source, 'catalog_number', db_row, 10, antibody_uuid)
-    check_hit(source, 'lot_number', db_row, 11, antibody_uuid)
-    check_hit(source, 'recombinant', db_row, 12, antibody_uuid)
-    check_hit(source, 'organ_or_tissue', db_row, 13, antibody_uuid)
-    check_hit(source, 'hubmap_platform', db_row, 14, antibody_uuid)
-    check_hit(source, 'submitter_orciid', db_row, 15, antibody_uuid)
+    check_hit(source, 'protocols_io_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
+    check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
+    check_hit(source, 'target_name', db_row, SI.TARGET_NAME, antibody_uuid)
+    check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
+    check_hit(source, 'antibody_name', db_row, SI.ANTIBODY_NAME, antibody_uuid)
+    check_hit(source, 'host_organism', db_row, SI.HOST_ORGANISM, antibody_uuid)
+    check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)
+    check_hit(source, 'vendor', db_row, SI.VENDOR_NAME, antibody_uuid)
+    check_hit(source, 'catalog_number', db_row, SI.CATALOG_NUMBER, antibody_uuid)
+    check_hit(source, 'lot_number', db_row, SI.LOT_NUMBER, antibody_uuid)
+    check_hit(source, 'recombinant', db_row, SI.RECOMBINATE, antibody_uuid)
+    check_hit(source, 'organ_or_tissue', db_row, SI.ORGAN_OR_TISSSUE, antibody_uuid)
+    check_hit(source, 'hubmap_platform', db_row, SI.HUBMAP_PLATFORM, antibody_uuid)
+    check_hit(source, 'submitter_orciid', db_row, SI.SUBMITTER_ORCIID, antibody_uuid)
 
 
 # Here we only need to check those entries not used i the where clause of the query
 def check_csv_row_to_db_row(csv_row, db_row) -> None:
-    if csv_row['clonality'] != db_row[8]:
+    if csv_row['clonality'] != db_row[SI.CLONALITY]:
         eprint(
-            f"ERROR: In file row {csv_row_number}; 'clonality' in .csv file is '{csv_row['clonality']}', but '{db_row[8]}' in database")
-    if map_yn_to_tf(csv_row['recombinant']) != db_row[12]:
+            f"ERROR: In file row {csv_row_number}; 'clonality' in .csv file is '{csv_row['clonality']}', but '{db_row[SI.CLONALITY]}' in database")
+    if map_yn_to_tf(csv_row['recombinant']) != db_row[SI.RECOMBINATE]:
         eprint(
-            f"ERROR: In file row {csv_row_number}; 'recombinant' in .csv file is '{csv_row['recombinant']}', but '{db_row[12]}' in database")
-    if 'avr_filename' in csv_row and csv_row['avr_filename'] != db_row[1]:
+            f"ERROR: In file row {csv_row_number}; 'recombinant' in .csv file is '{csv_row['recombinant']}', but '{db_row[SI.RECOMBINATE]}' in database")
+    if 'avr_filename' in csv_row and csv_row['avr_filename'] != db_row[SI.AVR_FILENAME]:
         eprint(
-            f"ERROR: In file row {csv_row_number}; 'avr_filename' in .csv file is '{csv_row['avr_filename']}', but '{db_row[1]}' in database")
+            f"ERROR: In file row {csv_row_number}; 'avr_filename' in .csv file is '{csv_row['avr_filename']}', but '{db_row[SI.AVR_FILENAME]}' in database")
 
 
 vprint(f"Processing file '{args.csv_file}'")
