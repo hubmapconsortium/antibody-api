@@ -66,7 +66,8 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 def base_antibody_query(csv_row: dict):
     select = '''
 SELECT
-    a.antibody_uuid, a.avr_filename,
+    a.antibody_uuid,
+    a.avr_filename, a.avr_uuid,
     a.protocols_io_doi,
     a.uniprot_accession_number,
     a.target_name, a.rrid,
