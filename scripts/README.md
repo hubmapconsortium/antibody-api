@@ -8,10 +8,15 @@ There is also a script for building/updating the API generated from the OpenAPI 
 The script './scripts/build_openapi_client.sh' will create/update the client API from the OpenAPI
 specification located at './antibody-api-spec.yml'. The client will be built in the 'hu-bap-antibody-api-client' directory.
 
-## Check .csv file upload
+## Verify .csv file upload
 
-The script './determine_that_csv_file_was_properly_loaded.py' is used to determine if data in the .csv file is present
-in PosgreSQL, ElasticSearch, and Assets. Documentation for running the file is available with the '-h' optional argument.
+The script './verify_csv_file_was_properly_loaded.py' is used to determine if data in the .csv file is present
+in PosgreSQL, ElasticSearch, and Assets. Documentation for running the program is available with the '-h' optional argument.
+
+## Verify ElasticSearch matches PostgreSQL
+
+The script './verify_db_in_elasticsearch.py' is used to determine if all of the data in the PostgreSQL
+database is represented in ElasticSearch. Documentation for running the program is available with the '-h' optional argument.
 
 ## Docker Scripts
 These scripts package the docker "magic".  They must be run from the repo root folder.

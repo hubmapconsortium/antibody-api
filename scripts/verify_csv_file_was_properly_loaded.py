@@ -7,7 +7,7 @@
 # source venv/bin/activate
 # pip install -r ../requirements.txt
 # pip install psycopg2 elasticsearch requests PyPDF2
-# ./determine_that_csv_file_was_properly_loaded.py ../server/manual_test_files/upload_mulriple_with_pdf/antibodies.csv
+# ./verify_csv_file_was_properly_loaded.py ../server/manual_test_files/upload_mulriple_with_pdf/antibodies.csv
 
 import argparse, csv, sys, psycopg2, elasticsearch, json, requests, io, PyPDF2
 from urllib.parse import urlparse
@@ -212,7 +212,7 @@ def check_csv_row_to_db_row(csv_row, db_row) -> None:
 # if the user has access to the file.
 def check_pdf_file_upload(avr_uuid: str, avr_filename: str):
     url: str = f"{args.assets_url}/{avr_uuid.replace('-', '')}/{avr_filename}"
-    vprint(f"Checking for avr_file with request {url}")
+    vprint(f"Checking for avr_file with request {url}", end='')
     response: requests.Response = requests.get(url)
     if response.status_code != 200:
         eprint(f"ERROR: avr_file not found. The request '{url} returns status_code {response.status_code}")
@@ -221,9 +221,10 @@ def check_pdf_file_upload(avr_uuid: str, avr_filename: str):
     try:
         PyPDF2.PdfFileReader(stream=io.BytesIO(content))
     except PyPDF2.utils.PdfReadError:
+        vprint(f" INVALID .pdf file")
         eprint(f"ERROR: avr_file {avr_filename} found, but not a valid .pdf file")
         return
-    vprint(f"The avr_file was found and determined to be a valid .pdf file")
+    vprint(f" valid .pdf file")
 
 
 vprint(f"Processing file '{args.csv_file}'")
