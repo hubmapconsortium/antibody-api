@@ -14,26 +14,47 @@ docker build -t hubmap/antibody-api:0.1.0 .
 
 ## Publish the image to DockerHub
 
+This requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
+You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
+
+For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag.
 ````
 docker login
 docker push hubmap/antibody-api:latest
 ````
 
-For a released version of the image, specify the version tag:
-
+For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
+in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
 ````
 docker push -t hubmap/antibody-api:0.1.0
 ````
 
 ## Deployment
 
-For DEV/TEST/STAGE, no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag. 
-
-For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
-
 ````
 docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
+
+To get the latest version of the server.
+
+```bash
+# Access the server, switch accounts and go to the server directory
+$ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.dev.hubmapconsortium.org
+$ sudo /bin/su - centos
+$ cd hubmap/antibody-api
+$ pwd
+/home/centos/hubmap/antibody-api
+$ git status
+# On branch production
+$ git pull
+```
+You should now have the most recent version of the code.
+If there are any changes to the './instance/app.conf' file, make them now.
+
+To look at the logs of the running server, you may use.
+```commandline
+$ tail -f server/log/uwsgi-antibody-api.log
+```
 
 ## Redeployment
 
@@ -48,6 +69,7 @@ Then download the new image and start up the container:
 ````
 docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
+The '--no-build' get's the container from DockerHub.
 
 ## Deployment Locally
 
