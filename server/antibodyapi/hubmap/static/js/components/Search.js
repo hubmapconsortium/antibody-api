@@ -4,12 +4,13 @@ import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits,
   Layout, TopBar, LayoutBody, SideBar, HierarchicalMenuFilter,
   RefinementListFilter, ActionBar, LayoutResults, HitsStats,
-  ActionBarRow, SelectedFilters, ResetFilters, NoHits
+  ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination
 } from "searchkit";
 
 import AntibodyHitsTable from './AntibodyHitsTable';
 
 const searchkit = new SearchkitManager("/");
+const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
 
 const Search = () => (
   <SearchkitProvider searchkit={searchkit}>
@@ -52,10 +53,14 @@ const Search = () => (
           </ActionBarRow>
 
         </ActionBar>
-        <Hits mod="sk-hits-list" hitsPerPage={50} listComponent={AntibodyHitsTable}
+        <Hits mod="sk-hits-list"
+          hitsPerPage={10}
+          listComponent={AntibodyHitsTable}
           sourceFilter={["antibody_name", "target_name", "host_organism", "vendor"]}/>
         <NoHits/>
+        <Pagination options={options}/>
       </LayoutResults>
+
     </LayoutBody>
   </Layout>
 </SearchkitProvider>

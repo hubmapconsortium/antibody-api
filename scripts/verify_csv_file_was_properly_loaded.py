@@ -6,7 +6,6 @@
 # python3 -m venv venv
 # source venv/bin/activate
 # pip install -r ../requirements.txt
-# pip install psycopg2 elasticsearch requests PyPDF2
 # ./verify_csv_file_was_properly_loaded.py ../server/manual_test_files/upload_mulriple_with_pdf/antibodies.csv
 
 import argparse

@@ -7,7 +7,8 @@ import json
 import requests
 import PyPDF2
 import io
-from urllib.parse import urlparse, unquote
+import elasticsearch
+from urllib.parse import urlparse, urlunparse, unquote, ParseResult
 from enum import IntEnum, unique
 
 
@@ -33,6 +34,16 @@ def make_db_connection(postgresql_url: str):
         port=port,
         dbname=url.path[1:]
     )
+
+
+def make_es_connection(es_url: str):
+    url = urlparse(es_url)
+    if url.port is None:
+        url = ParseResult(scheme=url.scheme, netloc="{}:{}".format(url.hostname, 9200),
+                          path=url.path, params=url.params, query=url.query, fragment=url.fragment)
+    vprint(f"Connecting to ElasticSearch at URL '{url.geturl()}'")
+    es_conn = elasticsearch.Elasticsearch(url.geturl(), timeout=30)
+    return es_conn
 
 
 @unique
@@ -88,7 +99,8 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 
 
 def base_antibody_query(csv_row: dict):
-    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_io_doi', '') + where_condition(csv_row, 'a.uniprot_accession_number') + \
+    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_io_doi', '') + \
+            where_condition(csv_row, 'a.uniprot_accession_number') + \
             where_condition(csv_row, 'a.target_name') + where_condition(csv_row, 'a.rrid') + \
             where_condition(csv_row, 'a.antibody_name') + where_condition(csv_row, 'a.host_organism') +\
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
@@ -125,8 +137,9 @@ def check_hit(es_hit: dict, ds_key: str, db_row, db_row_index: int, antibody_uui
 
 def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     antibody_uuid: str = db_row[SI.ANTIBODY_UUID].replace('-', '')
-    query: dict = json.loads('{"match": {"antibody_uuid": "%s"}}' % antibody_uuid)
-    es_resp = es_conn.search(index=es_index, query=query)
+    es_query: dict = json.loads('{"query": {"match": {"antibody_uuid": "%s"}}}' % antibody_uuid)
+    vprint(f"Executing ElasticSearch query: {es_query}")
+    es_resp = es_conn.search(index=es_index, body=es_query)
     if es_resp['hits']['total']['value'] == 0:
         eprint(f"ERROR: ElasticSearch query: {query}; no rows found")
     if es_resp['hits']['total']['value'] > 1:
