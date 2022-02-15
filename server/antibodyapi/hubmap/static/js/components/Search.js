@@ -54,9 +54,9 @@ const Search = () => (
 
         </ActionBar>
         <Hits mod="sk-hits-list"
-          hitsPerPage={10}
+          hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={["antibody_name", "target_name", "host_organism", "vendor"]}/>
+          sourceFilter={["antibody_name", "target_name", "host_organism", "vendor",  "avr_filename", "avr_uuid"]}/>
         <NoHits/>
         <Pagination options={options}/>
       </LayoutResults>

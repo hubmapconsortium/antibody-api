@@ -58,9 +58,11 @@ postgres                13.3      b2fcd079c1d4   6 months ago   315MB
 kibana                  7.4.2     230d3ded1abc   2 years ago    1.1GB
 elasticsearch           7.4.2     b1179d41a7b4   2 years ago    855MB
 ```
-To remove the images use 'docker rmi <<IMAGE ID>>' for each image.
+To remove the images use 'docker rmi IMAGE ID' for each image.
 
 Then use './scripts/run_local.sh' to rebuild the images and run them.
+
+You may then need to execute 'development/postgresql_init_scripts/create_tables.sql' (see 'development/README.md') to create the tables.
 
 ### Terminal
 

@@ -1,8 +1,7 @@
 from flask import abort, Blueprint, current_app, jsonify, make_response, request, session
 from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
 from antibodyapi.utils import (
-    find_or_create_vendor, base_antibody_query, base_antibody_query_result_to_json, get_cursor,
-    get_hubmap_uuid, insert_query, json_error
+    base_antibody_query, base_antibody_query_result_to_json, get_cursor
 )
 from antibodyapi.utils.elasticsearch import index_antibody
 import elasticsearch

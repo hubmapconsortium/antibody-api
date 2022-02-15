@@ -122,29 +122,51 @@ def map_empty_string_to_none(value: str):
     return value
 
 
+def check_hit_not_match_error(es_hit: dict, ds_key: str, db_row, db_row_index: int, antibody_uuid: str) -> None:
+    eprint(f"ERROR: ElasticSearch hit key '{ds_key}' value '{es_hit[ds_key]}' does not match expected PostgreSQL entry '{db_row[db_row_index]}' for antibody_uuid '{antibody_uuid}")
+
+
 def check_hit(es_hit: dict, ds_key: str, db_row, db_row_index: int, antibody_uuid: str) -> None:
     if ds_key not in es_hit:
-        eprint(f"ERROR: Key {ds_key} not in ElasticSearch hit for antibody_uuid '{antibody_uuid}")
+        eprint(f"ERROR: Key '{ds_key}' not in ElasticSearch hit for antibody_uuid '{antibody_uuid}'")
         return
     if len(db_row) < db_row_index:
-        eprint(f"ERROR: Insufficient entrys in database record for ElasticSearch {ds_key} for antibody_uuid '{antibody_uuid}")
+        eprint(f"ERROR: Insufficient entries in database record for ElasticSearch '{ds_key}' for antibody_uuid '{antibody_uuid}'")
         return
-    if ds_key == 'recombinant' and map_string_to_bool(es_hit[ds_key]) != db_row[db_row_index]:
-        eprint(f"ERROR: ElasticSearch hit key '{ds_key}' value '{es_hit[ds_key]}' does not match expected PostgreSQL entry '{db_row[db_row_index]}' for antibody_uuid '{antibody_uuid}")
-    elif ds_key != 'recombinant' and es_hit[ds_key] != db_row[db_row_index]:
-        eprint(f"ERROR: xxxElasticSearch hit key '{ds_key}' value '{es_hit[ds_key]}' does not match expected PostgreSQL entry '{db_row[db_row_index]}' for antibody_uuid '{antibody_uuid}")
+    if ds_key == 'recombinant':
+        if es_hit[ds_key] != db_row[db_row_index]:
+            check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
+    elif ds_key == 'vendor':
+        if map_string_to_bool(es_hit[ds_key]).upper() != db_row[db_row_index].upper():
+            check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
+    elif ds_key == 'avr_uuid':
+        if es_hit[ds_key] != db_row[db_row_index].replace('-', ''):
+            check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
+    else:
+        if es_hit[ds_key] != db_row[db_row_index]:
+            check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
 
 
+# This should check_hit on every item listed in:
+# 'server/antibodyapi/utils/elasticsearch/__init__.py: index_antibody(() doc
 def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     antibody_uuid: str = db_row[SI.ANTIBODY_UUID].replace('-', '')
     es_query: dict = json.loads('{"query": {"match": {"antibody_uuid": "%s"}}}' % antibody_uuid)
     vprint(f"Executing ElasticSearch query: {es_query}")
     es_resp = es_conn.search(index=es_index, body=es_query)
+    vprint(f"ElasticSearch query response: {es_resp}")
     if es_resp['hits']['total']['value'] == 0:
-        eprint(f"ERROR: ElasticSearch query: {query}; no rows found")
+        eprint(f"ERROR: ElasticSearch query: {es_query}; no rows found")
     if es_resp['hits']['total']['value'] > 1:
-        eprint(f"ERROR: ElasticSearch query: {query}; multiple rows found")
-    source: dict = es_resp['hits']['hits'][0]['_source']
+        eprint(f"ERROR: ElasticSearch query: {es_query}; multiple rows found")
+    hits = es_resp['hits']['hits']
+    if len(hits) == 0:
+        eprint(f"ERROR: ElasticSearch query: {es_query}; returned no hits {hits}")
+        return
+    source: dict = hits[0]['_source']
+    if 'avr_uuid' in source:
+        check_hit(source, 'avr_filename', db_row, SI.AVR_FILENAME, antibody_uuid)
+        check_hit(source, 'avr_uuid', db_row, SI.AVR_UUID, antibody_uuid)
     check_hit(source, 'protocols_io_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_name', db_row, SI.TARGET_NAME, antibody_uuid)
@@ -159,6 +181,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'organ_or_tissue', db_row, SI.ORGAN_OR_TISSSUE, antibody_uuid)
     check_hit(source, 'hubmap_platform', db_row, SI.HUBMAP_PLATFORM, antibody_uuid)
     check_hit(source, 'submitter_orciid', db_row, SI.SUBMITTER_ORCIID, antibody_uuid)
+    check_hit(source, 'created_by_user_email', db_row, SI.CREATED_BY_USER_EMAIL, antibody_uuid)
 
 
 # If you uploaded the file on DEV, then the URL:

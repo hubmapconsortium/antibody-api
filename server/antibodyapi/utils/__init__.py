@@ -5,6 +5,7 @@ from flask import (
     Flask, abort, g, jsonify, make_response, redirect,
     session, request, render_template, url_for
 )
+from enum import IntEnum, unique
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -17,15 +18,43 @@ requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # 
 
 ALLOWED_EXTENSIONS = {'csv'}
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Missing: avr_filename, avr_uuid
-def base_antibody_query():
-    return '''
+
+# TODO: This is duplicated in 'scripts/utils/__init__.py'
+@unique
+class SI(IntEnum):
+    ANTIBODY_UUID = 0
+    AVR_FILENAME = 1
+    AVR_UUID = 2
+    PROTOCOLS_IO_DOI = 3
+    UNIPROT_ACCESSION_NUMBER = 4
+    TARGET_NAME = 5
+    RRID = 6
+    ANTIBODY_NAME = 7
+    HOST_ORGANISM = 8
+    CLONALITY = 9
+    VENDOR_NAME = 10
+    CATALOG_NUMBER = 11
+    LOT_NUMBER = 12
+    RECOMBINATE = 13
+    ORGAN_OR_TISSSUE = 14
+    HUBMAP_PLATFORM = 15
+    SUBMITTER_ORCIID = 16
+    CREATED_TIMESTAMP = 17
+    CREATED_BY_USER_DISPLAYNAME = 18
+    CREATED_BY_USER_EMAIL = 19
+    CREATED_BY_USER_SUB = 20
+    GROUP_UUID = 21
+
+
+QUERY = '''
 SELECT
     a.antibody_uuid,
+    a.avr_filename, a.avr_uuid,
     a.protocols_io_doi,
     a.uniprot_accession_number,
     a.target_name, a.rrid,
@@ -41,30 +70,40 @@ FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
 
+
+def base_antibody_query():
+    return QUERY
+
+
 def base_antibody_query_result_to_json(antibody) -> dict:
     ant = {
-        'antibody_uuid': antibody[0],
-        'protocols_io_doi': antibody[1],
-        'uniprot_accession_number': antibody[2],
-        'target_name': antibody[3],
-        'rrid': antibody[4],
-        'antibody_name': antibody[5],
-        'host_organism': antibody[6],
-        'clonality': antibody[7],
-        'vendor': antibody[8],
-        'catalog_number': antibody[9],
-        'lot_number': antibody[10],
-        'recombinant': antibody[11],
-        'organ_or_tissue': antibody[12],
-        'hubmap_platform': antibody[13],
-        'submitter_orciid': antibody[14],
+        'antibody_uuid': antibody[SI.ANTIBODY_UUID].replace('-', ''),
+        'protocols_io_doi': antibody[SI.PROTOCOLS_IO_DOI],
+        'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
+        'target_name': antibody[SI.TARGET_NAME],
+        'rrid': antibody[SI.RRID],
+        'antibody_name': antibody[SI.ANTIBODY_NAME],
+        'host_organism': antibody[SI.HOST_ORGANISM],
+        'clonality': antibody[SI.CLONALITY],
+        'vendor': antibody[SI.VENDOR_NAME],
+        'catalog_number': antibody[SI.CATALOG_NUMBER],
+        'lot_number': antibody[SI.LOT_NUMBER],
+        'recombinant': antibody[SI.RECOMBINATE],
+        'organ_or_tissue': antibody[SI.ORGAN_OR_TISSSUE],
+        'hubmap_platform': antibody[SI.HUBMAP_PLATFORM],
+        'submitter_orciid': antibody[SI.SUBMITTER_ORCIID],
         # 'created_timestamp': antibody[15]
-        'created_by_user_displayname': antibody[16],
-        'created_by_user_email': antibody[17],
-        'created_by_user_sub': antibody[18],
-        'group_uuid': antibody[19]
+        'created_by_user_displayname': antibody[SI.CREATED_BY_USER_DISPLAYNAME],
+        'created_by_user_email': antibody[SI.CREATED_BY_USER_EMAIL],
+        'created_by_user_sub': antibody[SI.CREATED_BY_USER_SUB],
+        'group_uuid': antibody[SI.GROUP_UUID]
     }
+    print(f"****** antibody[SI.AVR_UUID]: {antibody[SI.AVR_UUID]}")
+    if antibody[SI.AVR_UUID] is not None:
+        ant['avr_filename'] = antibody[SI.AVR_FILENAME]
+        ant['avr_uuid'] = antibody[SI.AVR_UUID].replace('-', '')
     return ant
+
 
 def find_or_create_vendor(cursor, name):
     cursor.execute('SELECT id FROM vendors WHERE UPPER(name) = %s', (name.upper(),))
@@ -73,6 +112,7 @@ def find_or_create_vendor(cursor, name):
     except TypeError:
         cursor.execute('INSERT INTO vendors (name) VALUES (%s) RETURNING id', (name,))
         return cursor.fetchone()[0]
+
 
 def get_cursor(app):
     if 'connection' not in g:
@@ -85,6 +125,7 @@ def get_cursor(app):
         g.connection = conn # pylint: disable=assigning-non-slot
         g.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     return g.connection.cursor()
+
 
 def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     filename = secure_filename(file.filename)
@@ -119,7 +160,8 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
     )
     return req2.json()['file_uuid']
 
-def get_group_id(ingest_api_url, group_id=None):
+
+def get_group_id(ingest_api_url: str, group_id=None):
     req = requests.get(
         '%s/metadata/usergroups' % (ingest_api_url,),
         headers={
@@ -143,6 +185,7 @@ def get_group_id(ingest_api_url, group_id=None):
 
     return None
 
+
 def get_data_provider_groups(ingest_api_url):
     req = requests.get(
         '%s/metadata/usergroups' % (ingest_api_url,),
@@ -160,7 +203,8 @@ def get_data_provider_groups(ingest_api_url):
 
     return data_provider_groups
 
-def get_hubmap_uuid(uuid_api_url):
+
+def get_hubmap_uuid(uuid_api_url: str):
     req = requests.post(
         '%s/hmuuid' % (uuid_api_url,),
         headers={
@@ -172,10 +216,12 @@ def get_hubmap_uuid(uuid_api_url):
     )
     return req.json()[0]['uuid']
 
+
 def get_user_info(token):
     auth_token = token.by_resource_server['auth.globus.org']['access_token']
     auth_client = globus_sdk.AuthClient(authorizer=globus_sdk.AccessTokenAuthorizer(auth_token))
     return auth_client.oauth2_userinfo()
+
 
 def insert_query():
     return '''
@@ -216,6 +262,7 @@ VALUES (
     %(group_uuid)s
 ) RETURNING id
 '''
+
 
 def insert_query_with_avr_file_and_uuid():
     return '''
@@ -268,6 +315,7 @@ VALUES (
     %(group_uuid)s
 ) RETURNING id
 '''
+
 
 def json_error(message, error_code):
     return make_response(jsonify(message=message), error_code)

@@ -126,7 +126,7 @@ First query on the index and see if data exists as follows:
 ```commandline
 curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibodies/_search?pretty
 ```
-You should get an error telling you that the index soes not exist, or you should get data.
+You should get an error telling you that the index does not exist, or you should get data.
 
 To test the restore, you can delete the Elastic Search Index using the following:
 ```commandline
@@ -136,7 +136,7 @@ curl -H 'Content-Type: application/json' -X DELETE http://localhost:9200/hm_anti
 Restore the Elastic Search Index from the PostgreSQL database using the 
 MSAPI endpoint '/restore' on the antibody-api server as follows:
 ```commandline
-curl -H 'Content-Type: application/json' -X PUT http://localhost:5000/restore
+curl -H 'Content-Type: application/json' -X PUT http://localhost:5000/restore_elasticsearch
 ```
 
 At this point the query on the Elastic Search index should return a subset of

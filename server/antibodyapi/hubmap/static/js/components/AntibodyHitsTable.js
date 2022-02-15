@@ -13,6 +13,11 @@ class AntibodyHitsTable extends React.Component {
       antibodies += `<td>${hit._source.host_organism}</td>`;
       antibodies += `<td>${hit._source.target_name}</td>`;
       antibodies += `<td>${hit._source.vendor}</td>`;
+      antibodies += `<td>`;
+      if (hit._source.avr_filename != undefined) {
+        antibodies += `<a href="https://assets.test.hubmapconsortium.org/${hit._source.avr_uuid}/${hit._source.avr_filename}">${hit._source.avr_filename}</a>`;
+        }
+      antibodies += `</td>`;
       antibodies += `</tr>`;
     }
     return (
@@ -24,6 +29,7 @@ class AntibodyHitsTable extends React.Component {
               <th>Host Organism</th>
               <th>Target Name</th>
               <th>Vendor</th>
+              <th>PDF</th>
             </tr>
           </thead>
           <tbody dangerouslySetInnerHTML={{__html: antibodies}}/>

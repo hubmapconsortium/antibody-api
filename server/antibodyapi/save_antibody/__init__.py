@@ -9,6 +9,7 @@ from antibodyapi.utils.elasticsearch import index_antibody
 save_antibody_blueprint = Blueprint('save_antibody', __name__)
 @save_antibody_blueprint.route('/antibodies', methods=['POST'])
 def save_antibody():
+    # avr_uuid, and avr_filename are not required but are only present when a pdf is also uploaded.
     required_properties = (
       'protocols_io_doi',
       'uniprot_accession_number',

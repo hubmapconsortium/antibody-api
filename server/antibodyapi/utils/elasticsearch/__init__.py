@@ -37,8 +37,12 @@ def index_antibody(antibody: dict):
         'recombinant': antibody['recombinant'],
         'organ_or_tissue': antibody['organ_or_tissue'],
         'hubmap_platform': antibody['hubmap_platform'],
-        'submitter_orciid': antibody['submitter_orciid']
+        'submitter_orciid': antibody['submitter_orciid'],
+        'created_by_user_email': antibody['created_by_user_email']
     }
+    if 'avr_uuid' in antibody and 'avr_filename' in antibody and antibody['avr_filename'] != '':
+        doc['avr_uuid'] = antibody['avr_uuid']
+        doc['avr_filename'] = antibody['avr_filename']
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     es_conn.index(index=antibody_elasticsearch_index, body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 
@@ -69,6 +73,9 @@ def execute_query_through_search_api(query):
 def execute_query(query):
     logger.debug(f"*** Elastic Search Query: {query}")
     query_directly: str = current_app.config['QUERY_ELASTICSEARCH_DIRECTLY']
+    result: dict = {}
     if query_directly is True:
-        return execute_query_elasticsearch_directly(query)
-    return execute_query_through_search_api(query)
+        result = execute_query_elasticsearch_directly(query)
+    result = execute_query_through_search_api(query)
+    logger.info(f"execute_query: result = {result}")
+    return result

@@ -129,4 +129,4 @@ finally:
         db_conn.close()
         vprint(f"Closed connected to database at URL '{args.postgresql_url}'")
 
-vprint("Done.")
+eprint("Done.")
