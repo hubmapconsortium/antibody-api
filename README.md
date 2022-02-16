@@ -1,41 +1,10 @@
 # antibody-api
 
-## Build Docker Image and Publish it to DockerHub
+## Build, Publish, Deploy Workflow
+These are the steps used to build, publish a Docker image, and then deploy it.
 
-To build the latest image specify the latest tag:
-````
-docker build -t hubmap/antibody-api:latest .
-````
-
-For building a released version of the image, specify the version tag:
-````
-docker build -t hubmap/antibody-api:0.1.0 .
-````
-
-This requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
-You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
-
-For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag.
-````
-docker login
-docker push hubmap/antibody-api:latest
-````
-Below when you start the server up again with the '--no-build' optoinal parameter, it will find the image pushed above.
-
-For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
-in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
-````
-docker push -t hubmap/antibody-api:0.1.0
-````
-
-## Deployment
-
-````
-docker-compose -f docker-compose.deployment.yml up -d --no-build
-````
-
-To get the latest version of the server.
-
+### Get the Latest code
+Login to the target machine and get the latest version of the code from the GitHub repository.
 ```bash
 # Access the server, switch accounts and go to the server directory
 $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.dev.hubmapconsortium.org
@@ -48,8 +17,46 @@ $ git status
 $ git pull
 ```
 You should now have the most recent version of the code.
+
 If there are any changes to the './instance/app.conf' file, make them now.
 
+### Build Docker Image
+In building the latest image specify the latest tag:
+````
+docker build -t hubmap/antibody-api:latest .
+````
+
+In building a release version of the image, specify the version tag:
+````
+docker build -t hubmap/antibody-api:0.1.0 .
+````
+
+### Publish the Image to DockerHub
+Saving the image requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
+You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
+To make changes you must login.
+````
+docker login
+````
+
+For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag.
+````
+docker push hubmap/antibody-api:latest
+````
+
+For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
+in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
+````
+docker push -t hubmap/antibody-api:0.1.0
+````
+
+### Deploy the Saved Image
+Deploy the image that you saved on GitHub by using the '--no-build' optional argument.
+````
+docker-compose -f docker-compose.deployment.yml up -d --no-build
+````
+
+### Examine Server Logs
 To look at the logs of the running server, you may use.
 ```commandline
 $ tail -f server/log/uwsgi-antibody-api.log
