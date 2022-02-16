@@ -1,18 +1,16 @@
 # antibody-api
 
-## Build docker image
+## Build Docker Image and Publish it to DockerHub
 
+To build the latest image specify the latest tag:
 ````
 docker build -t hubmap/antibody-api:latest .
 ````
 
 For building a released version of the image, specify the version tag:
-
 ````
 docker build -t hubmap/antibody-api:0.1.0 .
 ````
-
-## Publish the image to DockerHub
 
 This requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
 You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
@@ -22,6 +20,7 @@ For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.depl
 docker login
 docker push hubmap/antibody-api:latest
 ````
+Below when you start the server up again with the '--no-build' optoinal parameter, it will find the image pushed above.
 
 For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
 in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.

@@ -26,6 +26,7 @@ class DefaultConfig:
     SEARCH_API_BASE = 'should-be-overridden'
     UUID_API_URL = 'http://uuidmock:1080'
     INGEST_API_URL = 'http://uuidmock:1080'
+    ASSETS_URL = 'should-be-overridden'
 
     ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
     QUERY_ELASTICSEARCH_DIRECTLY = False

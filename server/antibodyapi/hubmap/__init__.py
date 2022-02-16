@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, redirect, render_template, session, url_for, request
+from flask import abort, Blueprint, redirect, render_template, session, url_for, request, current_app
 from antibodyapi.utils.elasticsearch import execute_query
 
 def bad_request_error(err_msg):
@@ -26,7 +26,9 @@ def hubmap_search():
     # authenticated = session.get('is_authenticated')
     # if not authenticated:
     #     return redirect(url_for('login.login'))
-    return render_template('search.html')
+    assets_url: str = current_app.config['ASSETS_URL']
+    print(f"*** assets_url: {assets_url}")
+    return render_template('search.html', assets_url=assets_url)
 
 @hubmap_blueprint.route('/_search', methods = ['GET', 'POST'])
 def search():

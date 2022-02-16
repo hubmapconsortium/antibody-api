@@ -15,7 +15,9 @@ class AntibodyHitsTable extends React.Component {
       antibodies += `<td>${hit._source.vendor}</td>`;
       antibodies += `<td>`;
       if (hit._source.avr_filename != undefined) {
-        antibodies += `<a href="https://assets.test.hubmapconsortium.org/${hit._source.avr_uuid}/${hit._source.avr_filename}">${hit._source.avr_filename}</a>`;
+        var assets_url = document.getElementById('assets_url').innerHTML
+        console.log('assets_url: ' + assets_url)
+        antibodies += `<a href="${assets_url}/${hit._source.avr_uuid}/${hit._source.avr_filename}">${hit._source.avr_filename}</a>`;
         }
       antibodies += `</td>`;
       antibodies += `</tr>`;
