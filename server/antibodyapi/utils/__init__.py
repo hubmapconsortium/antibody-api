@@ -96,7 +96,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'created_by_user_displayname': antibody[SI.CREATED_BY_USER_DISPLAYNAME],
         'created_by_user_email': antibody[SI.CREATED_BY_USER_EMAIL],
         'created_by_user_sub': antibody[SI.CREATED_BY_USER_SUB],
-        'group_uuid': antibody[SI.GROUP_UUID]
+        'group_uuid': antibody[SI.GROUP_UUID].replace('-', '')
     }
     print(f"****** antibody[SI.AVR_UUID]: {antibody[SI.AVR_UUID]}")
     if antibody[SI.AVR_UUID] is not None:

@@ -38,9 +38,6 @@ def make_db_connection(postgresql_url: str):
 
 def make_es_connection(es_url: str):
     url = urlparse(es_url)
-    if url.port is None:
-        url = ParseResult(scheme=url.scheme, netloc="{}:{}".format(url.hostname, 9200),
-                          path=url.path, params=url.params, query=url.query, fragment=url.fragment)
     vprint(f"Connecting to ElasticSearch at URL '{url.geturl()}'")
     es_conn = elasticsearch.Elasticsearch(url.geturl(), timeout=30)
     return es_conn

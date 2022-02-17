@@ -5,18 +5,34 @@ There is also a script for building/updating the API generated from the OpenAPI 
 
 ## OpenAPI Script
 
-The script './scripts/build_openapi_client.sh' will create/update the client API from the OpenAPI
+This script will create/update the client API from the OpenAPI
 specification located at './antibody-api-spec.yml'. The client will be built in the 'hu-bap-antibody-api-client' directory.
+```commandline
+./scripts/build_openapi_client.sh
+```
 
 ## Verify .csv file upload
 
-The script './verify_csv_file_was_properly_loaded.py' is used to determine if data in the .csv file is present
+This script is used to determine if data in the .csv file is present
 in PosgreSQL, ElasticSearch, and Assets. Documentation for running the program is available with the '-h' optional argument.
+```commandline
+./verify_csv_file_was_properly_loaded.py -h
+```
 
-## Verify ElasticSearch matches PostgreSQL
+## Reloading ElasticSearch from PostgreSQL Database
 
-The script './verify_db_in_elasticsearch.py' is used to determine if all of the data in the PostgreSQL
-database is represented in ElasticSearch. Documentation for running the program is available with the '-h' optional argument.
+To delete the current ElaseicSearch index and reload it from the database you can use the following substituting the appropriate ANTIBODY_URL.
+```commandline
+ANTIBODY_URL='https://antibody-api.dev.hubmapconsortium.org'; curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
+```
+
+## Verify the ElasticSearch matches PostgreSQL
+
+This script is used to determine if all of the data in the PostgreSQL
+database is represented in ElasticSearch. It is wise to use it after reloading the ElasticSearch index from the PostgreSQL database.
+```commandline
+./verify_db_in_elasticsearch.py -h
+```
 
 ## Docker Scripts
 These scripts package the docker "magic".  They must be run from the repo root folder.
