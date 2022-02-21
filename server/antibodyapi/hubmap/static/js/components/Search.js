@@ -8,6 +8,7 @@ import {
 } from "searchkit";
 
 import AntibodyHitsTable from './AntibodyHitsTable';
+import { Checkbox } from './Checkbox.js';
 
 const searchkit = new SearchkitManager("/");
 const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
@@ -53,12 +54,34 @@ const Search = () => (
           </ActionBarRow>
 
         </ActionBar>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>Additional Columns:</td>
+                    <td><Checkbox id_col="rrid_col" text_col="RRID"/></td>
+                    <td><Checkbox id_col="clonality_col" text_col="Colonality"/></td>
+                    <td><Checkbox id_col="catalog_number_col" text_col="Catalog#"/></td>
+                    <td><Checkbox id_col="lot_number_col" text_col="Lot#"/></td>
+                    <td><Checkbox id_col="vendor_col" text_col="Vendor"/></td>
+                    <td><Checkbox id_col="recombinat_col" text_col="Recombinant"/></td>
+                    <td><Checkbox id_col="ot_col" text_col="Organ/Tissue"/></td>
+                    <td><Checkbox id_col="hp_col" text_col="Hubmap Platform"/></td>
+                    <td><Checkbox id_col="so_col" text_col="Submitter Orcid"/></td>
+                    <td><Checkbox id_col="email_col" text_col="Email"/></td>
+                    <td><Checkbox id_col="pdf_col" text_col="PDF"/></td>
+                </tr>
+            </thead>
+        </table>
+
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={["antibody_name", "target_name", "host_organism", "vendor",  "avr_filename", "avr_uuid"]}/>
+          sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orciid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
         <NoHits/>
+
         <Pagination options={options}/>
+
       </LayoutResults>
 
     </LayoutBody>
