@@ -58,7 +58,7 @@ const Search = () => (
         <table>
             <thead>
                 <tr>
-                    <td>Additional Columns:</td>
+                    <td><b>Additional Columns:</b></td>
                     <td><Checkbox id_col="rrid_col" text_col="RRID"/></td>
                     <td><Checkbox id_col="clonality_col" text_col="Colonality"/></td>
                     <td><Checkbox id_col="catalog_number_col" text_col="Catalog#"/></td>
@@ -69,13 +69,12 @@ const Search = () => (
                     <td><Checkbox id_col="hp_col" text_col="Hubmap Platform"/></td>
                     <td><Checkbox id_col="so_col" text_col="Submitter Orcid"/></td>
                     <td><Checkbox id_col="email_col" text_col="Email"/></td>
-                    <td><Checkbox id_col="pdf_col" text_col="PDF"/></td>
                 </tr>
             </thead>
         </table>
 
         <Hits mod="sk-hits-list"
-          hitsPerPage={20}
+          hitsPerPage={40}
           listComponent={AntibodyHitsTable}
           sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orciid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
         <NoHits/>

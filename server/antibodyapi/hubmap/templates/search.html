@@ -10,6 +10,12 @@
 
     <body>
         <div id="assets_url">{{ assets_url }}</div>
+        <script>
+          var assets_url={{ assets_url }};
+        </script>
+        <script>
+          var display={{ display | tojson }};
+        </script>
         <div id="render-react-here">
         </div>
         <script

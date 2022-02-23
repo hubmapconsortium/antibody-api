@@ -27,8 +27,13 @@ def hubmap_search():
     # if not authenticated:
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
-    print(f"*** assets_url: {assets_url}")
-    return render_template('search.html', assets_url=assets_url)
+    display: dict = {
+        "ho_col": "table-cell", "uniprot_no_col": "table-cell", "tn_col": "table-cell", "pdf_col": "table-cell",
+        "rrid_col": "none", "clonality_col": "none", "catalog_number_col": "none", "lot_number_col": "none",
+        "vendor_col": "none", "recombinat_col": "none", "ot_col": "none", "hp_col": "none", "so_col": "none",
+        "email_col": "none"
+    }
+    return render_template('search.html', assets_url=assets_url, display=display)
 
 @hubmap_blueprint.route('/_search', methods = ['GET', 'POST'])
 def search():
