@@ -44,7 +44,6 @@ const Search = () => (
           size={10}/>
       </SideBar>
       <LayoutResults>
-        <h3>Results</h3>
         <ActionBar>
 
           <ActionBarRow>
