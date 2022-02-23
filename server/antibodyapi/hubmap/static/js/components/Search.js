@@ -74,7 +74,7 @@ const Search = () => (
         </table>
 
         <Hits mod="sk-hits-list"
-          hitsPerPage={40}
+          hitsPerPage={20}
           listComponent={AntibodyHitsTable}
           sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orciid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
         <NoHits/>
