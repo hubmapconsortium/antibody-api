@@ -26,6 +26,8 @@ const Search = () => (
 
     <LayoutBody>
       <SideBar>
+        <h3>Filters</h3>
+        <ResetFilters/>
         <HierarchicalMenuFilter
           fields={["target_name.keyword"]}
           title="Target Name"
@@ -42,6 +44,7 @@ const Search = () => (
           size={10}/>
       </SideBar>
       <LayoutResults>
+        <h3>Results</h3>
         <ActionBar>
 
           <ActionBarRow>
@@ -50,7 +53,6 @@ const Search = () => (
 
           <ActionBarRow>
             <SelectedFilters/>
-            <ResetFilters/>
           </ActionBarRow>
 
         </ActionBar>
