@@ -1,8 +1,10 @@
 from flask import abort, Blueprint, redirect, render_template, session, url_for, request, current_app
 from antibodyapi.utils.elasticsearch import execute_query
 
+
 def bad_request_error(err_msg):
     abort(400, description = err_msg)
+
 
 hubmap_blueprint = Blueprint('hubmap', __name__, template_folder='templates')
 @hubmap_blueprint.route('/upload')
@@ -20,6 +22,7 @@ def hubmap():
         data_provider_groups=data_provider_groups
     )
 
+
 @hubmap_blueprint.route('/')
 def hubmap_search():
     #replace by the correct way to check token validity.
@@ -33,7 +36,12 @@ def hubmap_search():
         "vendor_col": "none", "recombinat_col": "none", "ot_col": "none", "hp_col": "none", "so_col": "none",
         "email_col": "none"
     }
-    return render_template('search.html', assets_url=assets_url, display=display)
+    return render_template(
+        'search.html',
+        assets_url=assets_url,
+        display=display
+    )
+
 
 @hubmap_blueprint.route('/_search', methods = ['GET', 'POST'])
 def search():
