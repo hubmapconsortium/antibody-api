@@ -25,7 +25,8 @@ const Search = () => (
       <SearchBox
         autofocus={true}
         searchOnChange={true}
-        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor"]}/>
+        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor"]}
+        />
       <a href="/upload" style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>Add AVRs</a>
     </TopBar>
 
