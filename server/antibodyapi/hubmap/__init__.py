@@ -1,4 +1,5 @@
-from flask import abort, Blueprint, redirect, render_template, session, url_for, request, current_app
+from flask import abort, Blueprint, redirect, render_template, session, url_for, request, current_app, send_from_directory
+import os
 from antibodyapi.utils.elasticsearch import execute_query
 
 
@@ -41,6 +42,19 @@ def hubmap_search():
         assets_url=assets_url,
         display=display
     )
+
+
+# https://flask.palletsprojects.com/en/2.0.x/patterns/favicon/
+@hubmap_blueprint.route('/static/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(current_app.root_path, 'hubmap', 'static'), 'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
+
+
+@hubmap_blueprint.route('/css/app.css')
+def css():
+    return send_from_directory(os.path.join(current_app.root_path, 'hubmap', 'css'), 'app.css',
+                               mimetype='text/css')
 
 
 @hubmap_blueprint.route('/_search', methods = ['GET', 'POST'])
