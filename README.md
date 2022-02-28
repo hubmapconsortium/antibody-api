@@ -1,7 +1,17 @@
 # antibody-api
 
+This information will help you get the Antibody API up in running whether locally or on an environment.
+
 ## Build, Publish, Deploy Workflow
 These are the steps used to build, publish a Docker image, and then deploy it.
+
+Before doing so you will need to follow the steps outlined in the section "Antibody API Configuration Changes"
+to configure the server, and the instructions in the section
+"Using the SearchAPI instead of directly reading from Elastic Search" to properly
+configure the Search API server to handle queries from the Antibody API.
+
+Local deployment instructions for testing purposes are found in the Section "Local Deployment".
+
 
 ### Get the Latest code
 Login to the target machine and get the latest version of the code from the GitHub repository.
@@ -77,14 +87,21 @@ docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 The '--no-build' get's the container from DockerHub.
 
-## Deployment Locally
+## Local Deployment
+
+For local development you will also need to install the [Search API from GitHub](https://github.com/hubmapconsortium/search-api).
+See "Using the SearchAPI instead of directly reading from Elastic Search" for configuration information.
+
+Before deploying the server you will need to configure it.
+Please follow the steps outlined in the section "Antibody API Configuration Changes"
 
 To shutdown and remove all containers if anything is running by executing the following:
 ```commandline
 ./scripts/run_local.sh down -v --rmi all
 ```
 
-Then restore the Docker Containers, Networks, and Volumes by executing the following:
+Then restore the Docker Containers, Networks, and Volumes can be done by executing the following script.
+If you delete one of the Docker images (say the "antibody-api_web-1 container) this will rebuild and restart it.
 ```commandline
 ./scripts/run_local.sh
 ```
@@ -119,6 +136,7 @@ psql -h localhost -U postgres -d antibodydb -c "SELECT * from antibodies where a
 ```
 
 Once the data is loaded you can use the antibody search api located at [http://localhost:500/](http://localhost:5000)
+
 
 ## Deleting and Restoring the Elastic Search Index
 
@@ -161,17 +179,16 @@ The following describes how to set this up for testing.
 search-api:src/instance/search-config.yaml: Add the following to the end of the file.
 This will add the Antibody API Elastic Search index to Search API.
 Note that the 'url' corresponds to the instance of ElasticSearch that is running in the Docker container.
+For running in the various environments, set the 'url' appropriately.
 ```commandline
+
   hm_antibodies:
     active: true
+    reindex_enabled: false
     public: hm_antibodies
     private: hm_antibodies
-    document_source_endpoint: 'Doesn''t use this'
     elasticsearch:
       url: 'http://localhost:9200'
-      mappings: "addl_index_transformations/portal/config.yaml"
-    transform:
-      module: elasticsearch.addl_index_transformations.portal
 ```
 
 serch-api:/src/instance/app.cfg: The Elastic Search server should point to the instance running in Docker,
