@@ -20,52 +20,75 @@
         </a>
         <h1 style="justify-content: center; display: flex; align-items: center; width: 100%">Antibody Validation Report Header</h1>
       </div>
+
+
       <div class="container px-5 py-10 mx-auto">
-        <div class="flex flex-col text-center w-full mb-12">
-          <p class="lg:w-2/3 mx-auto leading-relaxed text-base">The HuBMAP Antibody Validation Report Upload allows new reports to be uploaded to the HuBMAP AVR tracking system.</p>
-          <p class="lg:w-2/3 mx-auto leading-relaxed text-base">To add reports, upload a csv file as described in the <a href="avr_upload_documentation.html">AVR upload documentation</a> formatted based on the <a href="template_csv_file.html">template csv file</a> along with all of the AVR reports referenced in the csv as PDFs.</p>
-        </div>
-        <div class="lg:w-1/2 md:w-2/3 mx-auto">
+
+
+        <div class="uploadWrap " >
+
+          <div class="uploadCol " >
+          
+          <p class="leading-relaxed text-base">The HuBMAP Antibody Validation Report Upload allows new reports to be uploaded to the HuBMAP AVR tracking system.</p>
+                  <p class=" leading-relaxed text-base">To add reports, upload a csv file as described in the <a href="avr_upload_documentation.html">AVR upload documentation</a> formatted based on the <a href="template_csv_file.html">template csv file</a> along with all of the AVR reports referenced in the csv as PDFs.</p>
+      
+          </div>
+          <div class="uploadCol">
+      
           <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post" id="antibody-form">
-          <div class="flex flex-wrap -m-2">
-            <div class="p-2 w-full">
-              <div class="relative">
-                <section class="flex flex-col w-full h-full p-1 overflow-auto">
+      
+      
+      
+              <div class="uploadInnerWrap">
+      
+                  <p> Upload a single csv file describing the AVRs being uploaded (see <a href="avr_upload_documentation.html">AVR upload documentation</a> and <a href="template_csv_file.html">template csv file</a></p>
                   <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
-                  <header class="flex flex-col items-center justify-center py-5 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
-                    <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" required="">
-                    Upload a single csv file describing the AVRs being uploaded (see <a href="avr_upload_documentation.html">AVR upload documentation</a> and <a href="template_csv_file.html">template csv file</a>)
-                    </input>
-                  </header>
-                </section>
-                <section class="flex flex-col w-full h-full p-1 overflow-auto">
-                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
-                  <header class="flex flex-col items-center justify-center py-5 text-base text-blueGray-500 transition duration-500 ease-in-out transform bg-white border border-dashed rounded-lg focus:border-blue-500 focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2">
-                    <input accept="pdf" name="pdf" multiple="multiple" type="file" id="fileInput" class="w-auto px-2 py-1 my-2 mr-2 text-blueGray-500 transition duration-500 ease-in-out transform border rounded-md hover:text-blueGray-600 text-md focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 hover:bg-gray-100" >
-                    Upload the PDF files associated with the csv by clicking Browse. To easily upload place all files in a single directory and use the ctrl (or command on Mac) key to select them all in the file dialog.
-                    </input>
-                  </header>
-                </section>
+                  <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="" required="" />
+      
+          
               </div>
-            </div>
-            {% if data_provider_groups %}
-            <div>
-              Data Provider Group:
-              <select name="group_id">
-                {% for g in data_provider_groups %}
-                  <option value="{{g[0]}}">{{ g[1] }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            {% endif %}
-            <div class="p-2 w-full">
-              <button type="submit" class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Submit</button>
-            </div>
+      
+              <div class="uploadInnerWrap">
+      
+                  <p> Upload the PDF files associated with the csv by clicking Browse. To easily upload place all files in a single directory and use the ctrl (or command on Mac) key to select them all in the file dialog.</a></p>
+                  <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
+                  <input accept="pdf" name="pdf" multiple="multiple" type="file" id="fileInput"  />
+              </div>
+              
+              <div class="UploadInnerWrapFull">
+              {% if data_provider_groups %}
+                  <div>
+                  Data Provider Group:
+                  <select name="group_id">
+                      {% for g in data_provider_groups %}
+                      <option value="{{g[0]}}">{{ g[1] }}</option>
+                      {% endfor %}
+                  </select>
+                  </div>
+                  {% endif %}
+                  <div class="p-2 w-full">
+                  <button type="submit" class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Submit</button>
+                  </div>
+              </div>
+              
           </form>
+              
+              
+      
+          </div>
+      
+      
         </div>
+      
+
+
       </div>
-    </div>
+
+
   </section>
+
+
+
   <section class="text-gray-600 body-font relative hidden" id="loading-screen">
     <div class="flex flex-col text-center w-full mb-12">
       <div class="px-5" style="background-color:#444A65; color:white; height:60px; display:flex; flex-direction:row; align-items:center">
