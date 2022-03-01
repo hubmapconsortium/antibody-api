@@ -372,21 +372,48 @@ html{
   flex:50%;
   text-align:left;
 }
-.uploadColRight{
+
+.uploadColS{
+  padding: 0 20px;
+  flex:20%;
+  text-align:left;
+}
+
+.uploadColL{
+  padding: 0 20px;
+  flex:80%;
+  text-align:left;
+}
+
+.uploadCol{
   padding:5px;
   background:white;
   border-radius:.5rem;
 }
 .uploadCol p{
   text-align:left;
+  display:inline block;
 }
 .uploadInnerWrap{
   width: 100%;
   margin-top:20px;
+}
+.uploadInnerWrap p{
+  text-align:left;
+  display:inline block;
+}
+.uploadInnerWrap input{
+  text-align:left;
+  display:inline block;
 }
 
 .UploadInnerWrapFull{
   flex: 100%;
   text-align: left;
   width:50%;
+  margin-top:20px;
 }
+.submitBut{
+  margin-top:20px;
+}
+
