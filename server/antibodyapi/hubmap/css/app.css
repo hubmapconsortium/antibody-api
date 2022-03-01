@@ -355,7 +355,8 @@ caption {
 html{
   background-color:rgb(250, 250, 250);
 }
-.sk-top-bar{ 
+.sk-top-bar,
+.topmenu{ 
   min-height: 64px;
   box-sizing: border-box;
   background-color:#444A65;
