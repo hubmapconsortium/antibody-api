@@ -40,7 +40,7 @@ class AntibodyHitsTable extends React.Component {
             <tr>
               <th>Name</th>
               <th>Host Organism</th>
-              <th>Uniprot#</th>
+              <th>UniProt#</th>
               <th>Target Name</th>
               <th>PDF</th>
               <th id="rrid_col_head" style={{"display": display.rrid_col}}>RRID</th>
@@ -50,8 +50,8 @@ class AntibodyHitsTable extends React.Component {
               <th id="vendor_col_head" style={{"display": display.vendor_col}}>Vendor</th>
               <th id="recombinat_col_head" style={{"display": display.recombinat_col}}>Recombinant</th>
               <th id="ot_col_head" style={{"display": display.ot_col}}>Organ/Tissue</th>
-              <th id="hp_col_head" style={{"display": display.hp_col}}>Hubmap Platform</th>
-              <th id="so_col_head" style={{"display": display.so_col}}>Submitter Orcid</th>
+              <th id="hp_col_head" style={{"display": display.hp_col}}>HuBMAP Platform</th>
+              <th id="so_col_head" style={{"display": display.so_col}}>Submitter ORCID</th>
               <th id="email_col_head" style={{"display": display.email_col}}>Email</th>
             </tr>
           </thead>

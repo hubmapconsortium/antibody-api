@@ -73,8 +73,8 @@ const Search = () => (
                     <td><Checkbox id_col="vendor_col" text_col="Vendor"/></td>
                     <td><Checkbox id_col="recombinat_col" text_col="Recombinant"/></td>
                     <td><Checkbox id_col="ot_col" text_col="Organ/Tissue"/></td>
-                    <td><Checkbox id_col="hp_col" text_col="Hubmap Platform"/></td>
-                    <td><Checkbox id_col="so_col" text_col="Submitter Orcid"/></td>
+                    <td><Checkbox id_col="hp_col" text_col="HuBMAP Platform"/></td>
+                    <td><Checkbox id_col="so_col" text_col="Submitter ORCID"/></td>
                     <td><Checkbox id_col="email_col" text_col="Email"/></td>
                 </tr>
             </thead>
