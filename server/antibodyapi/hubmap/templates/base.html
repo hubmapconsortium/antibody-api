@@ -22,43 +22,47 @@
         <h1 class="toptitle" style="justify-content: center; display: flex; align-items: center; width: 100%">Antibody Validation Report Upload</h1>
       </div>
 
-
       <div class="container px-5 py-10 mx-auto">
 
+        <div class="uploadWrap">
 
-        <div class="uploadWrap " >
-
-
-
-          <div class="uploadCol uploadColClr " >
-          <h3>Antibody Validation Report</h3>
-          <p class="leading-relaxed text-base">The HuBMAP Antibody Validation Report Upload allows new reports to be uploaded to the HuBMAP AVR tracking system.</p>
-                  <p class=" leading-relaxed text-base">To add reports, upload a csv file as described in the <a href="avr_upload_documentation.html">AVR upload documentation</a> formatted based on the <a href="template_csv_file.html">template csv file</a> along with all of the AVR reports referenced in the csv as PDFs.</p>
-      
+          <div class="uploadCol uploadColClr">
+            <h3>Antibody Validation Report</h3>
+              <p class="leading-relaxed text-base">
+                  The HuBMAP Antibody Validation Report Upload allows new reports to be uploaded to the HuBMAP AVR tracking system.
+              </p>
+              <p class="leading-relaxed text-base">
+                  To add reports, upload a csv file as described in the
+                  <a href="avr_upload_documentation.html">AVR upload documentation</a>
+                  formatted based on the
+                  <a href="template_csv_file.html">template csv file</a>
+                  along with all of the AVR reports referenced in the csv as PDFs.
+              </p>
           </div>
 
-
-
           <div class="uploadCol">
-      
-          <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post" id="antibody-form">
-      
-      
-      
+            <form onsubmit="AJAXSubmit(this); return false;" enctype="multipart/form-data" action="/antibodies/import" method="post" id="antibody-form">
+
               <div class="uploadInnerWrap">
                 <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
-                  <p> Upload a single csv file describing the AVRs being uploaded (see <a href="avr_upload_documentation.html">AVR upload documentation</a> and <a href="template_csv_file.html">template csv file</a>)</p>
-                  
+                  <p>
+                      Upload a single csv file describing the AVRs being uploaded (see
+                      <a href="avr_upload_documentation.html">AVR upload documentation</a>
+                      and
+                      <a href="template_csv_file.html">template csv file</a>
+                      ).
+                  </p>
                   <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="" required="" />
-      
-          
               </div>
       
               <div class="uploadInnerWrap">
                 <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
-                  <p> Upload the PDF files associated with the csv by clicking Browse. To easily upload place all files in a single directory and use the ctrl (or command on Mac) key to select them all in the file dialog.</a></p>
-                  
-                  <input accept="pdf" name="pdf" multiple="multiple" type="file" id="fileInput"  />
+                  <p>
+                      Upload the PDF files associated with the csv by clicking Browse.
+                      To easily upload place all files in a single directory and use the ctrl (or command on Mac)
+                      key to select them all in the file dialog.
+                  </p>
+                  <input accept=".pdf" name="pdf" multiple="multiple" type="file" id="fileInput" />
               </div>
               
               <div class="UploadInnerWrapFull">
@@ -77,23 +81,14 @@
                   </div>
               </div>
               
-          </form>
-              
-              
-      
+            </form>
           </div>
-      
-      
-        </div>
-      
 
+        </div>
 
       </div>
 
-
   </section>
-
-
 
   <section class="text-gray-600 body-font relative hidden" id="loading-screen">
     <div class="flex flex-col text-center w-full mb-12">
@@ -112,7 +107,6 @@
     </div> -->
   </section>
 
-
   <section class="text-gray-600 body-font relative hidden" id="upload-results-block">
     <div class="flex flex-col text-center w-full mb-12">
       <div class="px-5 topmenu" style="background-color:#444A65; color:white; height:60px; display:flex; flex-direction:row; align-items:center">
@@ -123,26 +117,16 @@
         </a>
         <h1 class="toptitle"  style="justify-content: center; display: flex; align-items: center; width: 100%">Antibody Validation Report Upload</h1>
       </div>
-
     </div>
-
-
-
     <div class="uploadWrap centerJustify" >
-
-
-      <p class="leading-relaxed text-base">All entities have been successfully uploaded.</p>
+      <p class="leading-relaxed text-base"><b>Upload Results</b></p>
         <div class="" id="upload-results"></div>
-
         <div class="">
-
           <button class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg" onClick="returnHome();">Ok</button>
         </div>
-     
     </div>
-
-    
   </section>
+
   <script type="text/javascript">
 "use strict";
 
@@ -152,25 +136,41 @@ function returnHome () {
   window.location.href='/';
 }
 
-function ajaxSuccess () {
+function ajaxSuccess (event) {
   jQuery('#loading-screen').addClass('hidden');
   jQuery('#upload-results-block').removeClass('hidden');
-  var response = this.responseText;
-  var jsonresponse = JSON.parse(response);
-  var responsetable = '<table>';
-  csv_content = "antibody_name,antibody_uuid\n";
-  jQuery.each(jsonresponse.antibodies, function(name, value) {
-    responsetable += '<tr>';
-    responsetable += '<td>';
-    responsetable += value.antibody_name;
-    responsetable += '</td>';
-    responsetable += '<td>';
-    responsetable += value.antibody_uuid;
-    responsetable += '</td>';
-    responsetable += '</tr>';
-    csv_content += value.antibody_name + ',' + value.antibody_uuid + '\n';
-  })
-  responsetable += '</table>';
+  var jsonresponse = JSON.parse(event.target.response);
+  var http_status = event.target.status
+  var responsetable = '';
+  if (http_status == 201) {
+      csv_content = "antibody_name,antibody_uuid\n";
+      responsetable += '<p>All entities have been successfully uploaded.</p>';
+      responsetable += '<br>';
+      responsetable += '<table><tr><th>Antibody</th><th>UUID</th></tr>';
+      jQuery.each(jsonresponse.antibodies, function(name, value) {
+        responsetable += '<tr>';
+        responsetable += '<td>';
+        responsetable += value.antibody_name;
+        responsetable += '</td>';
+        responsetable += '<td>';
+        responsetable += value.antibody_uuid;
+        responsetable += '</td>';
+        responsetable += '</tr>';
+        csv_content += value.antibody_name + ',' + value.antibody_uuid + '\n';
+      })
+      responsetable += '</table>';
+  } else if (http_status == 406) {
+      responsetable += '<div>';
+      responsetable += '<p><b>Error</b></p>';
+      responsetable += '<p>' + jsonresponse.message + '</p>';
+      responsetable += '</div>';
+      responsetable += '<br>';
+  } else {
+      responsetable += '<div>';
+      responsetable += '<p><b>Error</b></p>';
+      responsetable += '<p>Unexpected error received from the server: ' + jsonresponse.message + '</p>';
+      responsetable += '</div>';
+  }
   jQuery('#upload-results').html(responsetable);
 }
 
@@ -192,7 +192,7 @@ function resetForm () {
 function AJAXSubmit (oFormElement) {
   if (!oFormElement.action) { return; }
   var oReq = new XMLHttpRequest();
-  oReq.onload = ajaxSuccess;
+  oReq.addEventListener("load", ajaxSuccess);
   jQuery('#form-block').addClass('hidden');
   jQuery('#loading-screen').removeClass('hidden');
   if (oFormElement.method.toLowerCase() === "post") {
@@ -211,7 +211,7 @@ function AJAXSubmit (oFormElement) {
         sSearch += "&" + escape(oField.name) + "=" + escape(oField.value);
       }
     }
-    oReq.open("get", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
+    oReq.open("GET", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
     oReq.send(null);
   }
 }

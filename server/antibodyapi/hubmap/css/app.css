@@ -97,14 +97,11 @@ body {
   transform: translate(-50%, -50%);
 }
 
-
-
 .modal-main, .modal-organ {
   padding: 1em;
   position: fixed;
   background: #E6E6E6;
   width: 85%;
-
   height: 85%;
   top: 50%;
   bottom: 50%;
@@ -120,9 +117,7 @@ body {
 }
 
 .modal-main {
-
   width: 80%;
-
 }
 
 #unityContainer {
@@ -237,8 +232,6 @@ caption {
   background: rgb(211, 215, 207);
   z-index: 10;
   overflow:scroll;
-
-
 }
 
 .modal-wrapper {
