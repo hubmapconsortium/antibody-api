@@ -49,6 +49,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
     for file in request.files.getlist('file'):
         if file.filename == '':
             abort(json_error('Filename missing', 406))
+        # TODO: Validate the .csv first before uploading anything....
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -146,7 +147,11 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> None
         for avr_file in request_files.getlist('pdf'):
             if avr_file.filename == row['avr_filename']:
                 found = True
-                content: bytes = avr_file.read()
+                content: bytes = avr_file.stream.read()
+                # Since this is a stream, we need to go back to the beginning or the next time that it is read
+                # it will be read from the end where there are no characters providing an empty file.
+                avr_file.stream.seek(0)
+                logger.debug(f"avr_file.filename: {row['avr_filename']}; size: {len(content)}")
                 try:
                     PyPDF2.PdfFileReader(stream=io.BytesIO(content))
                     logger.debug(f"Processing avr_filename: {avr_file.filename}; is a valid .pdf file")

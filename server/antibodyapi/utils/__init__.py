@@ -12,9 +12,13 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # pylint: disable=no-name-in-module
 from psycopg2.errors import UniqueViolation
+import logging
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
 requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
+
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -145,6 +149,8 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         verify=False
     )
     temp_file_id = req.json()['temp_file_id']
+    logger.debug(f"utils/get_file_uuid: temp_file_id = {temp_file_id}")
+    logger.debug(f"utils/get_file_uuid: antibody_uuid = {antibody_uuid}")
 
     req2 = requests.post(
         '%s/file-commit' % (ingest_api_url,),
@@ -158,7 +164,9 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         },
         verify=False
     )
-    return req2.json()['file_uuid']
+    file_uuid = req2.json()['file_uuid']
+    logger.debug(f"utils/get_file_uuid: file_uuid = {file_uuid}")
+    return file_uuid
 
 
 def get_group_id(ingest_api_url: str, group_id=None):
