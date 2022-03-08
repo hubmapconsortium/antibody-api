@@ -46,12 +46,13 @@ def import_antibodies(): # pylint: disable=too-many-branches
     if group_id is None:
         abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
+    pdf_files_processed: list = []
     for file in request.files.getlist('file'):
         if file.filename == '':
             abort(json_error('Filename missing', 406))
-        # TODO: Validate the .csv first before uploading anything....
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            logger.info(f"import_antibodies: processing filename: {filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
                 antibodycsv = csv.DictReader(csvfile, delimiter=',')
@@ -62,7 +63,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
+                        abort(json_error('Problem processing Vendor field of .csv file', 406))
                     vendor = row['vendor']
                     del row['vendor']
                     row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
@@ -82,6 +83,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                                         avr_file
                                     )
                                     query = insert_query_with_avr_file_and_uuid()
+                                    pdf_files_processed.append(avr_file.filename)
                     try:
                         cur.execute(query, row)
                         uuids_and_names.append({
@@ -95,7 +97,11 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         abort(json_error('Antibody not unique', 406))
         else:
             abort(json_error('Filetype forbidden', 406))
-    return make_response(jsonify(antibodies=uuids_and_names), 201)
+    pdf_files_not_processed: list = []
+    for avr_file in request.files.getlist('pdf'):
+        if avr_file.filename not in pdf_files_processed:
+            pdf_files_not_processed.append(avr_file.filename)
+    return make_response(jsonify(antibodies=uuids_and_names, pdf_files_not_processed=pdf_files_not_processed), 201)
 
 
 csv_header = [
