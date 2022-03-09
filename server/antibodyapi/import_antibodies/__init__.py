@@ -118,8 +118,14 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
         if key not in row:
             abort(json_error(f"CSV file row# {row_i}: Key '{key}' is not present", 406))
 
-    if row['recombinant'] not in ['true', 'false']:
-        abort(json_error(f"CSV file row# {row_i}: recombinant '{row['recombinant']}' is not 'true' of 'false'", 406))
+    valid_recombinat: list[str] = ['true', 'false']
+    if row['recombinant'] not in valid_recombinat:
+        abort(json_error(f"CSV file row# {row_i}: recombinant value '{row['recombinant']}' is not one of: {', '.join(valid_recombinat)}", 406))
+
+    # https://en.wikipedia.org/wiki/Clone_(cell_biology)
+    valid_clonality: list[str] = ['polyclonal', 'oligoclonal', 'monoclonal']
+    if row['clonality'] not in valid_clonality:
+        abort(json_error(f"CSV file row# {row_i}: clonality value '{row['clonality']}' is not one of: {', '.join(valid_clonality)}", 406))
 
     found_pdf: str = None
     if 'pdf' in request_files:
