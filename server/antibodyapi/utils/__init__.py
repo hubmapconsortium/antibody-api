@@ -102,7 +102,6 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'created_by_user_sub': antibody[SI.CREATED_BY_USER_SUB],
         'group_uuid': antibody[SI.GROUP_UUID].replace('-', '')
     }
-    print(f"****** antibody[SI.AVR_UUID]: {antibody[SI.AVR_UUID]}")
     if antibody[SI.AVR_UUID] is not None:
         ant['avr_filename'] = antibody[SI.AVR_FILENAME]
         ant['avr_uuid'] = antibody[SI.AVR_UUID].replace('-', '')

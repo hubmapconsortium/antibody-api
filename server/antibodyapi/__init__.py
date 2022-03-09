@@ -1,5 +1,5 @@
 from flask import g, Flask
-
+import logging
 from antibodyapi.hubmap import hubmap_blueprint
 from antibodyapi.import_antibodies import import_antibodies_blueprint
 from antibodyapi.list_antibodies import list_antibodies_blueprint
@@ -7,8 +7,12 @@ from antibodyapi.login import login_blueprint
 from antibodyapi.logout import logout_blueprint
 from antibodyapi.restore_elasticsearch import restore_elasticsearch_blueprint
 from antibodyapi.save_antibody import save_antibody_blueprint
-
 from . import default_config
+
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
+                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
+
 
 def create_app(testing=False):
     app = Flask(__name__, instance_relative_config=True)
@@ -32,6 +36,7 @@ def create_app(testing=False):
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
         if 'connection' in g:
+            logger.info(f"Closing Database Connection")
             g.connection.close()
 
     return app

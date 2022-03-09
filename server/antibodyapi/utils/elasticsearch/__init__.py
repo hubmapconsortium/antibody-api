@@ -3,17 +3,8 @@ from flask import current_app
 import requests
 import logging
 
-# TODO: Joe 12/1/21
-# - Rename the configuration name (line 8) 'ELASTICSEARCH_SERVER' to 'SEARCH_API_URL' to hit the search API server
-# - Have to manually create the 'hm_antibodies' index into Elastic Search and make come configuration change into
-#   search api so that it supports this index.
-# - Import the data associated with the index though some script.
-# - He is using the elastic search methods against the elastic search server we can get rid of the Elastic Search
-#   dependency, or move the dependency to the script so that we can import data using the functionality there.
-#   Better yet, use the Neo4j Admin import to load the data into the index.
-# Search UI https://antibody-api.dev.hubmapconsortium.org/
-
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
+                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 

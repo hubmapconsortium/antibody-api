@@ -22,7 +22,8 @@ import pprint
 
 import_antibodies_blueprint = Blueprint('import_antibodies', __name__)
 
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
+                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
@@ -155,7 +156,8 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
         if response.status_code == 404:
             abort(json_error(f"CSV file row# {row_i}: Uniprot Accession Number '{row['uniprot_accession_number']}' is not found in catalogue", 406))
     except requests.ConnectionError as error:
-        abort(json_error(f"CSV file row# {row_i}: Problem encountered fetching Uniprot Accession Number", 406))
+        # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Uniprot Accession Number", 406))
 
     try:
         orcid_url: str = f"https://pub.orcid.org/{row['submitter_orciid']}"
@@ -164,6 +166,7 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
             abort(json_error(f"CSV file row# {row_i}: ORCID '{row['submitter_orciid']}' is not found in catalogue",
                              406))
     except requests.ConnectionError as error:
+        # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered fetching ORCID", 406))
 
     # TODO: The rrid search is really fragile and a better way should be found
@@ -173,7 +176,8 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
         if re.search(r'0 results out of 0 with the query', response.text):
             abort(json_error(f"CSV file row# {row_i}: RRID '{row['rrid']}' is not valid", 406))
     except requests.ConnectionError as error:
-        abort(json_error(f"CSV file row# {row_i}: RRID '{row['rrid']}' is not valid", 406))
+        # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID", 406))
     # TODO: Make sure that the .pdf file was uploaded and that it really was a .pdf file.
 
     return found_pdf
