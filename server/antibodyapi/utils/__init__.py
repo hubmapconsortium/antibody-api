@@ -13,8 +13,8 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # pylint: disable=no-name-in-module
 from psycopg2.errors import UniqueViolation
 import logging
-
 from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
+
 requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')

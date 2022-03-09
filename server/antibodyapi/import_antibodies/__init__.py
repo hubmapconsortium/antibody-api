@@ -46,10 +46,10 @@ def import_antibodies(): # pylint: disable=too-many-branches
     if group_id is None:
         abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
-    pdf_files_processed: list = []
+    # Validate everything before saving anything...
+    pdf_files_processed: list = validate_antibodycsv(request.files)
+
     for file in request.files.getlist('file'):
-        if file.filename == '':
-            abort(json_error('Filename missing', 406))
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             logger.info(f"import_antibodies: processing filename: {filename}")
@@ -59,11 +59,10 @@ def import_antibodies(): # pylint: disable=too-many-branches
                 row_i = 1
                 for row in antibodycsv:
                     row_i = row_i + 1
-                    validate_antibodycsv_row(row_i, row, request.files)
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
-                        abort(json_error('Problem processing Vendor field of .csv file', 406))
+                        abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
                     vendor = row['vendor']
                     del row['vendor']
                     row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
@@ -83,7 +82,6 @@ def import_antibodies(): # pylint: disable=too-many-branches
                                         avr_file
                                     )
                                     query = insert_query_with_avr_file_and_uuid()
-                                    pdf_files_processed.append(avr_file.filename)
                     try:
                         cur.execute(query, row)
                         uuids_and_names.append({
@@ -94,9 +92,10 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     except KeyError:
                         abort(json_error('CSV fields are wrong', 406))
                     except UniqueViolation:
-                        abort(json_error('Antibody not unique', 406))
+                        abort(json_error(f"CSV file row# {row_i}: Antibody not unique", 406))
         else:
             abort(json_error('Filetype forbidden', 406))
+
     pdf_files_not_processed: list = []
     for avr_file in request.files.getlist('pdf'):
         if avr_file.filename not in pdf_files_processed:
@@ -110,12 +109,38 @@ csv_header = [
     'organ_or_tissue', 'hubmap_platform', 'submitter_orciid', 'avr_filename']
 
 
-def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> None:
+def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
+    logger.debug(f"validate_antibodycsv_row: row {row_i}: {row}")
+
     if len(row) != len(csv_header):
         abort(json_error(f"CSV file row# {row_i}: Has {len(row)} elements but should have {len(csv_header)}", 406))
     for key in csv_header:
         if key not in row:
             abort(json_error(f"CSV file row# {row_i}: Key '{key}' is not present", 406))
+
+    if row['recombinant'] not in ['true', 'false']:
+        abort(json_error(f"CSV file row# {row_i}: recombinant '{row['recombinant']}' is not 'true' of 'false'", 406))
+
+    found_pdf: str = None
+    if 'pdf' in request_files:
+        for avr_file in request_files.getlist('pdf'):
+            if avr_file.filename == row['avr_filename']:
+                content: bytes = avr_file.stream.read()
+                # Since this is a stream, we need to go back to the beginning or the next time that it is read
+                # it will be read from the end where there are no characters providing an empty file.
+                avr_file.stream.seek(0)
+                logger.debug(f"validate_antibodycsv_row: avr_file.filename: {row['avr_filename']}; size: {len(content)}")
+                try:
+                    PyPDF2.PdfFileReader(stream=io.BytesIO(content))
+                    logger.debug(f"validate_antibodycsv_row: Processing avr_filename: {avr_file.filename}; is a valid PDF file")
+                    found_pdf = avr_file.filename
+                    break
+                except PyPDF2.utils.PdfReadError:
+                    abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' found, but not a valid PDF file", 406))
+        if found_pdf is None:
+            abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' is not found", 406))
+    else:
+        abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' is not found", 406))
 
     try:
         uniprot_url: str = f"https://www.uniprot.org/uniprot/{row['uniprot_accession_number']}.rdf?include=yes "
@@ -145,25 +170,28 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> None
         abort(json_error(f"CSV file row# {row_i}: RRID '{row['rrid']}' is not valid", 406))
     # TODO: Make sure that the .pdf file was uploaded and that it really was a .pdf file.
 
-    if row['recombinant'] not in ['true', 'false']:
-        abort(json_error(f"CSV file row# {row_i}: recombinant '{row['recombinant']}' is not 'true' of 'false'", 406))
+    return found_pdf
 
-    if 'pdf' in request_files:
-        found: bool = False
-        for avr_file in request_files.getlist('pdf'):
-            if avr_file.filename == row['avr_filename']:
-                found = True
-                content: bytes = avr_file.stream.read()
-                # Since this is a stream, we need to go back to the beginning or the next time that it is read
-                # it will be read from the end where there are no characters providing an empty file.
-                avr_file.stream.seek(0)
-                logger.debug(f"avr_file.filename: {row['avr_filename']}; size: {len(content)}")
-                try:
-                    PyPDF2.PdfFileReader(stream=io.BytesIO(content))
-                    logger.debug(f"Processing avr_filename: {avr_file.filename}; is a valid .pdf file")
-                except PyPDF2.utils.PdfReadError:
-                    abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' found, but not a valid .pdf file", 406))
-        if not found:
-            abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' is not found", 406))
-    else:
-        abort(json_error(f"CSV file row# {row_i}: avr_filename '{row['avr_filename']}' is not found", 406))
+
+def validate_antibodycsv(request_files: dict) -> list:
+    pdf_files_processed: list = []
+    for file in request_files.getlist('file'):
+        if not file or file.filename == '':
+            abort(json_error('Filename missing in uploaded files', 406))
+        if file and allowed_file(file.filename):
+            lines: [str] = [x.decode("utf-8") for x in file.stream.readlines()]
+            # Since this is a stream, we need to go back to the beginning or the next time that it is read
+            # it will be read from the end where there are no characters providing an empty file.
+            file.stream.seek(0)
+            logger.debug(f"validate_antibodycsv: processing filename '{file.filename}' with {len(lines)} lines")
+            row_i = 1
+            for row in csv.DictReader(lines, delimiter=','):
+                row_i = row_i + 1
+                found_pdf: str = validate_antibodycsv_row(row_i, row, request_files)
+                if found_pdf is not None:
+                    logger.debug(f"validate_antibodycsv: CSV file row# {row_i}: found PDF file '{found_pdf}' as valid PDF")
+                    pdf_files_processed.append(found_pdf)
+                else:
+                    logger.debug(f"validate_antibodycsv: CSV file row# {row_i}: valid PDF not found")
+    logger.debug(f"validate_antibodycsv: found valid PDF files '{pdf_files_processed}'")
+    return pdf_files_processed
