@@ -30,7 +30,7 @@ class DownloadFile extends React.Component {
                 console.log('csv header: ', headerString)
 
                 data.antibodies.forEach(item => {
-                    console.log('item: ', item)
+                    //console.log('item: ', item)
                     var line = []
                     columnsToSave.forEach(function (key, index) {
                         line.push(item[key])

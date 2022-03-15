@@ -130,7 +130,7 @@ def get_cursor(app):
     return g.connection.cursor()
 
 
-def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
+def get_file_uuid(ingest_api_url: str, upload_folder, antibody_uuid, file):
     filename = secure_filename(file.filename)
     file.save(os.path.join(upload_folder, filename))
     req = requests.post(
@@ -147,6 +147,10 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         },
         verify=False
     )
+    if req.status_code != 201:
+        logger.debug(f"utils/get_file_uuid: response.status_code {req.status_code}")
+        abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req.status_code}", 406))
+
     temp_file_id = req.json()['temp_file_id']
     logger.debug(f"utils/get_file_uuid: temp_file_id = {temp_file_id}")
     logger.debug(f"utils/get_file_uuid: antibody_uuid = {antibody_uuid}")
@@ -163,6 +167,10 @@ def get_file_uuid(ingest_api_url, upload_folder, antibody_uuid, file):
         },
         verify=False
     )
+    if req.status_code != 201:
+        logger.debug(f"utils/get_file_uuid: response.status_code {req.status_code}")
+        abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req2.status_code}", 406))
+
     file_uuid = req2.json()['file_uuid']
     logger.debug(f"utils/get_file_uuid: file_uuid = {file_uuid}")
     return file_uuid
@@ -176,6 +184,10 @@ def get_group_id(ingest_api_url: str, group_id=None):
         },
         verify=False
     )
+    if req.status_code != 200:
+        logger.debug(f"utils/get_group_id: response.status_code {req.status_code}")
+        abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req.status_code}", 406))
+
     groups = {g['uuid']: g['data_provider'] for g in req.json()['groups']}
 
     if group_id:
@@ -193,7 +205,7 @@ def get_group_id(ingest_api_url: str, group_id=None):
     return None
 
 
-def get_data_provider_groups(ingest_api_url):
+def get_data_provider_groups(ingest_api_url: str):
     req = requests.get(
         '%s/metadata/usergroups' % (ingest_api_url,),
         headers={
@@ -201,6 +213,10 @@ def get_data_provider_groups(ingest_api_url):
         },
         verify=False
     )
+    if req.status_code != 200:
+        logger.debug(f"utils/get_data_provider_groups: response.status_code {req.status_code}")
+        abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req.status_code}", 406))
+
     groups = {g['uuid']: { 'displayname': g['displayname'], 'data_provider': g['data_provider'] } for g in req.json()['groups']}
 
     data_provider_groups = []
@@ -221,6 +237,10 @@ def get_hubmap_uuid(uuid_api_url: str):
         json={'entity_type': 'AVR'},
         verify=False
     )
+    if req.status_code != 200:
+        logger.debug(f"utils/get_hubmap_uuid: response.status_code {req.status_code}")
+        abort(json_error(f"Internal error caused when trying to accessing server '{uuid_api_url}'; status: {req.status_code}", 406))
+
     return req.json()[0]['uuid']
 
 

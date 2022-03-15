@@ -119,6 +119,10 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
         if key not in row:
             abort(json_error(f"CSV file row# {row_i}: Key '{key}' is not present", 406))
 
+    for item in row:
+        if '\n' in item:
+            abort(json_error(f"CSV file row# {row_i}: the new line character is not permitted in a data item", 406))
+
     valid_recombinat: list[str] = ['true', 'false']
     if row['recombinant'] not in valid_recombinat:
         abort(json_error(f"CSV file row# {row_i}: recombinant value '{row['recombinant']}' is not one of: {', '.join(valid_recombinat)}", 406))
