@@ -11,26 +11,26 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += `<td>${hit._source.antibody_name}</td>`;
-      antibodies += `<td>${hit._source.host_organism}</td>`;
-      antibodies += `<td><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
-      antibodies += `<td>${hit._source.target_name}</td>`;
-      antibodies += `<td>`;
+      antibodies += `<td class="antibody_name_col">${hit._source.antibody_name}</td>`;
+      antibodies += `<td class="host_organism_col">${hit._source.host_organism}</td>`;
+      antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
+      antibodies += `<td class="target_name_col">${hit._source.target_name}</td>`;
+      antibodies += `<td class="avr_filename_col">`;
       if (hit._source.avr_filename != undefined) {
         var assets_url = document.getElementById('assets_url').innerHTML;
         antibodies += `<a href="${assets_url}/${hit._source.avr_uuid}/${hit._source.avr_filename}" target="_blank">${hit._source.avr_filename}</a>`;
       }
       antibodies += `</td>`;
-      antibodies += '<td class="rrid_col" style="display:'+display.rrid_col+`;"><a href="https://scicrunch.org/resources/Any/search?q=${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
-      antibodies += '<td class="clonality_col" style="display:'+display.clonality_col+`;">${hit._source.clonality}</td>`;
-      antibodies += '<td class="catalog_number_col" style="display:'+display.catalog_number_col+`;">${hit._source.catalog_number}</td>`;
-      antibodies += '<td class="lot_number_col" style="display:'+display.lot_number_col+`;">${hit._source.lot_number}</td>`;
-      antibodies += '<td class="vendor_col" style="display:'+display.vendor_col+`;">${hit._source.vendor}</td>`;
-      antibodies += '<td class="recombinat_col" style="display:'+display.recombinat_col+`;">${hit._source.recombinant}</td>`;
-      antibodies += '<td class="ot_col" style="display:'+display.ot_col+`;">${hit._source.organ_or_tissue}</td>`;
-      antibodies += '<td class="hp_col" style="display:'+display.hp_col+`;">${hit._source.hubmap_platform}</td>`;
-      antibodies += '<td class="so_col" style="display:'+display.so_col+`;"><a href="https://orcid.org/${hit._source.submitter_orciid}" target="_blank">${hit._source.submitter_orciid}</a></td>`;
-      antibodies += '<td class="email_col" style="display:'+display.email_col+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
+      antibodies += '<td class="rrid_col" style="display:'+display.rrid+`"><a href="https://scicrunch.org/resources/Any/search?q=${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
+      antibodies += '<td class="clonality_col" style="display:'+display.clonality+`;">${hit._source.clonality}</td>`;
+      antibodies += '<td class="catalog_number_col" style="display:'+display.catalog_number+`;">${hit._source.catalog_number}</td>`;
+      antibodies += '<td class="lot_number_col" style="display:'+display.lot_number+`;">${hit._source.lot_number}</td>`;
+      antibodies += '<td class="vendor_col" style="display:'+display.vendor+`;">${hit._source.vendor}</td>`;
+      antibodies += '<td class="recombinant_col" style="display:'+display.recombinant+`;">${hit._source.recombinant}</td>`;
+      antibodies += '<td class="organ_or_tissue_col" style="display:'+display.organ_or_tissue+`;">${hit._source.organ_or_tissue}</td>`;
+      antibodies += '<td class="hubmap_platform_col" style="display:'+display.hubmap_platform+`;">${hit._source.hubmap_platform}</td>`;
+      antibodies += '<td class="submitter_orciid_col" style="display:'+display.submitter_orciid+`;"><a href="https://orcid.org/${hit._source.submitter_orciid}" target="_blank">${hit._source.submitter_orciid}</a></td>`;
+      antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
       antibodies += `</tr>`;
     }
     return (
@@ -38,21 +38,21 @@ class AntibodyHitsTable extends React.Component {
         <table id="antibody-results-table" className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Host Organism</th>
-              <th>UniProt#</th>
-              <th>Target Name</th>
-              <th>PDF</th>
-              <th id="rrid_col_head" style={{"display": display.rrid_col}}>RRID</th>
-              <th id="clonality_col_head" style={{"display": display.clonality_col}}>Clonality</th>
-              <th id="catalog_number_col_head" style={{"display": display.catalog_number_col}}>Catalog#</th>
-              <th id="lot_number_col_head" style={{"display": display.lot_number_col}}>Lot#</th>
-              <th id="vendor_col_head" style={{"display": display.vendor_col}}>Vendor</th>
-              <th id="recombinat_col_head" style={{"display": display.recombinat_col}}>Recombinant</th>
-              <th id="ot_col_head" style={{"display": display.ot_col}}>Organ/Tissue</th>
-              <th id="hp_col_head" style={{"display": display.hp_col}}>HuBMAP Platform</th>
-              <th id="so_col_head" style={{"display": display.so_col}}>Submitter ORCID</th>
-              <th id="email_col_head" style={{"display": display.email_col}}>Email</th>
+              <th id="antibody_name_col_head">Name</th>
+              <th id="host_organism_col_head">Host Organism</th>
+              <th id="uniprot_accession_col_head">UniProt#</th>
+              <th id="target_name_col_head">Target Name</th>
+              <th id="avr_filename_col_head">PDF</th>
+              <th id="rrid_col_head" style={{"display": display.rrid}}>RRID</th>
+              <th id="clonality_col_head" style={{"display": display.clonality}}>Clonality</th>
+              <th id="catalog_number_col_head" style={{"display": display.catalog_number}}>Catalog#</th>
+              <th id="lot_number_col_head" style={{"display": display.lot_number}}>Lot#</th>
+              <th id="vendor_col_head" style={{"display": display.vendor}}>Vendor</th>
+              <th id="recombinant_col_head" style={{"display": display.recombinant}}>Recombinant</th>
+              <th id="organ_or_tissue_col_head" style={{"display": display.organ_or_tissue}}>Organ/Tissue</th>
+              <th id="hubmap_platform_col_head" style={{"display": display.hubmap_platform}}>HuBMAP Platform</th>
+              <th id="submitter_orciid_col_head" style={{"display": display.submitter_orciid}}>Submitter ORCID</th>
+              <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Email</th>
             </tr>
           </thead>
           <tbody dangerouslySetInnerHTML={{__html: antibodies}}/>

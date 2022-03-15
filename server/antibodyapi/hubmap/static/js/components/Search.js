@@ -7,7 +7,8 @@ import {
 } from "searchkit";
 
 import AntibodyHitsTable from './AntibodyHitsTable';
-import { Checkbox } from './Checkbox.js';
+import { Checkbox } from './Checkbox';
+import DownloadFile from './DownloadFile';
 
 const searchkit = new SearchkitManager("/");
 const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
@@ -76,16 +77,16 @@ const Search = () => (
             <thead>
                 <tr>
                     <td><b>Additional Columns:</b></td>
-                    <td><Checkbox id_col="rrid_col" text_col="RRID"/></td>
-                    <td><Checkbox id_col="clonality_col" text_col="Colonality"/></td>
-                    <td><Checkbox id_col="catalog_number_col" text_col="Catalog#"/></td>
-                    <td><Checkbox id_col="lot_number_col" text_col="Lot#"/></td>
-                    <td><Checkbox id_col="vendor_col" text_col="Vendor"/></td>
-                    <td><Checkbox id_col="recombinat_col" text_col="Recombinant"/></td>
-                    <td><Checkbox id_col="ot_col" text_col="Organ/Tissue"/></td>
-                    <td><Checkbox id_col="hp_col" text_col="HuBMAP Platform"/></td>
-                    <td><Checkbox id_col="so_col" text_col="Submitter ORCID"/></td>
-                    <td><Checkbox id_col="email_col" text_col="Email"/></td>
+                    <td><Checkbox element="rrid" label="RRID"/></td>
+                    <td><Checkbox element="clonality" label="Colonality"/></td>
+                    <td><Checkbox element="catalog_number" label="Catalog#"/></td>
+                    <td><Checkbox element="lot_number" label="Lot#"/></td>
+                    <td><Checkbox element="vendor" label="Vendor"/></td>
+                    <td><Checkbox element="recombinant" label="Recombinant"/></td>
+                    <td><Checkbox element="organ_or_tissue" label="Organ/Tissue"/></td>
+                    <td><Checkbox element="hubmap_platform" label="HuBMAP Platform"/></td>
+                    <td><Checkbox element="submitter_orciid" label="Submitter ORCID"/></td>
+                    <td><Checkbox element="created_by_user_email" label="Email"/></td>
                 </tr>
             </thead>
         </table>
@@ -98,6 +99,7 @@ const Search = () => (
         <NoHits/>
 
         <Pagination options={options}/>
+        <DownloadFile />
 
       </LayoutResults>
 

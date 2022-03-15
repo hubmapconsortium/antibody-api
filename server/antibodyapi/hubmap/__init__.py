@@ -32,10 +32,21 @@ def hubmap_search():
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
     display: dict = {
-        "ho_col": "table-cell", "uniprot_no_col": "table-cell", "tn_col": "table-cell", "pdf_col": "table-cell",
-        "rrid_col": "none", "clonality_col": "none", "catalog_number_col": "none", "lot_number_col": "none",
-        "vendor_col": "none", "recombinat_col": "none", "ot_col": "none", "hp_col": "none", "so_col": "none",
-        "email_col": "none"
+        "antibody_name": "table-cell",
+        "host_organism": "table-cell",
+        "uniprot_accession_number": "table-cell",
+        "target_name": "table-cell",
+        "avr_filename": "table-cell",
+        "rrid": "none",
+        "clonality": "none",
+        "catalog_number": "none",
+        "lot_number": "none",
+        "vendor": "none",
+        "recombinant": "none",
+        "organ_or_tissue": "none",
+        "hubmap_platform": "none",
+        "submitter_orciid": "none",
+        "created_by_user_email": "none"
     }
     return render_template(
         'search.html',

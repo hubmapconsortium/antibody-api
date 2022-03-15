@@ -3,35 +3,38 @@ import React, {useState} from 'react';
 function Checkbox(props) {
 
   const [checked, setChecked] = useState(false);
-  const id_col = props.id_col;
-  const text_col = props.text_col;
-  const table_header=id_col+"_head";
+  const elt = props.element;
+  const id_col = elt + '_col'
+  const id_header = id_col + "_head";
+  const label = props.label;
+  //console.info('elt: ', elt, ' id_col: ', id_col, ' id_header: ', id_header, ' label: ', label)
+  //console.info('display: ', display)
 
   const handleChange = () => {
-    console.info(id_col, "checked on entry:", checked)
+    //console.info(elt, "checked on entry:", checked)
     setChecked(!checked);
     if (checked) {
-      display[id_col]="none";
+      display[elt]="none";
       var all_col=document.getElementsByClassName(id_col);
       for (var i=0;i<all_col.length;i++) {
-         all_col[i].style.display=display[id_col];
+         all_col[i].style.display=display[elt];
       }
-      var table_header_elt=document.getElementById(table_header);
-      table_header_elt.style.display=display[id_col];
+      var table_header_elt=document.getElementById(id_header);
+      table_header_elt.style.display=display[elt];
     } else {
-      display[id_col]="table-cell";
+      display[elt]="table-cell";
       var all_col=document.getElementsByClassName(id_col);
       for(var i=0;i<all_col.length;i++) {
-        all_col[i].style.display=display[id_col];
+        all_col[i].style.display=display[elt];
       }
-      var table_header_elt=document.getElementById(table_header);
-      table_header_elt.style.display=display[id_col];
+      var table_header_elt=document.getElementById(id_header);
+      table_header_elt.style.display=display[elt];
     }
   };
 
   return (
     <div>
-      <input type="checkbox" onChange={handleChange} /> {text_col}
+      <input type="checkbox" onChange={handleChange} /> {label}
     </div>
   );
 };
