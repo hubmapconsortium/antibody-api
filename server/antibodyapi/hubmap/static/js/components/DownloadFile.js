@@ -10,44 +10,44 @@ class DownloadFile extends React.Component {
     downloadFilename = 'file.csv';
 
     downloadData = () => {
-        console.info('display: ', display)
+        console.info('display: ', display);
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         fetch('/antibodies')
             .then(response => response.json())
             .then(data => {
                 //console.log('data.antibodies: ', data.antibodies)
-                var lines = []
+                var lines = [];
 
-                var columnsToSave = []
+                var columnsToSave = [];
                 const keys = Object.keys(display);
                 keys.forEach((k, i) => {
                     if (display[k] == 'table-cell') {
                         columnsToSave.push(k);
                     }
                 })
-                var headerString = columnsToSave.join(',')
-                lines.push(headerString)
-                console.log('csv header: ', headerString)
+                var headerString = columnsToSave.join(',');
+                lines.push(headerString);
+                console.log('csv header: ', headerString);
 
                 data.antibodies.forEach(item => {
-                    //console.log('item: ', item)
-                    var line = []
+                    //console.log('item: ', item);
+                    var line = [];
                     columnsToSave.forEach(function (key, index) {
-                        line.push(item[key])
+                        line.push(item[key]);
                     });
-                    var lineString = line.join(',')
-                    console.log('item line: ', lineString)
-                    lines.push(lineString)
+                    var lineString = line.join(',');
+                    console.log('item line: ', lineString);
+                    lines.push(lineString);
                 })
-                var linesString = lines.join("\n") + "\n"
-                console.log('lines: ', linesString)
+                var linesString = lines.join("\n") + "\n";
+                console.log('lines: ', linesString);
 
                 var csv = new Blob([linesString], {type: 'text/plain'});
-                let url = window.URL.createObjectURL(csv)
-	            let a = document.createElement('a')
-	            a.href = url
-	            a.download = this.downloadFilename
-	            a.click()
+                let url = window.URL.createObjectURL(csv);
+	            let a = document.createElement('a');
+	            a.href = url;
+	            a.download = this.downloadFilename;
+	            a.click();
             })
             .catch((error) => {
                 console.error('Error fetching antibodies:', error)

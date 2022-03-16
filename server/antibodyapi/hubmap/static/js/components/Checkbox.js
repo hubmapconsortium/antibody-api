@@ -7,11 +7,11 @@ function Checkbox(props) {
   const id_col = elt + '_col'
   const id_header = id_col + "_head";
   const label = props.label;
-  //console.info('elt: ', elt, ' id_col: ', id_col, ' id_header: ', id_header, ' label: ', label)
-  //console.info('display: ', display)
+  //console.info('elt: ', elt, ' id_col: ', id_col, ' id_header: ', id_header, ' label: ', label);
+  //console.info('display: ', display);
 
   const handleChange = () => {
-    //console.info(elt, "checked on entry:", checked)
+    //console.info(elt, "checked on entry:", checked);
     setChecked(!checked);
     if (checked) {
       display[elt]="none";
