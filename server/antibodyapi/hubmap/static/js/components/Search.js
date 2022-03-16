@@ -37,38 +37,40 @@ const Search = () => (
 
       <SideBar>
         <h3>Filters</h3>
-        <ResetFilters/>
+
+        <ResetFilters />
+
         <HierarchicalMenuFilter
           fields={["target_name.keyword"]}
           title="Target Name"
-          id="target_names"/>
+          id="target_names" />
         <HierarchicalMenuFilter
           fields={["vendor.keyword"]}
           title="Vendors"
-          id="vendors"/>
+          id="vendors" />
         <RefinementListFilter
           id="host_organism"
           title="Host Organism"
           field="host_organism.keyword"
           operator="OR"
-          size={10}/>
+          size={10} />
         <RefinementListFilter
           id="submitter_orciid"
           title="Submitter ORCID"
           field="submitter_orciid.keyword"
           operator="OR"
-          size={10}/>
+          size={10} />
       </SideBar>
 
       <LayoutResults>
         <ActionBar>
 
           <ActionBarRow>
-            <HitsStats/>
+            <HitsStats />
           </ActionBarRow>
 
           <ActionBarRow>
-            <SelectedFilters/>
+            <SelectedFilters />
           </ActionBarRow>
 
         </ActionBar>
@@ -95,10 +97,10 @@ const Search = () => (
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
           sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orciid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
-        <InitialLoader/>
-        <NoHits/>
+        <InitialLoader />
+        <NoHits />
 
-        <Pagination options={options}/>
+        <Pagination options={options} />
         <DownloadFile />
 
       </LayoutResults>
