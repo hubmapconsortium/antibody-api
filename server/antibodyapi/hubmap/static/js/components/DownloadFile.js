@@ -7,7 +7,7 @@ class DownloadFile extends React.Component {
         super(props);
     }
 
-    downloadFilename = 'file.csv';
+    downloadFilename = 'avr.csv';
 
     downloadData = () => {
         console.info('display: ', display);
@@ -57,7 +57,7 @@ class DownloadFile extends React.Component {
     render() {
         return (
             <div id="downloadfile">
-                <button onClick={this.downloadData}>Download to {this.downloadFilename}</button>
+                <button onClick={this.downloadData}>Download Selected AVR Information as CSV</button>
                 <p/>
             </div>
         )
