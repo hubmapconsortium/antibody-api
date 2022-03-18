@@ -1,19 +1,19 @@
 import React from 'react';
-
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats,
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
-
 import AntibodyHitsTable from './AntibodyHitsTable';
 import { Checkbox } from './Checkbox';
 import DownloadFile from './DownloadFile';
+import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
-const searchkit = new SearchkitManager("/");
-const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
+function Search(props) {
+  const searchkit = new SearchkitManager("/");
+  const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
 
-const Search = () => (
+  return(
   <SearchkitProvider searchkit={searchkit}>
   <Layout>
     <TopBar>
@@ -108,6 +108,6 @@ const Search = () => (
     </LayoutBody>
   </Layout>
 </SearchkitProvider>
-);
+)};
 
 export default Search;

@@ -1,7 +1,11 @@
 import React from 'react';
+import { SearchkitComponent } from "searchkit";
 
 // https://roytuts.com/download-file-from-server-using-react/
-class DownloadFile extends React.Component {
+
+// https://gitter.im/searchkit/searchkit?at=59768a50329651f46ebc8785
+// You can access the searchkit object in anything that extends SearchkitComponent as this.searchkit.
+class DownloadFile extends SearchkitComponent {
 
     constructor(props) {
         super(props);
@@ -10,40 +14,55 @@ class DownloadFile extends React.Component {
     downloadFilename = 'avr.csv';
 
     downloadData = () => {
+        // The last query...
+        let query = JSON.parse(JSON.stringify(this.searchkit.currentSearchRequest.query));
+
+        // Total results returned from the last query, and not the paged size results...
+        query.size = parseInt(JSON.stringify(this.searchkit.results.hits.total.value));
+
+        // Only the columns that the user is viewing, and not all of the columns...
+        var _source = [];
         console.info('display: ', display);
+        Object.keys(display).forEach(function (key) {
+            if (display[key] == 'table-cell') {
+                _source.push(key);
+            }
+        });
+        query._source = _source
+
+        console.info('query string for .csv file data: ', JSON.stringify(query))
+
+        //console.info('this.searchkit...', this.searchkit.currentSearchRequest.searchkit.history);
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-        fetch('/antibodies')
+        fetch('_search', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Cache-Control': 'max-age=0',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(query)
+        })
             .then(response => response.json())
             .then(data => {
-                //console.log('data.antibodies: ', data.antibodies)
                 var lines = [];
 
-                var columnsToSave = [];
-                const keys = Object.keys(display);
-                keys.forEach((k, i) => {
-                    if (display[k] == 'table-cell') {
-                        columnsToSave.push(k);
-                    }
-                })
-                var headerString = columnsToSave.join(',');
-                lines.push(headerString);
-                console.log('csv header: ', headerString);
+                lines.push(_source.join(','));
 
-                data.antibodies.forEach(item => {
-                    //console.log('item: ', item);
-                    var line = [];
-                    columnsToSave.forEach(function (key, index) {
-                        line.push(item[key]);
-                    });
-                    var lineString = line.join(',');
-                    console.log('item line: ', lineString);
-                    lines.push(lineString);
+                data.hits.hits.forEach(item => {
+                    const line = Object.keys(item._source).map(function(k) {
+                        return item._source[k]
+                        })
+                    lines.push(line.join(','));
                 })
                 var linesString = lines.join("\n") + "\n";
+
                 console.log('lines: ', linesString);
 
-                var csv = new Blob([linesString], {type: 'text/plain'});
-                let url = window.URL.createObjectURL(csv);
+                const csv = new Blob([linesString], {type: 'text/plain'});
+                const url = window.URL.createObjectURL(csv);
 	            let a = document.createElement('a');
 	            a.href = url;
 	            a.download = this.downloadFilename;
