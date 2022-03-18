@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "recombinant" boolean NOT NULL,
     "organ_or_tissue" text NOT NULL,
     "hubmap_platform" text NOT NULL,
-    "submitter_orciid" text NOT NULL,
+    "submitter_orcid" text NOT NULL,
     "created_timestamp" integer NOT NULL,
     "created_by_user_displayname" text NOT NULL,
     "created_by_user_email" text NOT NULL,

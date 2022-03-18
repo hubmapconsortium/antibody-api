@@ -7,4 +7,3 @@ const SearchPage = () => {
 };
 
 ReactDOM.render(<SearchPage />, document.getElementById("render-react-here"));
-

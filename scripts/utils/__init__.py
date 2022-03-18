@@ -61,7 +61,7 @@ class SI(IntEnum):
     RECOMBINATE = 13
     ORGAN_OR_TISSSUE = 14
     HUBMAP_PLATFORM = 15
-    SUBMITTER_ORCIID = 16
+    SUBMITTER_ORCID = 16
     CREATED_TIMESTAMP = 17
     CREATED_BY_USER_DISPLAYNAME = 18
     CREATED_BY_USER_EMAIL = 19
@@ -80,7 +80,7 @@ SELECT
     a.clonality, v.name,
     a.catalog_number, a.lot_number,
     a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orciid,
+    a.hubmap_platform, a.submitter_orcid,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
@@ -102,7 +102,7 @@ def base_antibody_query(csv_row: dict):
             where_condition(csv_row, 'a.antibody_name') + where_condition(csv_row, 'a.host_organism') +\
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
             where_condition(csv_row, 'a.organ_or_tissue') + where_condition(csv_row, 'a.hubmap_platform') +\
-            where_condition(csv_row, 'a.submitter_orciid') + where_condition(csv_row, 'a.hubmap_platform')
+            where_condition(csv_row, 'a.submitter_orcid') + where_condition(csv_row, 'a.hubmap_platform')
 
 
 def map_string_to_bool(value: str):
@@ -177,7 +177,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'recombinant', db_row, SI.RECOMBINATE, antibody_uuid)
     check_hit(source, 'organ_or_tissue', db_row, SI.ORGAN_OR_TISSSUE, antibody_uuid)
     check_hit(source, 'hubmap_platform', db_row, SI.HUBMAP_PLATFORM, antibody_uuid)
-    check_hit(source, 'submitter_orciid', db_row, SI.SUBMITTER_ORCIID, antibody_uuid)
+    check_hit(source, 'submitter_orcid', db_row, SI.SUBMITTER_ORCID, antibody_uuid)
     check_hit(source, 'created_by_user_email', db_row, SI.CREATED_BY_USER_EMAIL, antibody_uuid)
 
 

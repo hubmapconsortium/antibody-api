@@ -33,7 +33,7 @@ def raw_antibody_data():
         'recombinant': faker.pybool(),
         'organ_or_tissue': faker.first_name(),
         'hubmap_platform': faker.first_name(),
-        'submitter_orciid': faker.uuid4()
+        'submitter_orcid': faker.uuid4()
     }
 
 @pytest.fixture(scope='class')

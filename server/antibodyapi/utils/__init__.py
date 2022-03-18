@@ -47,7 +47,7 @@ class SI(IntEnum):
     RECOMBINATE = 13
     ORGAN_OR_TISSSUE = 14
     HUBMAP_PLATFORM = 15
-    SUBMITTER_ORCIID = 16
+    SUBMITTER_ORCID = 16
     CREATED_TIMESTAMP = 17
     CREATED_BY_USER_DISPLAYNAME = 18
     CREATED_BY_USER_EMAIL = 19
@@ -66,7 +66,7 @@ SELECT
     a.clonality, v.name,
     a.catalog_number, a.lot_number,
     a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orciid,
+    a.hubmap_platform, a.submitter_orcid,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
@@ -95,7 +95,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'recombinant': antibody[SI.RECOMBINATE],
         'organ_or_tissue': antibody[SI.ORGAN_OR_TISSSUE],
         'hubmap_platform': antibody[SI.HUBMAP_PLATFORM],
-        'submitter_orciid': antibody[SI.SUBMITTER_ORCIID],
+        'submitter_orcid': antibody[SI.SUBMITTER_ORCID],
         # 'created_timestamp': antibody[15]
         'created_by_user_displayname': antibody[SI.CREATED_BY_USER_DISPLAYNAME],
         'created_by_user_email': antibody[SI.CREATED_BY_USER_EMAIL],
@@ -261,7 +261,7 @@ INSERT INTO antibodies (
     clonality, vendor_id,
     catalog_number, lot_number,
     recombinant, organ_or_tissue,
-    hubmap_platform, submitter_orciid,
+    hubmap_platform, submitter_orcid,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
     created_by_user_sub, group_uuid
@@ -281,7 +281,7 @@ VALUES (
     %(recombinant)s,
     %(organ_or_tissue)s,
     %(hubmap_platform)s,
-    %(submitter_orciid)s,
+    %(submitter_orcid)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s,
     %(created_by_user_email)s,
@@ -310,7 +310,7 @@ INSERT INTO antibodies (
     recombinant,
     organ_or_tissue,
     hubmap_platform,
-    submitter_orciid,
+    submitter_orcid,
     created_timestamp,
     created_by_user_displayname,
     created_by_user_email,
@@ -334,7 +334,7 @@ VALUES (
     %(recombinant)s,
     %(organ_or_tissue)s,
     %(hubmap_platform)s,
-    %(submitter_orciid)s,
+    %(submitter_orcid)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s,
     %(created_by_user_email)s,

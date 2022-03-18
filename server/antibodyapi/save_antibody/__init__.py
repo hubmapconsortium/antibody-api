@@ -24,7 +24,7 @@ def save_antibody():
       'recombinant',
       'organ_or_tissue',
       'hubmap_platform',
-      'submitter_orciid'
+      'submitter_orcid'
     )
     try:
         antibody = request.get_json()['antibody']

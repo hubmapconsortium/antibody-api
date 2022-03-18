@@ -29,7 +29,7 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="recombinant_col" style="display:'+display.recombinant+`;">${hit._source.recombinant}</td>`;
       antibodies += '<td class="organ_or_tissue_col" style="display:'+display.organ_or_tissue+`;">${hit._source.organ_or_tissue}</td>`;
       antibodies += '<td class="hubmap_platform_col" style="display:'+display.hubmap_platform+`;">${hit._source.hubmap_platform}</td>`;
-      antibodies += '<td class="submitter_orciid_col" style="display:'+display.submitter_orciid+`;"><a href="https://orcid.org/${hit._source.submitter_orciid}" target="_blank">${hit._source.submitter_orciid}</a></td>`;
+      antibodies += '<td class="submitter_orcid_col" style="display:'+display.submitter_orcid+`;"><a href="https://orcid.org/${hit._source.submitter_orcid}" target="_blank">${hit._source.submitter_orcid}</a></td>`;
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
       antibodies += `</tr>`;
     }
@@ -51,7 +51,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="recombinant_col_head" style={{"display": display.recombinant}}>Recombinant</th>
               <th id="organ_or_tissue_col_head" style={{"display": display.organ_or_tissue}}>Organ/Tissue</th>
               <th id="hubmap_platform_col_head" style={{"display": display.hubmap_platform}}>HuBMAP Platform</th>
-              <th id="submitter_orciid_col_head" style={{"display": display.submitter_orciid}}>Submitter ORCID</th>
+              <th id="submitter_orcid_col_head" style={{"display": display.submitter_orcid}}>Submitter ORCID</th>
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Email</th>
             </tr>
           </thead>

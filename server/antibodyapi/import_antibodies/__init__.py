@@ -107,7 +107,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
 csv_header = [
     'protocols_io_doi', 'uniprot_accession_number', 'target_name', 'rrid', 'antibody_name',
     'host_organism', 'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
-    'organ_or_tissue', 'hubmap_platform', 'submitter_orciid', 'avr_filename']
+    'organ_or_tissue', 'hubmap_platform', 'submitter_orcid', 'avr_filename']
 
 
 def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
@@ -164,10 +164,10 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
         abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Uniprot Accession Number", 406))
 
     try:
-        orcid_url: str = f"https://pub.orcid.org/{row['submitter_orciid']}"
+        orcid_url: str = f"https://pub.orcid.org/{row['submitter_orcid']}"
         response = requests.get(orcid_url)
         if response.status_code == 404:
-            abort(json_error(f"CSV file row# {row_i}: ORCID '{row['submitter_orciid']}' is not found in catalogue",
+            abort(json_error(f"CSV file row# {row_i}: ORCID '{row['submitter_orcid']}' is not found in catalogue",
                              406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.

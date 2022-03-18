@@ -45,7 +45,7 @@ def hubmap_search():
         "recombinant": "none",
         "organ_or_tissue": "none",
         "hubmap_platform": "none",
-        "submitter_orciid": "none",
+        "submitter_orcid": "none",
         "created_by_user_email": "none"
     }
     return render_template(

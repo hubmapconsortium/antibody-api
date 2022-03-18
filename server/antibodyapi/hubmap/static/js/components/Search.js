@@ -25,7 +25,7 @@ function Search(props) {
       <SearchBox
         autofocus={true}
         searchOnChange={true}
-        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor", "submitter_orciid"]}
+        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor", "submitter_orcid"]}
         />
       <a href="/upload"
          style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
@@ -55,9 +55,9 @@ function Search(props) {
           operator="OR"
           size={10} />
         <RefinementListFilter
-          id="submitter_orciid"
+          id="submitter_orcid"
           title="Submitter ORCID"
-          field="submitter_orciid.keyword"
+          field="submitter_orcid.keyword"
           operator="OR"
           size={10} />
       </SideBar>
@@ -87,7 +87,7 @@ function Search(props) {
                     <td><Checkbox element="recombinant" label="Recombinant"/></td>
                     <td><Checkbox element="organ_or_tissue" label="Organ/Tissue"/></td>
                     <td><Checkbox element="hubmap_platform" label="HuBMAP Platform"/></td>
-                    <td><Checkbox element="submitter_orciid" label="Submitter ORCID"/></td>
+                    <td><Checkbox element="submitter_orcid" label="Submitter ORCID"/></td>
                     <td><Checkbox element="created_by_user_email" label="Email"/></td>
                 </tr>
             </thead>
@@ -96,7 +96,7 @@ function Search(props) {
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orciid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
+          sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orcid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
         <InitialLoader />
         <NoHits />
 

@@ -9,7 +9,7 @@ SELECT
     a.clonality, v.name,
     a.catalog_number, a.lot_number,
     a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orciid,
+    a.hubmap_platform, a.submitter_orcid,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
 FROM antibodies a
@@ -26,7 +26,7 @@ SELECT
     a.clonality, v.name,
     a.catalog_number, a.lot_number,
     a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orciid,
+    a.hubmap_platform, a.submitter_orcid,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
 FROM antibodies a

@@ -28,7 +28,7 @@ def index_antibody(antibody: dict):
         'recombinant': antibody['recombinant'],
         'organ_or_tissue': antibody['organ_or_tissue'],
         'hubmap_platform': antibody['hubmap_platform'],
-        'submitter_orciid': antibody['submitter_orciid'],
+        'submitter_orcid': antibody['submitter_orcid'],
         'created_by_user_email': antibody['created_by_user_email']
     }
     if 'avr_uuid' in antibody and 'avr_filename' in antibody and antibody['avr_filename'] != '':
