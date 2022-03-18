@@ -57,7 +57,7 @@ class DownloadFile extends SearchkitComponent {
                         })
                     lines.push(line.join(','));
                 })
-                var linesString = lines.join("\n") + "\n";
+                const linesString = lines.join("\n") + "\n";
 
                 console.log('lines: ', linesString);
 
