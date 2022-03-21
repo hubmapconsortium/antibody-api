@@ -49,9 +49,10 @@ class DownloadFile extends SearchkitComponent {
                 lines.push(_source.join(','));
 
                 data.hits.hits.forEach(item => {
-                    const line = Object.keys(item._source).map(function(k) {
-                        return item._source[k]
-                        })
+                    var line = []
+                    _source.forEach((key) => {
+                        line.push(item._source[key])
+                    })
                     lines.push(line.join(','));
                 })
                 const linesString = lines.join("\n") + "\n";
