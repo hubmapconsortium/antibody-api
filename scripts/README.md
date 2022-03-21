@@ -89,5 +89,11 @@ The use case for this is, if you want to add a library inside a container to get
 ### Tests
 
 This (./scripts/run_tests.sh) will run the tests (all without any parameters) in './server/tests' and display the results.
+```commandline
+./development/postgresql_init_scripts/create_test_database.sh
+python3 -m pip install --upgrade pip
+rm -rf ./server/.pytest_cache/
+./scripts/run_tests.sh
+```
 
-This is what you add to select a test: "-k test_post_csv_file_with_pdf_should_save_those_correctly"
+This is what you add to run_tests.sh select a test: "-k test_post_csv_file_with_pdf_should_save_those_correctly"

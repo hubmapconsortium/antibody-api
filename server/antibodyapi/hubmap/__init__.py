@@ -48,10 +48,16 @@ def hubmap_search():
         "submitter_orcid": "none",
         "created_by_user_email": "none"
     }
+    csv_column_order: list = [
+        "antibody_name", "host_organism", "uniprot_accession_number", "target_name", "avr_filename", "rrid",
+        "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform",
+        "submitter_orcid", "created_by_user_email"
+    ]
     return render_template(
         'search.html',
         assets_url=assets_url,
-        display=display
+        display=display,
+        csv_column_order=csv_column_order
     )
 
 

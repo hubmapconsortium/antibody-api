@@ -22,12 +22,9 @@ class DownloadFile extends SearchkitComponent {
 
         // Only the columns that the user is viewing, and not all of the columns...
         var _source = [];
-        console.info('display: ', display);
-        Object.keys(display).forEach(function (key) {
-            if (display[key] == 'table-cell') {
-                _source.push(key);
-            }
-        });
+        csv_column_order.forEach((key) => {
+            if (display[key] == 'table-cell') _source.push(key);
+        })
         query._source = _source
 
         console.info('query string for .csv file data: ', JSON.stringify(query))

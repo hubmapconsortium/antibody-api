@@ -17,7 +17,6 @@ class AntibodyHitsTable extends React.Component {
       antibodies += `<td class="target_name_col">${hit._source.target_name}</td>`;
       antibodies += `<td class="avr_filename_col">`;
       if (hit._source.avr_filename != undefined) {
-        var assets_url = document.getElementById('assets_url').innerHTML;
         antibodies += `<a href="${assets_url}/${hit._source.avr_uuid}/${hit._source.avr_filename}" target="_blank">${hit._source.avr_filename}</a>`;
       }
       antibodies += `</td>`;
