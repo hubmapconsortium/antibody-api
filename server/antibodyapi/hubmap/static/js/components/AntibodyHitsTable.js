@@ -5,8 +5,8 @@ class AntibodyHitsTable extends React.Component {
   render(){
     const { hits } = this.props;
 
-    console.info('display: ', display);
-    console.info('assets_url: ', assets_url);
+    //console.info('display: ', display);
+    //console.info('assets_url: ', assets_url);
     var antibodies = '';
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];

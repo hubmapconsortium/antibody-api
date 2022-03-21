@@ -27,7 +27,7 @@ class DownloadFile extends SearchkitComponent {
         })
         query._source = _source
 
-        console.info('query string for .csv file data: ', JSON.stringify(query))
+        //console.info('query string for .csv file data: ', JSON.stringify(query))
 
         //console.info('this.searchkit...', this.searchkit.currentSearchRequest.searchkit.history);
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
