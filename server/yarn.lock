@@ -937,10 +937,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.5.tgz#9283c9ce5b289a3c4f61c12757469e59377f81f3"
   integrity sha512-6nFkfkmSeV/rqSaS4oWHgmpnYw194f6hmWF5is6b0J1naJZoiD0NTc9AiUwPHvWsowkjuHErCZT1wa0jg+BLIA==
 
-"@elastic/eui@^51.1.0":
-  version "51.1.0"
-  resolved "https://registry.yarnpkg.com/@elastic/eui/-/eui-51.1.0.tgz#338b710ae7a819bb7c3b8e1916080610e0b8e691"
-  integrity sha512-pjbBSkfDPAjXBRCMk4zsyZ3sPpf70XVcbOzr4BzT0MW38uKjEgEh6nu1aCdnOi+jVSHRtziJkX9rD8BRDWfsnw==
+"@elastic/eui@^52.0.0":
+  version "52.0.0"
+  resolved "https://registry.yarnpkg.com/@elastic/eui/-/eui-52.0.0.tgz#3494a69f10decf84ee6c66c3b2d086abe5133b5a"
+  integrity sha512-R4Bd9V4Bz46mUwVZclnlt/JmZMYClkRtnu459h31l6aQnVY7Fy2AhVkqg+G8jR8fHE1gW3fDPGvcqiBzYXVIew==
   dependencies:
     "@types/chroma-js" "^2.0.0"
     "@types/lodash" "^4.14.160"
