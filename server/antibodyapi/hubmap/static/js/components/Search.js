@@ -56,7 +56,7 @@ function Search(props) {
           size={10} />
         <RefinementListFilter
           id="submitter_orcid"
-          title="Submitter ORCID"
+          title="Submitter ORCiD iD"
           field="submitter_orcid.keyword"
           operator="OR"
           size={10} />
@@ -87,8 +87,8 @@ function Search(props) {
                     <td><Checkbox element="recombinant" label="Recombinant"/></td>
                     <td><Checkbox element="organ_or_tissue" label="Organ/Tissue"/></td>
                     <td><Checkbox element="hubmap_platform" label="HuBMAP Platform"/></td>
-                    <td><Checkbox element="submitter_orcid" label="Submitter ORCID"/></td>
-                    <td><Checkbox element="created_by_user_email" label="Email"/></td>
+                    <td><Checkbox element="submitter_orcid" label="Submitter ORCiD iD"/></td>
+                    <td><Checkbox element="created_by_user_email" label="Submitter Email"/></td>
                 </tr>
             </thead>
         </table>

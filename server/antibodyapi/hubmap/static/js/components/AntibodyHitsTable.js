@@ -50,8 +50,8 @@ class AntibodyHitsTable extends React.Component {
               <th id="recombinant_col_head" style={{"display": display.recombinant}}>Recombinant</th>
               <th id="organ_or_tissue_col_head" style={{"display": display.organ_or_tissue}}>Organ/Tissue</th>
               <th id="hubmap_platform_col_head" style={{"display": display.hubmap_platform}}>HuBMAP Platform</th>
-              <th id="submitter_orcid_col_head" style={{"display": display.submitter_orcid}}>Submitter ORCID</th>
-              <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Email</th>
+              <th id="submitter_orcid_col_head" style={{"display": display.submitter_orcid}}>Submitter ORCiD iD</th>
+              <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>
             </tr>
           </thead>
           <tbody dangerouslySetInnerHTML={{__html: antibodies}}/>
