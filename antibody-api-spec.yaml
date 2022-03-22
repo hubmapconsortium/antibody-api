@@ -31,7 +31,7 @@ components:
           description: "The name of the antibody's target."
         rrid:
           type: string
-          description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)"
+          description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)."
         antibody_name:
           type: string
           description: "The antibody's name."
@@ -43,7 +43,8 @@ components:
           enum:
             - monoclonal
             - polyclonal
-          description: "One of the values: monoclonal, polyclonal."
+            - oligoclonal
+          description: "One of the values: monoclonal (one), oligoclonal (few), and polyclonal (many)."
         vendor:
           type: string
           description: "The antibody's vendor."

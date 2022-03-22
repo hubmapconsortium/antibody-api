@@ -26,7 +26,7 @@ def raw_antibody_data():
         'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
         'antibody_name': faker.first_name(),
         'host_organism': faker.first_name(),
-        'clonality': random.choice(('monoclonal','polyclonal')),
+        'clonality': random.choice(('monoclonal','polyclonal','oligoclonal')),
         'vendor': faker.first_name(),
         'catalog_number': faker.uuid4(),
         'lot_number': faker.uuid4(),

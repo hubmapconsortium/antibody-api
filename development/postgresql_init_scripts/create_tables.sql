@@ -10,7 +10,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS vendors_unique_index ON vendors(UPPER(name));
 DO $$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM pg_type WHERE typname = 'clonality_types') THEN
-        CREATE TYPE "clonality_types" AS ENUM ('monoclonal', 'polyclonal');
+        CREATE TYPE "clonality_types" AS ENUM ('monoclonal', 'polyclonal', 'oligoclonal');
     END IF;
 END$$;
 
