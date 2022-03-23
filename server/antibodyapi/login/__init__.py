@@ -20,15 +20,21 @@ def login():
         app.config['APP_CLIENT_ID'],
         app.config['APP_CLIENT_SECRET']
     )
-    client.oauth2_start_flow(redirect_uri)
+    client.oauth2_start_flow(redirect_uri, refresh_tokens=True)
 
+    # If there's no "code" query string parameter, we're in this route
+    # starting a Globus Auth login flow.
+    # Redirect out to Globus Auth
     if 'code' not in request.args: # pylint: disable=no-else-return
-        auth_uri = client.oauth2_get_authorize_url(query_params={"scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups urn:globus:auth:scope:groups.api.globus.org:all" }) # pylint: disable=line-too-long
+        auth_uri = client.oauth2_get_authorize_url(query_params={
+            "scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups urn:globus:auth:scope:groups.api.globus.org:all"
+        }) # pylint: disable=line-too-long
         return redirect(auth_uri)
     else:
         code = request.args.get('code')
         tokens = client.oauth2_exchange_code_for_tokens(code)
         user_info = get_user_info(tokens)
+
         session.update(
             name=user_info['name'],
             email=user_info['email'],
@@ -40,6 +46,7 @@ def login():
         session.update(
             data_provider_groups=get_data_provider_groups(app.config['INGEST_API_URL'])
         )
+
         logger.info(f"url_for('hubmap.hubmap'): {url_for('hubmap.hubmap')}")
         #return redirect(url_for('hubmap.hubmap'))
         target_url: str = app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/upload'
