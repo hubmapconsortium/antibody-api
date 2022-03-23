@@ -1,12 +1,21 @@
 import globus_sdk
 from flask import Blueprint, current_app, redirect, request, session, url_for
 from antibodyapi.utils import get_data_provider_groups, get_user_info
+import logging
+
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
+                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 login_blueprint = Blueprint('login', __name__)
+
+
 @login_blueprint.route('/login')
 def login():
     app = current_app
-    redirect_uri = url_for('login.login', _external=True)
+    redirect_uri: str = app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/login'
+    # redirect_uri: str =  url_for('login.login', _external=True)
+    logger.info(f"login():redirect_uri: {redirect_uri}")
     client = globus_sdk.ConfidentialAppAuthClient(
         app.config['APP_CLIENT_ID'],
         app.config['APP_CLIENT_SECRET']
@@ -31,4 +40,8 @@ def login():
         session.update(
             data_provider_groups=get_data_provider_groups(app.config['INGEST_API_URL'])
         )
-        return redirect(url_for('hubmap.hubmap'))
+        logger.info(f"url_for('hubmap.hubmap'): {url_for('hubmap.hubmap')}")
+        #return redirect(url_for('hubmap.hubmap'))
+        target_url: str = app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/upload'
+        logger.info(f"target_url: {target_url}")
+        return redirect(target_url)
