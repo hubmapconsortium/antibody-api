@@ -12,6 +12,7 @@ class DownloadFile extends SearchkitComponent {
     }
 
     downloadFilename = 'avr.csv';
+    avr_file_as_url = true;
 
     downloadData = () => {
         // The last query...
@@ -25,9 +26,12 @@ class DownloadFile extends SearchkitComponent {
         csv_column_order.forEach((key) => {
             if (display[key] == 'table-cell') _source.push(key);
         })
-        query._source = _source
+        query._source = _source;
+        if (this.avr_file_as_url && _source.includes('avr_filename')) {
+            query._source = _source.concat('avr_uuid');
+        }
 
-        //console.info('query string for .csv file data: ', JSON.stringify(query))
+        //console.info('query string for .csv file data: ', JSON.stringify(query));
 
         //console.info('this.searchkit...', this.searchkit.currentSearchRequest.searchkit.history);
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
@@ -49,9 +53,14 @@ class DownloadFile extends SearchkitComponent {
                 lines.push(_source.join(','));
 
                 data.hits.hits.forEach(item => {
-                    var line = []
+                    var line = [];
                     _source.forEach((key) => {
-                        line.push(item._source[key])
+                        let item_source = item._source[key];
+                        if (this.avr_file_as_url && key == 'avr_filename') {
+                            item_source = assets_url + '/' + item._source['avr_uuid'] + '/' + item_source;
+                            item_source = item_source.replace(/,/g, '%2C');
+                        }
+                        line.push(item_source);
                     })
                     lines.push(line.join(','));
                 })
@@ -67,7 +76,7 @@ class DownloadFile extends SearchkitComponent {
 	            a.click();
             })
             .catch((error) => {
-                console.error('Error fetching antibodies:', error)
+                console.error('Error fetching antibodies:', error);
             });
     }
 
