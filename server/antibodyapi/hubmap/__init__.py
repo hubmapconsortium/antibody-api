@@ -13,7 +13,9 @@ def hubmap():
     #replace by the correct way to check token validity.
     authenticated = session.get('is_authenticated')
     if not authenticated:
-        return redirect(url_for('login.login'))
+        #return redirect(url_for('login.login'))
+        redirect_url = current_app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/login'
+        return redirect(redirect_url)
     data_provider_groups = session.get('data_provider_groups')
     if data_provider_groups is not None and len(data_provider_groups) == 1:
         data_provider_groups = None
