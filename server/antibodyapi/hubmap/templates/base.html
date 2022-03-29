@@ -159,9 +159,9 @@ function resetForm () {
 
 function AJAXSubmit (oFormElement) {
   if (!oFormElement.action) { return; }
-  console.log('AJAXSubmit;token: ',token)
+  console.log('AJAXSubmit;token: ',token);
   var accessToken = token["nexus.api.globus.org"]["access_token"];
-  console.log('AJAXSubmit;nexus.api.globus.org.access_token: ',accessToken)
+  console.log('AJAXSubmit;nexus.api.globus.org.access_token: ',accessToken);
   var oReq = new XMLHttpRequest();
   oReq.addEventListener("load", ajaxSuccess);
   jQuery('#form-block').addClass('hidden');
@@ -190,11 +190,12 @@ function AJAXSubmit (oFormElement) {
 function ajaxSuccess (event) {
   jQuery('#loading-screen').addClass('hidden');
   jQuery('#upload-results-block').removeClass('hidden');
-  var jsonresponse = JSON.parse(event.target.response);
-  var http_status = event.target.status
+  console.log('event.target: ',event.target)
+  const http_status = event.target.status;
   var responsetable = '';
   if (http_status == 201) {
-      csv_content = "antibody_name,antibody_uuid\n";
+      const jsonresponse = JSON.parse(event.target.response);
+      var csv_content = "antibody_name,antibody_uuid\n";
       responsetable += '<p>All entities in the Andibody Files have been successfully uploaded.</p>';
       responsetable += '<br>';
       responsetable += '<table><tr><th>Antibody</th><th>UUID</th></tr>';
@@ -221,13 +222,13 @@ function ajaxSuccess (event) {
   } else if (http_status == 406) {
       responsetable += '<div>';
       responsetable += '<p><b>Error</b></p>';
-      responsetable += '<p>' + jsonresponse.message + '</p>';
+      responsetable += '<p>' + event.target.message + '</p>';
       responsetable += '</div>';
       responsetable += '<br>';
   } else {
       responsetable += '<div>';
       responsetable += '<p><b>Error</b></p>';
-      responsetable += '<p>Unexpected error received from the server: ' + jsonresponse.message + '</p>';
+      responsetable += '<p>Unexpected error received from the server; message: ' + event.target.message + + '; http_status: ' + http_status '</p>';
       responsetable += '</div>';
   }
   jQuery('#upload-results').html(responsetable);
