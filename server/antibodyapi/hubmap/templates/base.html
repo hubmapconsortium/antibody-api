@@ -12,6 +12,10 @@
   </head>
 
   <body>
+    <script>
+      var token={{ token | tojson }};
+      var data_provider_groups={{ data_provider_groups | tojson }};
+    </script>
     <section class="text-gray-600 body-font relative" id="form-block">
       <div class="px-5 topmenu" style="background-color:#444A65; color:white; height:50px; display:flex; flex-direction:row; align-items:center">
         <a href="https://portal.hubmapconsortium.org/">
@@ -155,10 +159,9 @@ function resetForm () {
 
 function AJAXSubmit (oFormElement) {
   if (!oFormElement.action) { return; }
-  console.log('localStorage: ', localStorage)
-  console.log('AJAXSubmit;window.location.hash: ',window.location.hash)
-  var accessToken = new URLSearchParams(window.location.hash).get('access_token');
-  console.log('AJAXSubmit;accessToken: ',accessToken)
+  console.log('AJAXSubmit;token: ',token)
+  var accessToken = token["nexus.api.globus.org"]["access_token"];
+  console.log('AJAXSubmit;nexus.api.globus.org.access_token: ',accessToken)
   var oReq = new XMLHttpRequest();
   oReq.addEventListener("load", ajaxSuccess);
   jQuery('#form-block').addClass('hidden');
