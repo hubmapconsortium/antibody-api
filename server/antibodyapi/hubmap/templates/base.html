@@ -138,6 +138,52 @@ function returnHome () {
   window.location.href='/';
 }
 
+function downloadCsv () {
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_content);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'antibodies_created.csv';
+  hiddenElement.click();
+}
+
+function resetForm () {
+  jQuery('#form-block').removeClass('hidden');
+  jQuery('#upload-results-block').addClass('hidden');
+  jQuery('#upload-results').html('');
+  jQuery('#antibody-form').trigger('reset');
+}
+
+function AJAXSubmit (oFormElement) {
+  if (!oFormElement.action) { return; }
+  console.log('localStorage: ', localStorage)
+  console.log('AJAXSubmit;window.location.hash: ',window.location.hash)
+  var accessToken = new URLSearchParams(window.location.hash).get('access_token');
+  console.log('AJAXSubmit;accessToken: ',accessToken)
+  var oReq = new XMLHttpRequest();
+  oReq.addEventListener("load", ajaxSuccess);
+  jQuery('#form-block').addClass('hidden');
+  jQuery('#loading-screen').removeClass('hidden');
+  if (oFormElement.method.toLowerCase() === "post") {
+    oReq.open("post", oFormElement.action, true);
+    oReq.setRequestHeader("Authorization", "Bearer " + accessToken);
+    oReq.send(new FormData(oFormElement));
+  } else {
+    var oField, sFieldType, nFile, sSearch = "";
+    for (var nItem = 0; nItem < oFormElement.elements.length; nItem++) {
+      oField = oFormElement.elements[nItem];
+      if (!oField.hasAttribute("name")) { continue; }
+      sFieldType = oField.nodeName.toUpperCase() === "INPUT" ? oField.getAttribute("type").toUpperCase() : "TEXT";
+      if (sFieldType === "FILE") {
+        for (nFile = 0; nFile < oField.files.length; sSearch += "&" + escape(oField.name) + "=" + escape(oField.files[nFile++].name));
+      } else if ((sFieldType !== "RADIO" && sFieldType !== "CHECKBOX") || oField.checked) {
+        sSearch += "&" + escape(oField.name) + "=" + escape(oField.value);
+      }
+    }
+    oReq.open("GET", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
+    oReq.send(null);
+  }
+}
+
 function ajaxSuccess (event) {
   jQuery('#loading-screen').addClass('hidden');
   jQuery('#upload-results-block').removeClass('hidden');
@@ -182,48 +228,6 @@ function ajaxSuccess (event) {
       responsetable += '</div>';
   }
   jQuery('#upload-results').html(responsetable);
-}
-
-function downloadCsv () {
-  var hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_content);
-  hiddenElement.target = '_blank';
-  hiddenElement.download = 'antibodies_created.csv';
-  hiddenElement.click();
-}
-
-function resetForm () {
-  jQuery('#form-block').removeClass('hidden');
-  jQuery('#upload-results-block').addClass('hidden');
-  jQuery('#upload-results').html('');
-  jQuery('#antibody-form').trigger('reset');
-}
-
-function AJAXSubmit (oFormElement) {
-  if (!oFormElement.action) { return; }
-  var oReq = new XMLHttpRequest();
-  oReq.addEventListener("load", ajaxSuccess);
-  jQuery('#form-block').addClass('hidden');
-  jQuery('#loading-screen').removeClass('hidden');
-  if (oFormElement.method.toLowerCase() === "post") {
-    oReq.open("post", oFormElement.action, true);
-    oReq.setRequestHeader("authorization", "Bearer Whatever");
-    oReq.send(new FormData(oFormElement));
-  } else {
-    var oField, sFieldType, nFile, sSearch = "";
-    for (var nItem = 0; nItem < oFormElement.elements.length; nItem++) {
-      oField = oFormElement.elements[nItem];
-      if (!oField.hasAttribute("name")) { continue; }
-      sFieldType = oField.nodeName.toUpperCase() === "INPUT" ? oField.getAttribute("type").toUpperCase() : "TEXT";
-      if (sFieldType === "FILE") {
-        for (nFile = 0; nFile < oField.files.length; sSearch += "&" + escape(oField.name) + "=" + escape(oField.files[nFile++].name));
-      } else if ((sFieldType !== "RADIO" && sFieldType !== "CHECKBOX") || oField.checked) {
-        sSearch += "&" + escape(oField.name) + "=" + escape(oField.value);
-      }
-    }
-    oReq.open("GET", oFormElement.action.replace(/(?:\?.*)?$/, sSearch.replace(/^&/, "?")), true);
-    oReq.send(null);
-  }
 }
 </script>
 </body>
