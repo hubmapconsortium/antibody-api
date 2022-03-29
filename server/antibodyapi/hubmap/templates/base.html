@@ -228,8 +228,9 @@ function ajaxSuccess (event) {
   } else {
       responsetable += '<div>';
       responsetable += '<p><b>Unexpected Error</b></p>';
-      responsetable += '<p>Unexpected error received from the server: ' + event.target.statusText + '; ' + event.target.responseText + '; http_status: ' + http_status + '</p>';
+      responsetable += '<p>Received from the server: ' + event.target.statusText + '; ' + event.target.responseText + '; HTTP Status: ' + http_status + '</p>';
       responsetable += '</div>';
+      responsetable += '<br>';
   }
   jQuery('#upload-results').html(responsetable);
 }
