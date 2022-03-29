@@ -222,13 +222,13 @@ function ajaxSuccess (event) {
   } else if (http_status == 406) {
       responsetable += '<div>';
       responsetable += '<p><b>Error</b></p>';
-      responsetable += '<p>' + event.target.statusText + '</p>';
+      responsetable += '<p>' + event.target.statusText + '; ' + event.target.responseText + '</p>';
       responsetable += '</div>';
       responsetable += '<br>';
   } else {
       responsetable += '<div>';
-      responsetable += '<p><b>Error</b></p>';
-      responsetable += '<p>Unexpected error received from the server: ' + event.target.statusText + '; http_status: ' + http_status + '</p>';
+      responsetable += '<p><b>Unexpected Error</b></p>';
+      responsetable += '<p>Unexpected error received from the server: ' + event.target.statusText + '; ' + event.target.responseText + '; http_status: ' + http_status + '</p>';
       responsetable += '</div>';
   }
   jQuery('#upload-results').html(responsetable);
