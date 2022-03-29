@@ -7,16 +7,16 @@ There is also a script for building/updating the API generated from the OpenAPI 
 
 This script will create/update the client API from the OpenAPI
 specification located at './antibody-api-spec.yml'. The client will be built in the 'hu-bap-antibody-api-client' directory.
-```commandline
-./scripts/build_openapi_client.sh
+```bash
+$ ./scripts/build_openapi_client.sh
 ```
 
 ## Verify .csv file upload
 
 This script is used to determine if data in the .csv file is present
 in PosgreSQL, ElasticSearch, and Assets. Documentation for running the program is available with the '-h' optional argument.
-```commandline
-./verify_csv_file_was_properly_loaded.py -h
+```bash
+$ ./verify_csv_file_was_properly_loaded.py -h
 ```
 
 ## Reloading ElasticSearch from PostgreSQL Database
@@ -30,8 +30,8 @@ ANTIBODY_URL='https://antibody-api.dev.hubmapconsortium.org'; curl -X PUT --head
 
 This script is used to determine if all of the data in the PostgreSQL
 database is represented in ElasticSearch. It is wise to use it after reloading the ElasticSearch index from the PostgreSQL database.
-```commandline
-./verify_db_in_elasticsearch.py -h
+```bash
+$ ./verify_db_in_elasticsearch.py -h
 ```
 
 ## Docker Scripts
@@ -65,8 +65,8 @@ and some data must be loaded as well (please see /server/manual_test_files/READM
 For setup from scratch, please see 'README.md' section 'Deployment Locally'.
 
 To identify the images use 'docker images'.
-```commandline
-6$  docker images
+```bash
+$  docker images
 REPOSITORY              TAG       IMAGE ID       CREATED        SIZE
 antibody-api_web        latest    1812e7e3ab65   2 days ago     956MB
 mockserver/mockserver   latest    8d46fe09df91   2 days ago     228MB
@@ -89,11 +89,11 @@ The use case for this is, if you want to add a library inside a container to get
 ### Tests
 
 This (./scripts/run_tests.sh) will run the tests (all without any parameters) in './server/tests' and display the results.
-```commandline
-./development/postgresql_init_scripts/create_test_database.sh
-python3 -m pip install --upgrade pip
-rm -rf ./server/.pytest_cache/
-./scripts/run_tests.sh
+```bash
+$ ./development/postgresql_init_scripts/create_test_database.sh
+$ python3 -m pip install --upgrade pip
+$ rm -rf ./server/.pytest_cache/
+$ ./scripts/run_tests.sh
 ```
 
 This is what you add to run_tests.sh select a test: "-k test_post_csv_file_with_pdf_should_save_those_correctly"

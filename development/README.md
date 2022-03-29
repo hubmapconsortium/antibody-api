@@ -5,12 +5,12 @@ They are used for the PostgreSQL container to initialize the database.
 They won't run if the database already exists.
 
 They may work automatically though the docker-compose file for development. If not, use the following.
-```commandline
-psql -h localhost -U postgres -d antibodydb -a -f ./development/postgresql_init_scripts/create_tables.sql 
+```bash
+$ psql -h localhost -U postgres -d antibodydb -a -f ./development/postgresql_init_scripts/create_tables.sql 
 ```
 The database information should be found in the './instance/app.conf' file which overwrites the './server/antibodyapi/default_config.py'.
-```commandline
-psql -h localhost -U DATABASE_USER -d DATABASE_NAME -a -f ./development/postgresql_init_scripts/create_tables.sql 
+```bash
+$ psql -h localhost -U DATABASE_USER -d DATABASE_NAME -a -f ./development/postgresql_init_scripts/create_tables.sql 
 ```
 For the password, use the DATABASE_PASSWORD.
 

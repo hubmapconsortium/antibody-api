@@ -7,11 +7,11 @@ If you don't give the .pdf file mentioned in the .csv file, it will be processed
 a manner where no .pdf file exists (e.g., it won't give an error).
 
 You need to be in a 'dataprovider group' to do [http://localhost:5000/upload](http://localhost:5000/upload) or you will see:
-```
+```json
 Response:
-{
-  "message": "Not a member of a data provider group or no group_id provided"
-}
+    {
+      "message": "Not a member of a data provider group or no group_id provided"
+    }
 ```
 
 The reason that there is a .csv and .pdf upload is because the .csv file makes reference (optional) to a pdf.
@@ -20,16 +20,16 @@ Go to [https://app.globus.org/groups](https://app.globus.org/groups).
 You need to be added to a group that has 'data provider' capabilities (i.e., the HuBMAP-Testing-Group).
 If you are in more than one group you need to specify which one you are going to use.
 
-```
-        {
-            "data_provider": true,
-            "displayname": "California Institute of Technology TMC",
-            "generateuuid": true,
-            "name": "hubmap-caltech-tmc",
-            "shortname": "TMC - Cal Tech",
-            "tmc_prefix": "CALT",
-            "uuid": "308f5ffc-ed43-11e8-b56a-0e8017bdda58"
-        }
+```json
+    {
+        "data_provider": true,
+        "displayname": "California Institute of Technology TMC",
+        "generateuuid": true,
+        "name": "hubmap-caltech-tmc",
+        "shortname": "TMC - Cal Tech",
+        "tmc_prefix": "CALT",
+        "uuid": "308f5ffc-ed43-11e8-b56a-0e8017bdda58"
+    }
 ```
 
 ## Manual test for 'upload' (.csv only)
@@ -59,8 +59,8 @@ should see the information that is available in the databse.
 The 'antibody_name' in the 'antibody' table should match the 'Name' on the webpage.
 
 You can also query Elastic Search directly with
-```commandline
-curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibodies/_search?pretty
+```bash
+$ curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibodies/_search?pretty
 ```
 
 ## Manual test of uploading .csv and .pdf files

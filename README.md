@@ -32,58 +32,56 @@ If there are any changes to the './instance/app.conf' file, make them now.
 
 ### Build Docker Image
 In building the latest image specify the latest tag:
-````
-docker build -t hubmap/antibody-api:latest .
+````bash
+$ docker build -t hubmap/antibody-api:latest .
 ````
 
 In building a release version of the image, specify the version tag:
-````
-docker build -t hubmap/antibody-api:0.1.0 .
+````bash
+$ docker build -t hubmap/antibody-api:0.1.0 .
 ````
 
 ### Publish the Image to DockerHub
 Saving the image requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
 You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
 To make changes you must login.
-````
-docker login
+````bash
+$ docker login
 ````
 
 For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag.
-````
-docker push hubmap/antibody-api:latest
+````bash
+$ docker push hubmap/antibody-api:latest
 ````
 
 For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
 in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
-````
-docker push -t hubmap/antibody-api:0.1.0
+````bash
+$ docker push -t hubmap/antibody-api:0.1.0
 ````
 
 ### Deploy the Saved Image
 Deploy the image that you saved on GitHub by using the '--no-build' optional argument.
-````
-docker-compose -f docker-compose.deployment.yml up -d --no-build
+````bash
+$ docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 
 ### Examine Server Logs
 To look at the logs of the running server, you may use.
-```commandline
+```bash
 $ tail -f server/log/uwsgi-antibody-api.log
 ```
 
 ## Redeployment
 
 Will need to shut down the running container and remove the old image first:
-
-````
-docker-compose -f docker-compose.deployment.yml down --rmi all
+````bash
+$ docker-compose -f docker-compose.deployment.yml down --rmi all
 ````
 
 Then download the new image and start up the container:
-
-````
-docker-compose -f docker-compose.deployment.yml up -d --no-build
+````bash
+$ docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 The '--no-build' get's the container from DockerHub.
 
@@ -96,21 +94,21 @@ Before deploying the server you will need to configure it.
 Please follow the steps outlined in the section "Antibody API Configuration Changes"
 
 To shutdown and remove all containers if anything is running by executing the following:
-```commandline
-./scripts/run_local.sh down -v --rmi all
+```bash
+$ ./scripts/run_local.sh down -v --rmi all
 ```
 
 Then restore the Docker Containers, Networks, and Volumes can be done by executing the following script.
 If you delete one of the Docker images (say the "antibody-api_web-1 container) this will rebuild and restart it.
-```commandline
-./scripts/run_local.sh
+```bash
+$ ./scripts/run_local.sh
 ```
 
 You will need to manually create the tables on the PostgreSQL database that is running in the container.
 The user, password, and database definitions are found in 'server/antibodyapi/default_config.py',
 and for deployment should be overwritten in 'instance/app.conf' (which is not kept in the repo).
 This is done by accessing the database through the command line 'psql' command.
-```commandline
+```bash
 if [[ `which psql; echo $?` -ne 0 ]] ; then
   brew install postgresql
 fi
@@ -123,7 +121,7 @@ This will upload the data to the PostgreSQL database and to Elastic Search.
 
 To see the data that is in Elastic Search directly you can execute the following.
 The index (here 'hm_antibodies') is defined in 'server/antibodyapi/default_config.py' as ANTIBODY_ELASTICSEARCH_INDEX.
-```commandline
+```bash
 if [[ `which curl; echo $?` -ne 0 ]] ; then
   brew install curl
 fi
@@ -131,8 +129,8 @@ curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibod
 ```
 
 This should match the data in the database. Taking one of the "antibody_uuid" entries returned by Elastic Search above.
-```commandline
-psql -h localhost -U postgres -d antibodydb -c "SELECT * from antibodies where antibody_uuid='ec53fcf7bf49db0a100ff5b218cf82a3'"
+```bash
+$ psql -h localhost -U postgres -d antibodydb -c "SELECT * from antibodies where antibody_uuid='ec53fcf7bf49db0a100ff5b218cf82a3'"
 ```
 
 Once the data is loaded you can use the antibody search api located at [http://localhost:500/](http://localhost:5000)
@@ -147,20 +145,20 @@ The following shows how to do this using the Docker containters spun up using
 './scripts/run_local.sh' (see './scripts/README.md for more information on these scripts).
 
 First query on the index and see if data exists as follows:
-```commandline
-curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibodies/_search?pretty
+```bash
+$ curl -H 'Content-Type: application/json' -X GET http://localhost:9200/hm_antibodies/_search?pretty
 ```
 You should get an error telling you that the index does not exist, or you should get data.
 
 To test the restore, you can delete the Elastic Search Index using the following:
-```commandline
-curl -H 'Content-Type: application/json' -X DELETE http://localhost:9200/hm_antibodies
+```bash
+$ curl -H 'Content-Type: application/json' -X DELETE http://localhost:9200/hm_antibodies
 ```
 
 Restore the Elastic Search Index from the PostgreSQL database using the 
 MSAPI endpoint '/restore' on the antibody-api server as follows:
-```commandline
-curl -H 'Content-Type: application/json' -X PUT http://localhost:5000/restore_elasticsearch
+```bash
+$ curl -H 'Content-Type: application/json' -X PUT http://localhost:5000/restore_elasticsearch
 ```
 
 At this point the query on the Elastic Search index should return a subset of
@@ -181,7 +179,6 @@ This will add the Antibody API Elastic Search index to Search API.
 Note that the 'url' corresponds to the instance of ElasticSearch that is running in the Docker container.
 For running in the various environments, set the 'url' appropriately.
 ```commandline
-
   hm_antibodies:
     active: true
     reindex_enabled: false
@@ -204,7 +201,7 @@ ENTITY_API_URL = 'https://entity-api.test.hubmapconsortium.org'
 ### Startup the Search API on localhost
 
 In the Search API repository consult the file './local-development-instructions.md'.
-```commandline
+```bash
 $ source venv-hm-search-api/bin/activate
 $ python3 src/app.py
 ```
@@ -247,16 +244,16 @@ If you have not already started the Antibody API do so (see /scripts/README.md).
 ### Accessing the Search API from the container
 
 You should be able to access the Search-API from the container with the following:
-```commandline
-docker exec -it antibody-api_db_1 bash
-apt update; apt install curl
-curl -H 'Content-Type: application/json' -d '{"query": {"match_all": {}}}' -X POST  http://host.docker.internal:5005/hm_antibodies/search
+```bash
+$ docker exec -it antibody-api_db_1 bash
+$ apt update; apt install curl
+$ curl -H 'Content-Type: application/json' -d '{"query": {"match_all": {}}}' -X POST  http://host.docker.internal:5005/hm_antibodies/search
 {"_shards":{"failed":0,"skipped":0,"successful":1,"total":1}, ... , "timed_out":false,"took":1}
 ```
 
 If you get an error message like below .
-```commandline
-curl -H 'Content-Type: application/json' -d '{"query": {"match_all": {}}}' -X POST  http://host.docker.internal:5005/hm_antibodies/search
+```bash
+$ curl -H 'Content-Type: application/json' -d '{"query": {"match_all": {}}}' -X POST  http://host.docker.internal:5005/hm_antibodies/search
 {"error":{"index":"hm_antibodies","index_uuid":"_na_","reason":"no such index [hm_antibodies]"
 ```
 If you get this message you will need to load some data (see 'server/manual_test_files/README.md' section 'Manual test for 'upload' (.csv only)').
