@@ -6,6 +6,7 @@ import requests
 from flask import abort
 import logging
 from .. import allowed_file, json_error
+from typing import List
 
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
@@ -40,10 +41,20 @@ def validate_row_data_item_isprintable(row_i: int, item: str) -> None:
             f"CSV file row# {row_i}: non-printable characters are not permitted in a data item",
             406))
 
+
+# This may not be necessary, but there is some confusion in blog posts as to what isprintable() considers printable
+def validate_row_data_item_not_linebreaks(row_i: int, item: str) -> None:
+    lines: List[str] = item.splitlines()
+    if len(lines) > 1:
+        abort(json_error(
+            f"CSV file row# {row_i}: line break characters are not permitted in a data item",
+            406))
+
 def validate_row_data(row_i: int, row: dict) -> None:
     for item in row.values():
         validate_row_data_item_not_leading_trailing_whitespace(row_i, item)
         validate_row_data_item_isprintable(row_i, item)
+        validate_row_data_item_not_linebreaks(row_i, item)
 
     valid_recombinat: list[str] = ['true', 'false']
     if row['recombinant'] not in valid_recombinat:
