@@ -160,8 +160,8 @@ function resetForm () {
 function AJAXSubmit (oFormElement) {
   if (!oFormElement.action) { return; }
   console.log('AJAXSubmit;token: ',token);
-  var accessToken = token["nexus.api.globus.org"]["access_token"];
-  console.log('AJAXSubmit;nexus.api.globus.org.access_token: ',accessToken);
+  var accessToken = token["groups.api.globus.org"]["access_token"];
+  console.log('AJAXSubmit;groups.api.globus.org.access_token: ',accessToken);
   var oReq = new XMLHttpRequest();
   oReq.addEventListener("load", ajaxSuccess);
   jQuery('#form-block').addClass('hidden');
