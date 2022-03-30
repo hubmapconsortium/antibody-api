@@ -54,12 +54,6 @@ function Search(props) {
           field="host_organism.keyword"
           operator="OR"
           size={10} />
-        <RefinementListFilter
-          id="submitter_orcid"
-          title="Submitter ORCiD iD"
-          field="submitter_orcid.keyword"
-          operator="OR"
-          size={10} />
       </SideBar>
 
       <LayoutResults>
