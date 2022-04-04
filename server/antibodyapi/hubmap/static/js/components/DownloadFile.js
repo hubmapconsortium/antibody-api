@@ -50,6 +50,7 @@ class DownloadFile extends SearchkitComponent {
             .then(data => {
                 var lines = [];
 
+                // header for .csv file...
                 lines.push(_source.join(','));
 
                 data.hits.hits.forEach(item => {
@@ -60,8 +61,13 @@ class DownloadFile extends SearchkitComponent {
                             item_source = assets_url + '/' + item._source['avr_uuid'] + '/' + item_source;
                             item_source = item_source.replace(/,/g, '%2C');
                         }
+                        // so the right number of commas show up in the .csv file...
+                        if (item_source.indexOf(',') > -1) {
+                            item_source = '"' + item_source + '"'
+                        }
                         line.push(item_source);
                     })
+                    // data line for .csv file...
                     lines.push(line.join(','));
                 })
                 const linesString = lines.join("\n") + "\n";
