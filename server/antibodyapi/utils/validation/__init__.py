@@ -29,7 +29,7 @@ def validate_row_keys(row_i: int, row: dict) -> None:
 
 
 def validate_row_data_item_not_leading_trailing_whitespace(row_i: int, item: str) -> None:
-    if item[0].isspace() or item[-1].isspace():
+    if len(item) > 0 and (item[0].isspace() or item[-1].isspace()):
         abort(json_error(
             f"CSV file row# {row_i}: a leading or trailing whitespace characters are not permitted in a data item",
             406))
@@ -49,6 +49,7 @@ def validate_row_data_item_not_linebreaks(row_i: int, item: str) -> None:
         abort(json_error(
             f"CSV file row# {row_i}: line break characters are not permitted in a data item",
             406))
+
 
 def validate_row_data(row_i: int, row: dict) -> None:
     for item in row.values():
