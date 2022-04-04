@@ -218,6 +218,8 @@ antibody-api:/server/antibodyapi/default_config.py: Contains the variable 'QUERY
 If this variable is set to True, then searches from the UI will use Elastic Search directly.
 If False then UI search queries will take place through the Search API.
 
+You will need to specify the FLASK_APP_BASE_URI because of OAUTH2 redirection to the original application from the Gateway.
+
 Use the local ELASTICSEARCH_SERVER, and SEARCH_API_BASE.
 Set the UUID_API_URL (used to get the unique identifier for the antibodies),
 and the INGEST_API_URL (used to store the .pdf files) the in test space (same space as Search API above).
@@ -227,13 +229,16 @@ and the port from the INFO line above when the Search API is started (e.g., "Run
 Make sure that both 'antibody-api:/instance/app.conf' and 'search-api/src/instance/app.cfg'
 are using the same environment ('test' is suggested).
 ```commandline
-    ELASTICSEARCH_SERVER =   'http://elasticsearch'
-    SEARCH_API_BASE =        'http://host.docker.internal:5005'
-    UUID_API_URL =           'https://uuid-api.test.hubmapconsortium.org'
-    INGEST_API_URL =         'https://ingest-api.test.hubmapconsortium.org'
+FLASK_APP_BASE_URI = 'http://localhost:5000/'
 
-    ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
-    QUERY_ELASTICSEARCH_DIRECTLY = False
+# This is the name of the container in the docker-compose file.
+ELASTICSEARCH_SERVER =   'http://elasticsearch'
+SEARCH_API_BASE =        'http://host.docker.internal:5005'
+UUID_API_URL =           'https://uuid-api.test.hubmapconsortium.org'
+INGEST_API_URL =         'https://ingest-api.test.hubmapconsortium.org'
+
+ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
+QUERY_ELASTICSEARCH_DIRECTLY = False
 ```
 
 ### Startup the Antibody API processes in Docker
