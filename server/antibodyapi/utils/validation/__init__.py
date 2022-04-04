@@ -51,11 +51,26 @@ def validate_row_data_item_not_linebreaks(row_i: int, item: str) -> None:
             406))
 
 
+def validate_row_data_required_fields(row_i: int, row: dict) -> None:
+    required_item_keys: list[str] = [
+        'protocols_io_doi', 'uniprot_accession_number', 'target_name', 'rrid', 'antibody_name', 'host_organism',
+        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'organ_or_tissue', 'hubmap_platform',
+        'submitter_orcid', 'avr_filename'
+    ]
+    for item_key in required_item_keys:
+        if len(row[item_key].strip()) == 0:
+            abort(json_error(f"CSV file row# {row_i}: value for '{item_key}' is required", 406))
+
+
 def validate_row_data(row_i: int, row: dict) -> None:
+    validate_row_data_required_fields(row_i, row)
+
     for item in row.values():
         validate_row_data_item_not_leading_trailing_whitespace(row_i, item)
         validate_row_data_item_isprintable(row_i, item)
         validate_row_data_item_not_linebreaks(row_i, item)
+
+    # Validate specific values in an item....
 
     valid_recombinat: list[str] = ['true', 'false']
     if row['recombinant'] not in valid_recombinat:

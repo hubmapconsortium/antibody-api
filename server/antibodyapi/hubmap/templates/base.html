@@ -193,8 +193,8 @@ function ajaxSuccess (event) {
   console.log('event.target: ',event.target)
   const http_status = event.target.status;
   var responsetable = '';
+  const jsonresponse = JSON.parse(event.target.response);
   if (http_status == 201) {
-      const jsonresponse = JSON.parse(event.target.response);
       var csv_content = "antibody_name,antibody_uuid\n";
       responsetable += '<p>All entities in the Andibody Files have been successfully uploaded.</p>';
       responsetable += '<br>';
@@ -222,13 +222,13 @@ function ajaxSuccess (event) {
   } else if (http_status == 406) {
       responsetable += '<div>';
       responsetable += '<p><b>Error</b></p>';
-      responsetable += '<p>' + event.target.statusText + '; ' + event.target.responseText + '</p>';
+      responsetable += '<p>' + jsonresponse.message + '</p>';
       responsetable += '</div>';
       responsetable += '<br>';
   } else {
       responsetable += '<div>';
       responsetable += '<p><b>Unexpected Error</b></p>';
-      responsetable += '<p>Received from the server: ' + event.target.statusText + '; ' + event.target.responseText + '; HTTP Status: ' + http_status + '</p>';
+      responsetable += '<p>Received from the server: ' + jsonresponse.message + '; HTTP Status: ' + http_status + '</p>';
       responsetable += '</div>';
       responsetable += '<br>';
   }
