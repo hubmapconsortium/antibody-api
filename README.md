@@ -57,8 +57,10 @@ $ docker push hubmap/antibody-api:latest
 For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
 in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
 ````bash
-$ docker push -t hubmap/antibody-api:0.1.0
+$ docker push hubmap/antibody-api:0.1.0
 ````
+After you've created the numbered release (text after the colon above) you should save it in
+the project [Release](https://github.com/hubmapconsortium/antibody-api/releases) page.
 
 ### Deploy the Saved Image
 Deploy the image that you saved on GitHub by using the '--no-build' optional argument.
