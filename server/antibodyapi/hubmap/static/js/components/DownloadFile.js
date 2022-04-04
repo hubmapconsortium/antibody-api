@@ -20,6 +20,8 @@ class DownloadFile extends SearchkitComponent {
 
         // Total results returned from the last query, and not the paged size results...
         query.size = parseInt(JSON.stringify(this.searchkit.results.hits.total.value));
+        query.from = 0;
+        console.info('this.searchkit.results: ', JSON.parse(JSON.stringify(this.searchkit.results)));
 
         // Only the columns that the user is viewing, and not all of the columns...
         var _source = [];
@@ -31,7 +33,7 @@ class DownloadFile extends SearchkitComponent {
             query._source = _source.concat('avr_uuid');
         }
 
-        //console.info('query string for .csv file data: ', JSON.stringify(query));
+        console.info('query string for .csv file data: ', query);
 
         //console.info('this.searchkit...', this.searchkit.currentSearchRequest.searchkit.history);
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
