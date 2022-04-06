@@ -14,7 +14,8 @@ Local deployment instructions for testing purposes are found in the Section "Loc
 
 
 ### Get the Latest code
-Login to the target machine and get the latest version of the code from the GitHub repository.
+Login to the deployment machine (in this case 'dev') and get the latest version of the code from the GitHub repository.
+For production the deployment machine is 'ingest.hubmapconsortium.org'.
 ```bash
 # Access the server, switch accounts and go to the server directory
 $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.dev.hubmapconsortium.org
@@ -22,11 +23,13 @@ $ sudo /bin/su - centos
 $ cd hubmap/antibody-api
 $ pwd
 /home/centos/hubmap/antibody-api
+$ git checkout production
 $ git status
 # On branch production
 $ git pull
 ```
-You should now have the most recent version of the code.
+You should now have the most recent version of the code which should be in the 'production'
+branch. You can also deploy other branches on 'dev' for testing.
 
 If there are any changes to the './instance/app.conf' file, make them now.
 
@@ -36,7 +39,7 @@ In building the latest image specify the latest tag:
 $ docker build -t hubmap/antibody-api:latest .
 ````
 
-In building a release version of the image, specify the version tag:
+In building a release version of the image, use the 'production' branch, and specify the version tag:
 ````bash
 $ docker build -t hubmap/antibody-api:0.1.0 .
 ````
@@ -59,8 +62,10 @@ in the `docker-compose.deployment.yml` before pulling the docker image and start
 ````bash
 $ docker push hubmap/antibody-api:0.1.0
 ````
-After you've created the numbered release (text after the colon above) you should save it in
+After you've created the numbered release you should save it in
 the project [Release](https://github.com/hubmapconsortium/antibody-api/releases) page.
+Github suggests that you prefix version tag begin with the letter 'v'.
+Also write some release notes instead of leaving it blank (it uses the git commit message in this case).
 
 ### Deploy the Saved Image
 Deploy the image that you saved on GitHub by using the '--no-build' optional argument.
