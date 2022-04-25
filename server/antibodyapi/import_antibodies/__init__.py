@@ -80,6 +80,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                                         avr_file
                                     )
                                     query = insert_query_with_avr_file_and_uuid()
+                                    row['avr_filename'] = secure_filename(row['avr_filename'])
                     try:
                         cur.execute(query, row)
                         uuids_and_names.append({
