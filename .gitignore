@@ -51,3 +51,5 @@ Thumbs.db
 server/*.egg-info
 
 instance/
+
+**/venv/
