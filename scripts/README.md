@@ -21,10 +21,13 @@ $ ./verify_csv_file_was_properly_loaded.py -h
 
 ## Reloading ElasticSearch from PostgreSQL Database
 
-To delete the current ElaseicSearch index and reload it from the database you can use the following substituting the appropriate ANTIBODY_URL.
+To delete the current ElaseicSearch index and reload it from the database you can use the following substituting the appropriate ANTIBODY_URL, and TOKEN.
 ```commandline
-ANTIBODY_URL='https://antibody-api.dev.hubmapconsortium.org'; curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
+$ TOKEN='TheTokenString'; ANTIBODY_URL='https://avr.hubmapconsortium.org'; curl -v -X PUT -H 'Content-Type: application/json' -H "Authorization: Bearer ${TOKEN}" "${ANTIBODY_URL}/restore_elasticsearch"
 ```
+You can get the TOKEN by logging into the [HuBMAP Portal](https://portal.hubmapconsortium.org/),
+opening the "Browser Tools", and looking for a request (in the 'Network' section) to one of the other back end services
+in the 'Headers' section of that URL and copying the 'Authorization: Bearer TheTokenString'.
 
 ## Verify the ElasticSearch matches PostgreSQL
 
