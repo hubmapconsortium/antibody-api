@@ -12,9 +12,8 @@ configure the Search API server to handle queries from the Antibody API.
 
 Local deployment instructions for testing purposes are found in the Section "Local Deployment".
 
-
-### Get the Latest code
-Login to the deployment machine (in this case 'dev') and get the latest version of the code from the GitHub repository.
+### Get the Latest Code
+Login to the deployment server (in this case 'dev') and get the latest version of the code from the GitHub repository.
 For production the deployment machine is 'ingest.hubmapconsortium.org'.
 ```bash
 # Access the server, switch accounts and go to the server directory
@@ -28,6 +27,11 @@ $ git status
 # On branch production
 $ git pull
 ```
+For production the deployment machine is 'ingest.hubmapconsortium.org'.
+```bash
+$ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.hubmapconsortium.org
+...
+```
 You should now have the most recent version of the code which should be in the 'production'
 branch. You can also deploy other branches on 'dev' for testing.
 
@@ -39,38 +43,62 @@ In building the latest image specify the latest tag:
 $ docker build -t hubmap/antibody-api:latest .
 ````
 
-In building a release version of the image, use the 'production' branch, and specify the version tag:
+In building a release version of the image, use the 'production' branch, and specify a version tag.
+You can see the previous version tags at [DockerHub Antibody APi](https://github.com/hubmapconsortium/antibody-api/releases/).
 ````bash
-$ docker build -t hubmap/antibody-api:0.1.0 .
+$ docker build -t hubmap/antibody-api:0.0.2 .
 ````
 
 ### Publish the Image to DockerHub
 Saving the image requires access to the DockerHub account with 'PERMISSION' 'Owner' account.
-You may also see [DockerHub Antibody APi](https://hub.docker.com/repository/docker/hubmap/antibody-api).
+You may also see [DockerHub Antibody APi](https://github.com/hubmapconsortium/antibody-api/releases/).
 To make changes you must login.
 ````bash
 $ docker login
 ````
 
-For DEV/TEST/STAGE, there is no need to make changes to the `docker-compose.deployment.yml` and just use the `hubmap/antibody-api:latest` tag.
+For DEV/TEST/STAGE, just use the `latest` tag.
 ````bash
 $ docker push hubmap/antibody-api:latest
 ````
 
-For PROD, use the released version/tag like `hubmap/antibody-api:0.1.0` by specifying it
+For PROD, use the released version/tag like `hubmap/antibody-api:1.0.2` by specifying it
 in the `docker-compose.deployment.yml` before pulling the docker image and starting the container.
 ````bash
-$ docker push hubmap/antibody-api:0.1.0
+$ docker push hubmap/antibody-api:1.0.2
 ````
-After you've created the numbered release you should save it in
+
+### PROD Documenting the Docker image
+For PROD, after you've created the numbered release you should save it in
 the project [Release](https://github.com/hubmapconsortium/antibody-api/releases) page.
-Github suggests that you prefix version tag begin with the letter 'v'.
-Also write some release notes instead of leaving it blank (it uses the git commit message in this case).
+On this page, click on the "Draft a new release" (white on black) botton.
+Create a new release version in the "Release title" box.
+Use the same release number as in DockerHub, but prefix it with the letter v (see "Tag suggestion" on the left), and enter release notes in the "Write" section.
+Then click on the "Publish Release" (green) button.
 
 ### Deploy the Saved Image
-Deploy the image that you saved on GitHub by using the '--no-build' optional argument.
+For PROD, download the new numbered release image from DockerHub to the deployment server in the Git repository
+directory (see "Get the Latest Code" above).
+
+For DEV, you can use 'latest'. So, in this case all of the numbered
+releases below will be 'hubmap/antibody-api:latest'.
 ````bash
-$ docker-compose -f docker-compose.deployment.yml up -d --no-build
+$ docker pull hubmap/antibody-api:1.0.2
+````
+Determine the current image version.
+````bash
+$ docker ps
+CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS                  PORTS                          NAMES
+407cbcc4d15d        hubmap/antibody-api:1.0.1   "/usr/local/bin/entr…"   3 weeks ago         Up 3 weeks (healthy)    0.0.0.0:5000->5000/tcp         antibody-api
+...
+````
+Stop the process associated with it and delete the image.
+````bash
+$ export ANTIBODY_API_VERSION=1.0.1; docker-compose -f docker-compose.deployment.yml down --rmi all
+````
+Start the new container using the image just pulled from DockerHub.
+````bash
+$ export ANTIBODY_API_VERSION=1.0.2; docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 
 ### Examine Server Logs
@@ -81,14 +109,21 @@ $ tail -f server/log/uwsgi-antibody-api.log
 
 ## Redeployment
 
-Will need to shut down the running container and remove the old image first:
+First download the new image.
 ````bash
-$ docker-compose -f docker-compose.deployment.yml down --rmi all
+$ docker pull hubmap/antibody-api:0.0.2
+$ docker ps
+````
+The service should be running on the old (0.0.1) image.
+
+Then shut down the running container and remove the old image:
+````bash
+$ export ANTIBODY_API_VERSION=0.0.1; docker-compose -f docker-compose.deployment.yml down --rmi all
 ````
 
-Then download the new image and start up the container:
+Then start up the container on the image that you just downloaded:
 ````bash
-$ docker-compose -f docker-compose.deployment.yml up -d --no-build
+$ export ANTIBODY_API_VERSION=0.0.2; docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 The '--no-build' get's the container from DockerHub.
 
