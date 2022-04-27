@@ -46,7 +46,7 @@ $ docker build -t hubmap/antibody-api:latest .
 In building a release version of the image, use the 'production' branch, and specify a version tag.
 You can see the previous version tags at [DockerHub Antibody APi](https://github.com/hubmapconsortium/antibody-api/releases/).
 ````bash
-$ docker build -t hubmap/antibody-api:0.0.2 .
+$ docker build -t hubmap/antibody-api:1.0.2 .
 ````
 
 ### Publish the Image to DockerHub
@@ -99,6 +99,18 @@ $ export ANTIBODY_API_VERSION=1.0.1; docker-compose -f docker-compose.deployment
 Start the new container using the image just pulled from DockerHub.
 ````bash
 $ export ANTIBODY_API_VERSION=1.0.2; docker-compose -f docker-compose.deployment.yml up -d --no-build
+````
+
+Make sure that the new images has started.
+````bash
+$ docker ps
+CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS                            PORTS                       NAMES
+5c0bdb68bd22        hubmap/antibody-api:1.0.2   "/usr/local/bin/entr…"   6 seconds ago       Up 4 seconds (health: starting)   0.0.0.0:5000->5000/tcp      antibody-api
+````
+
+The production version of the server should be running at...
+````bash
+https://avr.hubmapconsortium.org/
 ````
 
 ### Examine Server Logs
