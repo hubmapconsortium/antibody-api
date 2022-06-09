@@ -96,3 +96,10 @@ The use case for this is, if you want to add a library inside a container to get
 ### Tests
 
 For information on how to run the tests, please see 'server/tests/README.md'.
+
+### Environments
+
+There are several environments:
+[DEV](https://avr.dev.hubmapconsortium.org/),
+[TEST](https://avr.test.hubmapconsortium.org/),
+[PROD](https://avr.hubmapconsortium.org/).
