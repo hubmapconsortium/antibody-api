@@ -20,8 +20,6 @@ services:
       start_period: 40s
     networks:
       - gateway_hubmap
-    ports:
-      - '5000:5000'
     volumes:
       # Flask configuration
       - "./instance:/app/var/antibodyapi-instance"
