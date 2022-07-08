@@ -1,6 +1,10 @@
 # antibody-api
 
 This information will help you get the Antibody API up in running whether locally or on an environment.
+The Antibody API should be running on the following environments:
+[Prod](https://avr.hubmapconsortium.org/),
+[Test](https://avr.test.hubmapconsortium.org/),
+[Dev](https://avr.dev.hubmapconsortium.org/).
 
 ## Build, Publish, Deploy Workflow
 These are the steps used to build, publish a Docker image, and then deploy it.
@@ -14,7 +18,6 @@ Local deployment instructions for testing purposes are found in the Section "Loc
 
 ### Get the Latest Code
 Login to the deployment server (in this case 'dev') and get the latest version of the code from the GitHub repository.
-For production the deployment machine is 'ingest.hubmapconsortium.org'.
 ```bash
 # Access the server, switch accounts and go to the server directory
 $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.dev.hubmapconsortium.org
@@ -22,7 +25,7 @@ $ sudo /bin/su - centos
 $ cd hubmap/antibody-api
 $ pwd
 /home/centos/hubmap/antibody-api
-$ git checkout production
+$ git checkout main
 $ git status
 # On branch production
 $ git pull
@@ -106,11 +109,6 @@ Make sure that the new images has started.
 $ docker ps
 CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS                            PORTS                       NAMES
 5c0bdb68bd22        hubmap/antibody-api:1.0.2   "/usr/local/bin/entr…"   6 seconds ago       Up 4 seconds (health: starting)   0.0.0.0:5000->5000/tcp      antibody-api
-````
-
-The production version of the server should be running at...
-````bash
-https://avr.hubmapconsortium.org/
 ````
 
 ### Examine Server Logs
