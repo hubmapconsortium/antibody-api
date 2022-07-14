@@ -13,6 +13,8 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
                     level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
+# TODO: Changes: do an auto lower case on anything is 'true' or 'false' as Excel likes all uppercase and people seem to use Excel to make the .csv files
+# TODO: When validating the .csv file silently drop any non-utf-8 characters as these tend to be grademark signs https://stackoverflow.com/questions/26307271/re-encode-unicode-stream-as-ascii-ignoring-errors
 
 # This test should be the first one because subsequent tests depend on these keys existing in the row dict...
 def validate_row_keys(row_i: int, row: dict) -> None:
@@ -108,7 +110,7 @@ def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
         abort(json_error(f"CSV file row# {row_i}: Problem encountered fetching ORCID", 406))
 
 
-def validate_rrid(row_id: int, rrid: str) -> None:
+def validate_rrid(row_i: int, rrid: str) -> None:
     # TODO: The rrid search is really fragile and a better way should be found
     try:
         rrid_url: str = f"https://antibodyregistry.org/search?q={rrid}"
@@ -121,7 +123,7 @@ def validate_rrid(row_id: int, rrid: str) -> None:
 
 
 def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
-    logger.debug(f"validate_antibodycsv_row: row {row_i}: {row}")
+    logger.debug(f"validate_antibodycsv_row: row# {row_i}: {row}")
 
     validate_row_keys(row_i, row)
     validate_row_data(row_i, row)
@@ -162,6 +164,7 @@ def validate_antibodycsv(request_files: dict) -> list:
         if not file or file.filename == '':
             abort(json_error('Filename missing in uploaded files', 406))
         if file and allowed_file(file.filename):
+            # TODO: remove any non-utf-8 characters from the stream both here and when processing it.
             lines: [str] = [x.decode("utf-8") for x in file.stream.readlines()]
             # Since this is a stream, we need to go back to the beginning or the next time that it is read
             # it will be read from the end where there are no characters providing an empty file.
