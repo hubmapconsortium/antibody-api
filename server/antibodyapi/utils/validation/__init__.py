@@ -87,7 +87,7 @@ def validate_row_data(row_i: int, row: dict) -> None:
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
     try:
         uniprot_url: str = f"https://www.uniprot.org/uniprot/{uniprot_accession_number}.rdf?include=yes "
-        response = requests.get(uniprot_url)
+        response = requests.get(uniprot_url, verify=False)
         # https://www.uniprot.org/help/api_retrieve_entries
         if response.status_code == 404:
             abort(json_error(f"CSV file row# {row_i}: Uniprot Accession Number '{uniprot_accession_number}' is not found in catalogue",
@@ -100,7 +100,7 @@ def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str)
 def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
     try:
         orcid_url: str = f"https://pub.orcid.org/{submitter_orcid}"
-        response = requests.get(orcid_url)
+        response = requests.get(orcid_url, verify=False)
         # TODO: 302
         if response.status_code == 404:
             abort(json_error(f"CSV file row# {row_i}: ORCID '{submitter_orcid}' is not found in catalogue",
@@ -114,7 +114,9 @@ def validate_rrid(row_i: int, rrid: str) -> None:
     # TODO: The rrid search is really fragile and a better way should be found
     try:
         rrid_url: str = f"https://antibodyregistry.org/search?q={rrid}"
-        response = requests.get(rrid_url)
+        # https://stackoverflow.com/questions/10667960/python-requests-throwing-sslerror
+        # Fix for: ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
+        response = requests.get(rrid_url, verify=False)
         if re.search(r'0 results out of 0 with the query', response.text):
             abort(json_error(f"CSV file row# {row_i}: RRID '{rrid}' is not valid", 406))
     except requests.ConnectionError as error:
