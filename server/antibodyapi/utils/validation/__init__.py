@@ -13,6 +13,8 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
                     level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
+# TODO: Changes: do an auto lower case on anything is 'true' or 'false' as Excel likes all uppercase and people seem to use Excel to make the .csv files
+# TODO: When validating the .csv file silently drop any non-utf-8 characters as these tend to be grademark signs https://stackoverflow.com/questions/26307271/re-encode-unicode-stream-as-ascii-ignoring-errors
 
 # This test should be the first one because subsequent tests depend on these keys existing in the row dict...
 def validate_row_keys(row_i: int, row: dict) -> None:
@@ -85,7 +87,7 @@ def validate_row_data(row_i: int, row: dict) -> None:
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
     try:
         uniprot_url: str = f"https://www.uniprot.org/uniprot/{uniprot_accession_number}.rdf?include=yes "
-        response = requests.get(uniprot_url)
+        response = requests.get(uniprot_url, verify=False)
         # https://www.uniprot.org/help/api_retrieve_entries
         if response.status_code == 404:
             abort(json_error(f"CSV file row# {row_i}: Uniprot Accession Number '{uniprot_accession_number}' is not found in catalogue",
@@ -98,7 +100,7 @@ def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str)
 def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
     try:
         orcid_url: str = f"https://pub.orcid.org/{submitter_orcid}"
-        response = requests.get(orcid_url)
+        response = requests.get(orcid_url, verify=False)
         # TODO: 302
         if response.status_code == 404:
             abort(json_error(f"CSV file row# {row_i}: ORCID '{submitter_orcid}' is not found in catalogue",
@@ -108,11 +110,13 @@ def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
         abort(json_error(f"CSV file row# {row_i}: Problem encountered fetching ORCID", 406))
 
 
-def validate_rrid(row_id: int, rrid: str) -> None:
+def validate_rrid(row_i: int, rrid: str) -> None:
     # TODO: The rrid search is really fragile and a better way should be found
     try:
         rrid_url: str = f"https://antibodyregistry.org/search?q={rrid}"
-        response = requests.get(rrid_url)
+        # https://stackoverflow.com/questions/10667960/python-requests-throwing-sslerror
+        # Fix for: ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
+        response = requests.get(rrid_url, verify=False)
         if re.search(r'0 results out of 0 with the query', response.text):
             abort(json_error(f"CSV file row# {row_i}: RRID '{rrid}' is not valid", 406))
     except requests.ConnectionError as error:
@@ -121,7 +125,7 @@ def validate_rrid(row_id: int, rrid: str) -> None:
 
 
 def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
-    logger.debug(f"validate_antibodycsv_row: row {row_i}: {row}")
+    logger.debug(f"validate_antibodycsv_row: row# {row_i}: {row}")
 
     validate_row_keys(row_i, row)
     validate_row_data(row_i, row)
@@ -162,6 +166,7 @@ def validate_antibodycsv(request_files: dict) -> list:
         if not file or file.filename == '':
             abort(json_error('Filename missing in uploaded files', 406))
         if file and allowed_file(file.filename):
+            # TODO: remove any non-utf-8 characters from the stream both here and when processing it.
             lines: [str] = [x.decode("utf-8") for x in file.stream.readlines()]
             # Since this is a stream, we need to go back to the beginning or the next time that it is read
             # it will be read from the end where there are no characters providing an empty file.
