@@ -95,6 +95,9 @@ def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str)
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Uniprot Accession Number", 406))
+    finally:
+        if response is not None:
+            response.close()
 
 
 def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
@@ -108,20 +111,31 @@ def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered fetching ORCID", 406))
+    finally:
+        if response is not None:
+            response.close()
 
 
 def validate_rrid(row_i: int, rrid: str) -> None:
     # TODO: The rrid search is really fragile and a better way should be found
     try:
-        rrid_url: str = f"https://antibodyregistry.org/search?q={rrid}"
-        # https://stackoverflow.com/questions/10667960/python-requests-throwing-sslerror
-        # Fix for: ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
+        rrid_url: str = f"https://scicrunch.org/resolver/RRID:{rrid}.json"
         response = requests.get(rrid_url, verify=False)
-        if re.search(r'0 results out of 0 with the query', response.text):
-            abort(json_error(f"CSV file row# {row_i}: RRID '{rrid}' is not valid", 406))
+        if response.status_code != 200:
+            abort(json_error(f"CSV file row# {row_i}: RRID '{rrid}' is not found in catalogue",
+                             406))
+        # data: dict = response.json()
+        # if len(data.get('hits').get('total')) != 1:
+        #     abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
+        # identifier: dict = data.get('hits').get('hits').get(0).get('_source').get('item').get('identifier')
+        # if identifier.upper() != rrid.upper():
+        #     abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
-        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID", 406))
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
+    finally:
+        if response is not None:
+            response.close()
 
 
 def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:

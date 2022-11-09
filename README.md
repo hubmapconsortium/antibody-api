@@ -30,7 +30,7 @@ $ git status
 # On branch production
 $ git pull
 ```
-For production the deployment machine is 'ingest.hubmapconsortium.org'.
+For production the deployment machine is `ingest.hubmapconsortium.org`.
 ```bash
 $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.hubmapconsortium.org
 ...
@@ -38,7 +38,7 @@ $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.hubmapconsortium.org
 You should now have the most recent version of the code which should be in the 'production'
 branch. You can also deploy other branches on 'dev' for testing.
 
-If there are any changes to the './instance/app.conf' file, make them now.
+If there are any changes to the `./instance/app.conf` file, make them now.
 
 ### Build Docker Image
 In building the latest image specify the latest tag:
@@ -84,7 +84,7 @@ For PROD, download the new numbered release image from DockerHub to the deployme
 directory (see "Get the Latest Code" above).
 
 For DEV, you can use 'latest'. So, in this case all of the numbered
-releases below will be 'hubmap/antibody-api:latest'.
+releases below will be `hubmap/antibody-api:latest`.
 ````bash
 $ docker pull hubmap/antibody-api:1.0.2
 ````
@@ -157,8 +157,8 @@ $ ./scripts/run_local.sh
 ```
 
 You will need to manually create the tables on the PostgreSQL database that is running in the container.
-The user, password, and database definitions are found in 'server/antibodyapi/default_config.py',
-and for deployment should be overwritten in 'instance/app.conf' (which is not kept in the repo).
+The user, password, and database definitions are found in `server/antibodyapi/default_config.py`,
+and for deployment should be overwritten in `instance/app.conf` (which is not kept in the repo).
 This is done by accessing the database through the command line 'psql' command.
 ```bash
 if [[ `which psql; echo $?` -ne 0 ]] ; then
@@ -167,12 +167,20 @@ fi
 psql -h localhost -U postgres -d antibodydb -a -f ./development/postgresql_init_scripts/create_tables.sql 
 ```
 
+You will be asked for the database password which you will find in the `instance/app.conf` file in the entry `DATABASE_PASSWORD`.
+
+When running locally you will need to start an instance of `search-api`
+on your development machine because one is not included in the docker-config
+packages. To do this please see the section `Startup the Search API on localhost`.
+
+Once the data is loaded you can use the antibody search api located at [http://localhost:500/](http://localhost:5000)
+
 Now that the tables exist, you will need to load some data into them.
-Find the file 'server/manual_test_files/README.md', and execute the sequence in the 'Manual test for 'upload' (.csv only)' section.
+Find the file `server/manual_test_files/README.md`, and execute the sequence in the 'Manual test for 'upload' (.csv only)' section.
 This will upload the data to the PostgreSQL database and to Elastic Search.
 
 To see the data that is in Elastic Search directly you can execute the following.
-The index (here 'hm_antibodies') is defined in 'server/antibodyapi/default_config.py' as ANTIBODY_ELASTICSEARCH_INDEX.
+The index (here 'hm_antibodies') is defined in `server/antibodyapi/default_config.py` as ANTIBODY_ELASTICSEARCH_INDEX.
 ```bash
 if [[ `which curl; echo $?` -ne 0 ]] ; then
   brew install curl
@@ -185,8 +193,20 @@ This should match the data in the database. Taking one of the "antibody_uuid" en
 $ psql -h localhost -U postgres -d antibodydb -c "SELECT * from antibodies where antibody_uuid='ec53fcf7bf49db0a100ff5b218cf82a3'"
 ```
 
-Once the data is loaded you can use the antibody search api located at [http://localhost:500/](http://localhost:5000)
+You can ssh to the local container as `root` with...
+```bash
+$ docker ps
+CONTAINER ID   IMAGE            ...
+7d5c3d228284   antibody-api_web ...
+$ docker exec -it <CONTAINER_ID> /bin/sh
+/app/server # id
+uid=0(root) gid=0(root) groups=0(root)
+```
 
+To load a utility (e.g., curl) onto the container use...
+```bash
+# apk add curl
+```
 
 ## Deleting and Restoring the Elastic Search Index
 
@@ -194,7 +214,7 @@ The PostgreSQL database is used as the stable store for all of the data input,
 and Elastic Search is used as a method to query it. If you need to move a database
 from one server to another you can restore the Elastic Search Index as follows.
 The following shows how to do this using the Docker containters spun up using
-'./scripts/run_local.sh' (see './scripts/README.md for more information on these scripts).
+`./scripts/run_local.sh` (see `./scripts/README.md` for more information on these scripts).
 
 First query on the index and see if data exists as follows:
 ```bash
@@ -208,17 +228,17 @@ $ curl -H 'Content-Type: application/json' -X DELETE http://localhost:9200/hm_an
 ```
 
 Restore the Elastic Search Index from the PostgreSQL database using the 
-MSAPI endpoint '/restore' on the antibody-api server as follows:
+MSAPI endpoint `/restore` on the antibody-api server as follows:
 ```bash
 $ curl -H 'Content-Type: application/json' -X PUT http://localhost:5000/restore_elasticsearch
 ```
 
 At this point the query on the Elastic Search index should return a subset of
-the data found in the database (see ./scripts/compare_db_with_index.py)
+the data found in the database (see `./scripts/compare_db_with_index.py`).
 
 ## Using the SearchAPI instead of directly reading from Elastic Search
 
-The file './server/antibodyapi/default_config.py' contains the variable 'QUERY_ELASTICSEARCH_DIRECTLY'.
+The file `./server/antibodyapi/default_config.py` contains the variable `QUERY_ELASTICSEARCH_DIRECTLY`.
 If this variable is set to True, then searches from the UI will use Elastic Search directly.
 If False then UI search queries will take place through the Search API.
 
@@ -226,7 +246,7 @@ The following describes how to set this up for testing.
 
 ### Search API Configuration Changes
 
-search-api:src/instance/search-config.yaml: Add the following to the end of the file.
+Add the following to the end of the file `search-api:src/instance/search-config.yaml`.
 This will add the Antibody API Elastic Search index to Search API.
 Note that the 'url' corresponds to the instance of ElasticSearch that is running in the Docker container.
 For running in the various environments, set the 'url' appropriately.
@@ -240,10 +260,11 @@ For running in the various environments, set the 'url' appropriately.
       url: 'http://localhost:9200'
 ```
 
-serch-api:/src/instance/app.cfg: The Elastic Search server should point to the instance running in Docker,
+`serch-api:/src/instance/app.cfg`: The Elastic Search server should point to the instance running in Docker,
 and the Entity API should be in the same space as the Antibody API; in this case 'test'.
-You will also have to set the APP_CLIENT_ID, APP_CLIENT_SECRET, GLOBUS_HUBMAP_READ_GROUP_UUID,
-GLOBUS_HUBMAP_DATA_ADMIN_GROUP_UUID appropriately.
+You will also have to set the `APP_CLIENT_ID`, `APP_CLIENT_SECRET`, `GLOBUS_HUBMAP_READ_GROUP_UUID`, and
+`GLOBUS_HUBMAP_DATA_ADMIN_GROUP_UUID` appropriately.
+
 These are not saved in GitHub for security reasons.
 ```commandline
 ELASTICSEARCH_URL = 'http://localhost:9200'
