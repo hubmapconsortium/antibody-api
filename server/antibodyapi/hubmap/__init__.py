@@ -1,13 +1,14 @@
-from flask import abort, Blueprint, redirect, render_template, session, url_for, request, current_app, send_from_directory
+from flask import abort, Blueprint, redirect, render_template, session, request, current_app, send_from_directory
 import os
 from antibodyapi.utils.elasticsearch import execute_query
+
+hubmap_blueprint = Blueprint('hubmap', __name__, template_folder='templates')
 
 
 def bad_request_error(err_msg):
     abort(400, description = err_msg)
 
 
-hubmap_blueprint = Blueprint('hubmap', __name__, template_folder='templates')
 @hubmap_blueprint.route('/upload')
 def hubmap():
     #replace by the correct way to check token validity.

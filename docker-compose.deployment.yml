@@ -23,9 +23,11 @@ services:
       - gateway_hubmap
     volumes:
       # Flask configuration
-      - "./instance:/app/var/antibodyapi-instance"
+      - ./instance:/app/var/antibodyapi-instance
       # uWSGI log
-      - "./server/log:/app/server/log"
+      - ./server/log:/app/server/log
+      - ./VERSION:/app/server/VERSION
+      - ./BUILD:/app/server/BUILD
 
 networks:
   gateway_hubmap:

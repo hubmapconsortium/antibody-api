@@ -7,6 +7,7 @@ from antibodyapi.login import login_blueprint
 from antibodyapi.logout import logout_blueprint
 from antibodyapi.restore_elasticsearch import restore_elasticsearch_blueprint
 from antibodyapi.save_antibody import save_antibody_blueprint
+from antibodyapi.status import status_blueprint
 from . import default_config
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
@@ -32,6 +33,7 @@ def create_app(testing=False):
     app.register_blueprint(logout_blueprint)
     app.register_blueprint(restore_elasticsearch_blueprint)
     app.register_blueprint(save_antibody_blueprint)
+    app.register_blueprint(status_blueprint)
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument

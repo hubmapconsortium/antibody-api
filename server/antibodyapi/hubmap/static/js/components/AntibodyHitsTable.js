@@ -20,7 +20,7 @@ class AntibodyHitsTable extends React.Component {
         antibodies += `<a href="${assets_url}/${hit._source.avr_uuid}/${hit._source.avr_filename}" target="_blank">${hit._source.avr_filename}</a>`;
       }
       antibodies += `</td>`;
-      antibodies += '<td class="rrid_col" style="display:'+display.rrid+`"><a href="https://scicrunch.org/resources/Any/search?q=${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
+      antibodies += '<td class="rrid_col" style="display:'+display.rrid+`"><a href="https://scicrunch.org/resolver/RRID:${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
       antibodies += '<td class="clonality_col" style="display:'+display.clonality+`;">${hit._source.clonality}</td>`;
       antibodies += '<td class="catalog_number_col" style="display:'+display.catalog_number+`;">${hit._source.catalog_number}</td>`;
       antibodies += '<td class="lot_number_col" style="display:'+display.lot_number+`;">${hit._source.lot_number}</td>`;

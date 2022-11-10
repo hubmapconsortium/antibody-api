@@ -21,10 +21,10 @@ Login to the deployment server (in this case 'dev') and get the latest version o
 ```bash
 # Access the server, switch accounts and go to the server directory
 $ ssh -i ~/.ssh/id_rsa_e2c.pem cpk36@ingest.dev.hubmapconsortium.org
-$ sudo /bin/su - centos
-$ cd hubmap/antibody-api
+$ sudo /bin/su - hive
+$ cd /opt/hubmap/antibody-api
 $ pwd
-/home/centos/hubmap/antibody-api
+/opt/hubmap/antibody-api
 $ git checkout main
 $ git status
 # On branch production
@@ -43,12 +43,14 @@ If there are any changes to the `./instance/app.conf` file, make them now.
 ### Build Docker Image
 In building the latest image specify the latest tag:
 ````bash
+$ ./generate-build-version.sh
 $ docker build -t hubmap/antibody-api:latest .
 ````
 
 In building a release version of the image, use the 'production' branch, and specify a version tag.
 You can see the previous version tags at [DockerHub Antibody APi](https://github.com/hubmapconsortium/antibody-api/releases/).
 ````bash
+$ ./generate-build-version.sh
 $ docker build -t hubmap/antibody-api:1.0.2 .
 ````
 

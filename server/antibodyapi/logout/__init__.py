@@ -2,6 +2,8 @@ import globus_sdk
 from flask import Blueprint, current_app, redirect, session, url_for
 
 logout_blueprint = Blueprint('logout', __name__)
+
+
 @logout_blueprint.route('/logout')
 def logout():
     """

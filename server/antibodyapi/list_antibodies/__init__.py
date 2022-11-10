@@ -2,6 +2,8 @@ from flask import Blueprint, current_app, jsonify, make_response
 from antibodyapi.utils import base_antibody_query, base_antibody_query_result_to_json, get_cursor
 
 list_antibodies_blueprint = Blueprint('list_antibodies', __name__)
+
+
 @list_antibodies_blueprint.route('/antibodies')
 def list_antibodies():
     cur = get_cursor(current_app)

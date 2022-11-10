@@ -1,5 +1,4 @@
 import csv
-import re
 import io
 import PyPDF2
 import requests

@@ -7,3 +7,5 @@ services:
       - ./instance:/app/var/antibodyapi-instance
       - ./server:/app/server
       - /app/server/node_modules
+      - ./VERSION:/app/server/VERSION
+      - ./BUILD:/app/server/BUILD

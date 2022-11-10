@@ -8,7 +8,7 @@ import requests
 import PyPDF2
 import io
 import elasticsearch
-from urllib.parse import urlparse, urlunparse, unquote, ParseResult
+from urllib.parse import urlparse, unquote
 from enum import IntEnum, unique
 
 
