@@ -74,7 +74,7 @@ function Search(props) {
                 <tr>
                     <td><b>Additional Columns:</b></td>
                     <td><Checkbox element="rrid" label="RRID"/></td>
-                    <td><Checkbox element="clonality" label="Colonality"/></td>
+                    <td><Checkbox element="clonality" label="Clonality"/></td>
                     <td><Checkbox element="catalog_number" label="Catalog#"/></td>
                     <td><Checkbox element="lot_number" label="Lot#"/></td>
                     <td><Checkbox element="vendor" label="Vendor"/></td>
