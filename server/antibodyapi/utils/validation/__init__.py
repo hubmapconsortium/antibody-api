@@ -12,8 +12,6 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
                     level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
-# TODO: Changes: do an auto lower case on anything is 'true' or 'false' as Excel likes all uppercase and people seem to use Excel to make the .csv files
-# TODO: When validating the .csv file silently drop any non-utf-8 characters as these tend to be grademark signs https://stackoverflow.com/questions/26307271/re-encode-unicode-stream-as-ascii-ignoring-errors
 
 # This test should be the first one because subsequent tests depend on these keys existing in the row dict...
 def validate_row_keys(row_i: int, row: dict) -> None:
@@ -116,19 +114,12 @@ def validate_submitter_orcid(row_i: int, submitter_orcid: str) -> None:
 
 
 def validate_rrid(row_i: int, rrid: str) -> None:
-    # TODO: The rrid search is really fragile and a better way should be found
     try:
         rrid_url: str = f"https://scicrunch.org/resolver/RRID:{rrid}.json"
         response = requests.get(rrid_url, verify=False)
         if response.status_code != 200:
             abort(json_error(f"CSV file row# {row_i}: RRID '{rrid}' is not found in catalogue",
                              406))
-        # data: dict = response.json()
-        # if len(data.get('hits').get('total')) != 1:
-        #     abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
-        # identifier: dict = data.get('hits').get('hits').get(0).get('_source').get('item').get('identifier')
-        # if identifier.upper() != rrid.upper():
-        #     abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))

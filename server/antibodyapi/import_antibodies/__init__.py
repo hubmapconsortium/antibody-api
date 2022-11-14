@@ -14,6 +14,7 @@ from antibodyapi.utils import (
 )
 from antibodyapi.utils.validation import validate_antibodycsv
 from antibodyapi.utils.elasticsearch import index_antibody
+import string
 import logging
 
 
@@ -22,6 +23,13 @@ import_antibodies_blueprint = Blueprint('import_antibodies', __name__)
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
                     level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
+
+
+def only_printable(s: str) -> str:
+    # This does not work because (apparently) the TM symbol is a unicode character.
+    # s.encode('utf-8', errors='ignore').decode('utf-8')
+    # So, we use the more restrictive string.printable which does not contain unicode characters.
+    return ''.join(c for c in s if c in string.printable)
 
 
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
@@ -56,6 +64,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                 antibodycsv = csv.DictReader(csvfile, delimiter=',')
                 row_i = 1
                 for row in antibodycsv:
+                    # silently drop any non-printable characters like Trademark symbols from Excel documents
+                    row = [only_printable(i) for i in row]
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
@@ -68,6 +78,9 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
                     row['group_uuid'] = group_id
+                    # do an auto lower case on anything is 'true' or 'false' as Excel likes
+                    # all uppercase and people seem to use Excel to make the .csv files
+                    row['recombinant'] = row['recombinant'].lower()
                     query = insert_query()
                     if 'avr_filename' in row.keys():
                         if 'pdf' in request.files:

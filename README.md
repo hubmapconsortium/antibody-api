@@ -89,6 +89,7 @@ For DEV, you can use 'latest'. So, in this case all of the numbered
 releases below will be `hubmap/antibody-api:latest`.
 ````bash
 $ docker pull hubmap/antibody-api:1.0.2
+$ ./generate-build-version.sh
 ````
 Determine the current image version.
 ````bash
