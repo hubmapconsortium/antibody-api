@@ -65,8 +65,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                 row_i = 1
                 for row in antibodycsv:
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
-                    logger.info(f'row: {row}')
-                    row = [only_printable(i) for i in row]
+                    row = {k: only_printable(v) for (k, v) in row.iteritems()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
