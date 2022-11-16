@@ -72,7 +72,7 @@ def validate_row_data(row_i: int, row: dict) -> None:
     # Validate specific values in an item....
 
     valid_recombinat: list[str] = ['true', 'false']
-    if row['recombinant'] not in valid_recombinat:
+    if row['recombinant'].lower() not in valid_recombinat:
         abort(json_error(f"CSV file row# {row_i}: recombinant value '{row['recombinant']}' is not one of: {', '.join(valid_recombinat)}", 406))
 
     # https://en.wikipedia.org/wiki/Clone_(cell_biology)
