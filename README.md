@@ -100,10 +100,12 @@ CONTAINER ID        IMAGE                       COMMAND                  CREATED
 ````
 Stop the process associated with it and delete the image.
 ````bash
+$ export ANTIBODY_API_VERSION=latest; docker-compose -f docker-compose.deployment.yml down --rmi all
 $ export ANTIBODY_API_VERSION=1.0.1; docker-compose -f docker-compose.deployment.yml down --rmi all
 ````
 Start the new container using the image just pulled from DockerHub.
 ````bash
+$ export ANTIBODY_API_VERSION=latest; docker-compose -f docker-compose.deployment.yml up -d --no-build
 $ export ANTIBODY_API_VERSION=1.0.2; docker-compose -f docker-compose.deployment.yml up -d --no-build
 ````
 
