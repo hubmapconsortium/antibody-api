@@ -25,7 +25,7 @@ function Search(props) {
       <SearchBox
         autofocus={true}
         searchOnChange={true}
-        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor", "submitter_orcid"]}
+        prefixQueryFields={["target_name^2","host", "vendor_name", "author_orcid"]}
         />
       <a href="/upload"
          style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
@@ -45,7 +45,7 @@ function Search(props) {
           title="Target Name"
           id="target_names" />
         <HierarchicalMenuFilter
-          fields={["vendor.keyword"]}
+          fields={["vendor_name.keyword"]}
           title="Vendors"
           id="vendors" />
         <RefinementListFilter
@@ -77,11 +77,27 @@ function Search(props) {
                     <td><Checkbox element="clonality" label="Clonality"/></td>
                     <td><Checkbox element="catalog_number" label="Catalog#"/></td>
                     <td><Checkbox element="lot_number" label="Lot#"/></td>
-                    <td><Checkbox element="vendor" label="Vendor"/></td>
+                    <td><Checkbox element="vendor_name" label="Vendor"/></td>
                     <td><Checkbox element="recombinant" label="Recombinant"/></td>
-                    <td><Checkbox element="organ_or_tissue" label="Organ/Tissue"/></td>
-                    <td><Checkbox element="hubmap_platform" label="HuBMAP Platform"/></td>
-                    <td><Checkbox element="submitter_orcid" label="Submitter ORCiD iD"/></td>
+                    <td><Checkbox element="organ" label="Organ"/></td>
+                    <td><Checkbox element="method" label="Method"/></td>
+                    <td><Checkbox element="author_orcid" label="Author ORCiD iD"/></td>
+
+                    <td><Checkbox element="hgnc_id" label="HGNC iD"/></td>
+                    <td><Checkbox element="isotype" label="Isotype"/></td>
+                    <td><Checkbox element="concentration_value" label="Concentration"/></td>
+                    <td><Checkbox element="dilution" label="Dilution"/></td>
+                    <td><Checkbox element="conjugate" label="Conjugate"/></td>
+                    <td><Checkbox element="tissue_preservation" label="Tissue Preservation"/></td>
+                    <td><Checkbox element="cycle_number" label="Cycle#"/></td>
+                    <td><Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/></td>
+                    <td><Checkbox element="manuscript_doi" label="Manuscript DOI"/></td>
+                    <td><Checkbox element="protocols_doi" label="Protocols DOI"/></td>
+                    <td><Checkbox element="vendor_affiliation" label="Vendor Affiliation"/></td>
+                    <td><Checkbox element="organ_uberon" label="Organ UBERON"/></td>
+                    <td><Checkbox element="antigen_retrieval" label="Antigen Retrieval"/></td>
+                    <td><Checkbox element="omap_id" label="OMAP"/></td>
+
                     <td><Checkbox element="created_by_user_email" label="Submitter Email"/></td>
                 </tr>
             </thead>
@@ -90,7 +106,15 @@ function Search(props) {
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orcid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
+          sourceFilter={[
+              "host", "uniprot_accession_number", "target_name", "rrid", "clonality",
+              "catalog_number", "lot_number", "vendor", "recombinant", "organ", "method",
+              "author_orcid", "hgnc_id", "isotype", "concentration_value", "dilution",
+              "conjugate", "tissue_preservation", "cycle_number", "fluorescent_reporter",
+              "manuscript_doi", "protocols_doi", "vendor_affiliation", "organ_uberon",
+              "antigen_retrieval", "omap_id",
+              "created_by_user_email", "avr_pdf_filename", "avr_pdf_uuid"
+          ]}/>
         <InitialLoader />
         <NoHits />
 

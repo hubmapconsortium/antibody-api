@@ -35,26 +35,42 @@ def hubmap_search():
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
     display: dict = {
-        "antibody_name": "table-cell",
-        "host_organism": "table-cell",
+        "host": "table-cell",
         "uniprot_accession_number": "table-cell",
         "target_name": "table-cell",
-        "avr_filename": "table-cell",
+        "avr_pdf_filename": "table-cell",
         "rrid": "none",
         "clonality": "none",
         "catalog_number": "none",
         "lot_number": "none",
-        "vendor": "none",
+        "vendor_name": "none",
         "recombinant": "none",
-        "organ_or_tissue": "none",
-        "hubmap_platform": "none",
-        "submitter_orcid": "none",
+        "organ": "none",
+        "method": "none",
+        "author_orcid": "none",
+        "hgnc_id": "none",
+        "isotype": "none",
+        "concentration_value": "none",
+        "dilution": "none",
+        "conjugate": "none",
+        "tissue_preservation": "none",
+        "cycle_number": "none",
+        "fluorescent_reporter": "none",
+        "manuscript_doi": "none",
+        "vendor_affiliation": "none",
+        "organ_uberon": "none",
+        "antigen_retrieval": "none",
+        "omap_id": "none",
         "created_by_user_email": "none"
     }
     csv_column_order: list = [
-        "antibody_name", "host_organism", "uniprot_accession_number", "target_name", "avr_filename", "rrid",
-        "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform",
-        "submitter_orcid", "created_by_user_email"
+        "host", "uniprot_accession_number", "target_name", "avr_pdf_filename",
+        "rrid", "clonality", "catalog_number", "lot_number", "vendor_name",
+        "recombinant", "organ", "method", "author_orcid", "hgnc_id", "isotype",
+        "concentration_value", "dilution", "conjugate", "tissue_preservation",
+        "cycle_number", "fluorescent_reporter", "manuscript_doi", "vendor_affiliation",
+        "organ_uberon", "antigen_retrieval", "omap_id",
+        "created_by_user_email"
     ]
     return render_template(
         'search.html',

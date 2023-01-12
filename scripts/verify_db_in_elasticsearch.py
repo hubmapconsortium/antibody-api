@@ -7,8 +7,15 @@
 # ./verify_db_in_elasticsearch.py
 
 import argparse
+import os
 import elasticsearch
-from utils import *
+import psycopg2
+from utils import (
+    eprint, vprint,
+    make_db_connection, make_es_connection,
+    check_es_entry_to_db_row, check_pdf_file_upload,
+    QUERY, SI
+)
 
 
 class RawTextArgumentDefaultsHelpFormatter(
@@ -67,9 +74,9 @@ try:
     rows_processed = 0
     for db_row in cursor.fetchall():
         check_es_entry_to_db_row(es_conn, args.elasticsearch_index, db_row)
-        avr_filename = db_row[SI.AVR_FILENAME]
-        if avr_filename is not None:
-            check_pdf_file_upload(args.assets_url, db_row[SI.AVR_UUID], avr_filename)
+        avr_pdf_filename = db_row[SI.AVR_PDF_FILENAME]
+        if avr_pdf_filename is not None:
+            check_pdf_file_upload(args.assets_url, db_row[SI.AVR_PDF_UUID], avr_pdf_filename)
         rows_processed = rows_processed + 1
     eprint(f"Database Rows processed: {rows_processed}")
 
