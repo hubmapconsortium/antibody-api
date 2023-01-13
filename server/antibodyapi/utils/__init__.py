@@ -1,21 +1,15 @@
 import os
 import globus_sdk
 import requests
-from flask import (
-    Flask, abort, g, jsonify, make_response, redirect,
-    session, request, render_template, url_for
-)
+from flask import abort, g, jsonify, make_response,  session
 from enum import IntEnum, unique
-from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-# pylint: disable=no-name-in-module
-from psycopg2.errors import UniqueViolation
 import logging
 from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
 
-requests.packages.urllib3.disable_warnings(category = InsecureRequestWarning) # pylint: disable=no-member
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning) # pylint: disable=no-member
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
@@ -32,41 +26,53 @@ def allowed_file(filename):
 @unique
 class SI(IntEnum):
     ANTIBODY_UUID = 0
-    AVR_FILENAME = 1
-    AVR_UUID = 2
-    PROTOCOLS_IO_DOI = 3
+    AVR_PDF_FILENAME = 1
+    AVR_PDF_UUID = 2
+    PROTOCOLS_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
     TARGET_NAME = 5
     RRID = 6
-    ANTIBODY_NAME = 7
-    HOST_ORGANISM = 8
-    CLONALITY = 9
-    VENDOR_NAME = 10
-    CATALOG_NUMBER = 11
-    LOT_NUMBER = 12
-    RECOMBINATE = 13
-    ORGAN_OR_TISSSUE = 14
-    HUBMAP_PLATFORM = 15
-    SUBMITTER_ORCID = 16
-    CREATED_TIMESTAMP = 17
-    CREATED_BY_USER_DISPLAYNAME = 18
-    CREATED_BY_USER_EMAIL = 19
-    CREATED_BY_USER_SUB = 20
-    GROUP_UUID = 21
+    HOST = 7
+    CLONALITY = 8
+    VENDOR_NAME = 9
+    CATALOG_NUMBER = 10
+    LOT_NUMBER = 11
+    RECOMBINANT = 12
+    ORGAN = 13
+    METHOD = 14
+    AUTHOR_ORCID = 15
+    HGNC_ID = 16
+    ISOTYPE = 17
+    CONCENTRATION_VALUE = 18
+    DILUTION = 19
+    CONJUGATE = 20
+    TISSUE_PRESERVATION = 21
+    CYCLE_NUMBER = 22
+    FLUORESCENT_REPORTER = 23
+    MANUSCRIPT_DOI = 24
+    VENDOR_AFFILIATION = 25
+    ORGAN_UBERON = 26
+    ANTIGEN_RETRIEVAL = 27
+    OMAP_ID = 28
+    CREATED_TIMESTAMP = 29
+    CREATED_BY_USER_DISPLAYNAME = 30
+    CREATED_BY_USER_EMAIL = 31
+    CREATED_BY_USER_SUB = 32
+    GROUP_UUID = 33
 
 
 QUERY = '''
 SELECT
     a.antibody_uuid,
-    a.avr_filename, a.avr_uuid,
-    a.protocols_io_doi,
-    a.uniprot_accession_number,
-    a.target_name, a.rrid,
-    a.antibody_name, a.host_organism,
-    a.clonality, v.name,
-    a.catalog_number, a.lot_number,
-    a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orcid,
+    a.avr_pdf_filename, a.avr_pdf_uuid,
+    a.protocols_doi, a.uniprot_accession_number,
+    a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.catalog_number, a.lot_number, a.recombinant, a.organ,
+    a.method, a.author_orcid, a.hgnc_id, a.isotype,
+    a.concentration_value, a.dilution, a.conjugate,
+    a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
@@ -82,38 +88,50 @@ def base_antibody_query():
 def base_antibody_query_result_to_json(antibody) -> dict:
     ant = {
         'antibody_uuid': antibody[SI.ANTIBODY_UUID].replace('-', ''),
-        'protocols_io_doi': antibody[SI.PROTOCOLS_IO_DOI],
+        'protocols_doi': antibody[SI.PROTOCOLS_DOI],
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
         'target_name': antibody[SI.TARGET_NAME],
         'rrid': antibody[SI.RRID],
-        'antibody_name': antibody[SI.ANTIBODY_NAME],
-        'host_organism': antibody[SI.HOST_ORGANISM],
+        'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
-        'vendor': antibody[SI.VENDOR_NAME],
+        'vendor_name': antibody[SI.VENDOR_NAME],
         'catalog_number': antibody[SI.CATALOG_NUMBER],
         'lot_number': antibody[SI.LOT_NUMBER],
-        'recombinant': antibody[SI.RECOMBINATE],
-        'organ_or_tissue': antibody[SI.ORGAN_OR_TISSSUE],
-        'hubmap_platform': antibody[SI.HUBMAP_PLATFORM],
-        'submitter_orcid': antibody[SI.SUBMITTER_ORCID],
-        # 'created_timestamp': antibody[15]
+        'recombinant': antibody[SI.RECOMBINANT],
+        'organ': antibody[SI.ORGAN],
+        'method': antibody[SI.METHOD],
+        'author_orcid': antibody[SI.AUTHOR_ORCID],
+        'hgnc_id': antibody[SI.HGNC_ID],
+        'isotype': antibody[SI.ISOTYPE],
+        'concentration_value': antibody[SI.CONCENTRATION_VALUE],
+        'dilution': antibody[SI.DILUTION],
+        'conjugate': antibody[SI.CONJUGATE],
+        'tissue_preservation': antibody[SI.TISSUE_PRESERVATION],
+        'cycle_number': antibody[SI.CYCLE_NUMBER],
+        'fluorescent_reporter': antibody[SI.FLUORESCENT_REPORTER],
+        'manuscript_doi': antibody[SI.MANUSCRIPT_DOI],
+        'vendor_affiliation': antibody[SI.VENDOR_AFFILIATION],
+        'organ_uberon': antibody[SI.ORGAN_UBERON],
+        'antigen_retrieval': antibody[SI.ANTIGEN_RETRIEVAL],
+        'omap_id': antibody[SI.OMAP_ID],
+        # 'created_timestamp': antibody[SI.CREATED_TIMESTAMP]
         'created_by_user_displayname': antibody[SI.CREATED_BY_USER_DISPLAYNAME],
         'created_by_user_email': antibody[SI.CREATED_BY_USER_EMAIL],
         'created_by_user_sub': antibody[SI.CREATED_BY_USER_SUB],
         'group_uuid': antibody[SI.GROUP_UUID].replace('-', '')
     }
-    if antibody[SI.AVR_UUID] is not None:
-        ant['avr_filename'] = antibody[SI.AVR_FILENAME]
-        ant['avr_uuid'] = antibody[SI.AVR_UUID].replace('-', '')
+    if antibody[SI.AVR_PDF_UUID] is not None:
+        ant['avr_pdf_uuid'] = antibody[SI.AVR_PDF_UUID].replace('-', '')
+        ant['avr_pdf_filename'] = antibody[SI.AVR_PDF_FILENAME]
     return ant
 
 
-def find_or_create_vendor(cursor, name):
-    cursor.execute('SELECT id FROM vendors WHERE UPPER(name) = %s', (name.upper(),))
+def find_or_create_vendor(cursor, vendor_name):
+    cursor.execute('SELECT id FROM vendors WHERE UPPER(vendor_name) = %s', (vendor_name.upper(),))
     try:
         return cursor.fetchone()[0]
     except TypeError:
-        cursor.execute('INSERT INTO vendors (name) VALUES (%s) RETURNING id', (name,))
+        cursor.execute('INSERT INTO vendors (vendor_name) VALUES (%s) RETURNING id', (vendor_name,))
         return cursor.fetchone()[0]
 
 
@@ -130,7 +148,7 @@ def get_cursor(app):
     return g.connection.cursor()
 
 
-def get_file_uuid(ingest_api_url: str, upload_folder, antibody_uuid, file):
+def get_file_uuid(ingest_api_url: str, upload_folder: str, antibody_uuid: str, file) -> str:
     filename = secure_filename(file.filename)
     file.save(os.path.join(upload_folder, filename))
     req = requests.post(
@@ -254,39 +272,31 @@ def insert_query():
     return '''
 INSERT INTO antibodies (
     antibody_uuid,
-    protocols_io_doi,
-    uniprot_accession_number,
-    target_name, rrid,
-    antibody_name, host_organism,
-    clonality, vendor_id,
-    catalog_number, lot_number,
-    recombinant, organ_or_tissue,
-    hubmap_platform, submitter_orcid,
+    protocols_doi, uniprot_accession_number,
+    target_name, rrid, host, clonality, vendor_id,
+    catalog_number, lot_number, recombinant, organ,
+    method, author_orcid, hgnc_id, isotype,
+    concentration_value, dilution, conjugate,
+    tissue_preservation, cycle_number, fluorescent_reporter,
+    manuscript_doi, vendor_affiliation, organ_uberon,
+    antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
     created_by_user_sub, group_uuid
 ) 
 VALUES (
     %(antibody_uuid)s,
-    %(protocols_io_doi)s,
-    %(uniprot_accession_number)s,
-    %(target_name)s,
-    %(rrid)s,
-    %(antibody_name)s,
-    %(host_organism)s,
-    %(clonality)s,
-    %(vendor_id)s,
-    %(catalog_number)s,
-    %(lot_number)s,
-    %(recombinant)s,
-    %(organ_or_tissue)s,
-    %(hubmap_platform)s,
-    %(submitter_orcid)s,
+    %(protocols_doi)s, %(uniprot_accession_number)s,
+    %(target_name)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
+    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
+    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
-    %(created_by_user_displayname)s,
-    %(created_by_user_email)s,
-    %(created_by_user_sub)s,
-    %(group_uuid)s
+    %(created_by_user_displayname)s, %(created_by_user_email)s,
+    %(created_by_user_sub)s, %(group_uuid)s
 ) RETURNING id
 '''
 
@@ -295,51 +305,33 @@ def insert_query_with_avr_file_and_uuid():
     return '''
 INSERT INTO antibodies (
     antibody_uuid,
-    avr_uuid,
-    avr_filename,
-    protocols_io_doi,
-    uniprot_accession_number,
-    target_name,
-    rrid,
-    antibody_name,
-    host_organism,
-    clonality,
-    vendor_id,
-    catalog_number,
-    lot_number,
-    recombinant,
-    organ_or_tissue,
-    hubmap_platform,
-    submitter_orcid,
+    avr_pdf_uuid, avr_pdf_filename,
+    protocols_doi, uniprot_accession_number,
+    target_name, rrid, host, clonality, vendor_id,
+    catalog_number, lot_number, recombinant, organ,
+    method, author_orcid, hgnc_id, isotype,
+    concentration_value, dilution, conjugate,
+    tissue_preservation, cycle_number, fluorescent_reporter,
+    manuscript_doi, vendor_affiliation, organ_uberon,
+    antigen_retrieval, omap_id,
     created_timestamp,
-    created_by_user_displayname,
-    created_by_user_email,
-    created_by_user_sub,
-    group_uuid
+    created_by_user_displayname, created_by_user_email,
+    created_by_user_sub, group_uuid
 ) 
 VALUES (
     %(antibody_uuid)s,
-    %(avr_uuid)s,
-    %(avr_filename)s,
-    %(protocols_io_doi)s,
-    %(uniprot_accession_number)s,
-    %(target_name)s,
-    %(rrid)s,
-    %(antibody_name)s,
-    %(host_organism)s,
-    %(clonality)s,
-    %(vendor_id)s,
-    %(catalog_number)s,
-    %(lot_number)s,
-    %(recombinant)s,
-    %(organ_or_tissue)s,
-    %(hubmap_platform)s,
-    %(submitter_orcid)s,
+    %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
+    %(protocols_doi)s, %(uniprot_accession_number)s,
+    %(target_name)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
+    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
+    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
-    %(created_by_user_displayname)s,
-    %(created_by_user_email)s,
-    %(created_by_user_sub)s,
-    %(group_uuid)s
+    %(created_by_user_displayname)s, %(created_by_user_email)s,
+    %(created_by_user_sub)s, %(group_uuid)s
 ) RETURNING id
 '''
 

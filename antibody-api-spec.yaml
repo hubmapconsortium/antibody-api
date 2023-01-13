@@ -32,9 +32,6 @@ components:
         rrid:
           type: string
           description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)."
-        antibody_name:
-          type: string
-          description: "The antibody's name."
         host_organism:
           type: string
           description: "The antibody's host organism."

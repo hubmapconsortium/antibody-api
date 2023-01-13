@@ -1,13 +1,13 @@
-from flask import abort, Blueprint, current_app, jsonify, make_response, request, session
-from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
+from flask import Blueprint, current_app, jsonify, make_response
 from antibodyapi.utils import (
     base_antibody_query, base_antibody_query_result_to_json, get_cursor
 )
 from antibodyapi.utils.elasticsearch import index_antibody
 import elasticsearch
 
-
 restore_elasticsearch_blueprint = Blueprint('restore_elasticsearch', __name__)
+
+
 @restore_elasticsearch_blueprint.route('/restore_elasticsearch', methods=['PUT'])
 def restore_elasticsearch():
     # Delete the index...

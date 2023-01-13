@@ -13,7 +13,8 @@ fi
 
 export PGPASSWORD=$DATABASE_PASSWORD
 psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -c "DROP TABLE IF EXISTS antibodies, vendors"
-psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -f ../development/postgresql_init_scripts/create_tables.sql
+psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -f development/postgresql_init_scripts/create_tables.sql
 
+# TODO: FIX THIS!
 # Rebuild the index
-curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
+# curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"

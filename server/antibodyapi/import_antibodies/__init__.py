@@ -14,6 +14,7 @@ from antibodyapi.utils import (
 )
 from antibodyapi.utils.validation import validate_antibodycsv
 from antibodyapi.utils.elasticsearch import index_antibody
+import string
 import logging
 
 
@@ -24,8 +25,19 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
 logger = logging.getLogger(__name__)
 
 
+def only_printable(s: str) -> str:
+    # This does not work because (apparently) the TM symbol is a unicode character.
+    # s.encode('utf-8', errors='ignore').decode('utf-8')
+    # So, we use the more restrictive string.printable which does not contain unicode characters.
+    return ''.join(c for c in s if c in string.printable)
+
+
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
 def import_antibodies(): # pylint: disable=too-many-branches
+    """
+    Currently this is called from 'server/antibodyapi/hubmap/templates/base.html' through the
+    <form onsubmit="AJAXSubmit(this);..." enctype="..." action="/antibodies/import" method="post" ...>
+    """
     authenticated = session.get('is_authenticated')
     if not authenticated:
         return redirect(url_for('login'))
@@ -37,10 +49,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
     cur = get_cursor(app)
     uuids_and_names = []
 
-    group_id = get_group_id(
-        app.config['INGEST_API_URL'], request.form.get('group_id')
-    )
-
+    group_id = get_group_id(app.config['INGEST_API_URL'], request.form.get('group_id'))
     if group_id is None:
         abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
@@ -56,6 +65,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                 antibodycsv = csv.DictReader(csvfile, delimiter=',')
                 row_i = 1
                 for row in antibodycsv:
+                    # silently drop any non-printable characters like Trademark symbols from Excel documents
+                    row = {k: only_printable(v) for (k, v) in row.items()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
@@ -68,23 +79,25 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
                     row['group_uuid'] = group_id
+                    # do an auto lower case on anything is 'true' or 'false' as Excel likes
+                    # all uppercase and people seem to use Excel to make the .csv files
+                    row['recombinant'] = row['recombinant'].lower()
                     query = insert_query()
-                    if 'avr_filename' in row.keys():
+                    if 'avr_pdf_filename' in row.keys():
                         if 'pdf' in request.files:
                             for avr_file in request.files.getlist('pdf'):
-                                if avr_file.filename == row['avr_filename']:
-                                    row['avr_uuid'] = get_file_uuid(
+                                if avr_file.filename == row['avr_pdf_filename']:
+                                    row['avr_pdf_uuid'] = get_file_uuid(
                                         app.config['INGEST_API_URL'],
                                         app.config['UPLOAD_FOLDER'],
                                         row['antibody_uuid'],
                                         avr_file
                                     )
                                     query = insert_query_with_avr_file_and_uuid()
-                                    row['avr_filename'] = secure_filename(row['avr_filename'])
+                                    row['avr_pdf_filename'] = secure_filename(row['avr_pdf_filename'])
                     try:
                         cur.execute(query, row)
                         uuids_and_names.append({
-                            'antibody_name': row['antibody_name'],
                             'antibody_uuid': row['antibody_uuid']
                         })
                         index_antibody(row | {'vendor': vendor})

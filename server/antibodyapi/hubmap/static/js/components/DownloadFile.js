@@ -29,8 +29,8 @@ class DownloadFile extends SearchkitComponent {
             if (display[key] == 'table-cell') _source.push(key);
         })
         query._source = _source;
-        if (this.avr_file_as_url && _source.includes('avr_filename')) {
-            query._source = _source.concat('avr_uuid');
+        if (this.avr_file_as_url && _source.includes('avr_pdf_filename')) {
+            query._source = _source.concat('avr_pdf_uuid');
         }
 
         console.info('query string for .csv file data: ', query);
@@ -59,8 +59,8 @@ class DownloadFile extends SearchkitComponent {
                     var line = [];
                     _source.forEach((key) => {
                         let item_source = item._source[key];
-                        if (this.avr_file_as_url && key == 'avr_filename') {
-                            item_source = assets_url + '/' + item._source['avr_uuid'] + '/' + item_source;
+                        if (this.avr_file_as_url && key == 'avr_pdf_filename') {
+                            item_source = assets_url + '/' + item._source['avr_pdf_uuid'] + '/' + item_source;
                             item_source = item_source.replace(/,/g, '%2C');
                         }
                         // so the right number of commas show up in the .csv file...

@@ -53,3 +53,7 @@ server/*.egg-info
 instance/
 
 **/venv/
+
+server/BUILD
+server/VERSION
+BUILD

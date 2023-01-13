@@ -28,19 +28,19 @@ class TestPostCSVFile(AntibodyTesting):
     @classmethod
     def get_antibody_file_name(cls, cursor, uuid):
         cursor.execute(
-            'SELECT avr_filename FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
+            'SELECT avr_pdf_filename FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
             { 'antibody_uuid': uuid }
         )
         try:
-            avr_filename = cursor.fetchone()[0]
+            avr_pdf_filename = cursor.fetchone()[0]
         except: # pylint: disable=bare-except
-            avr_filename = None
-        return avr_filename
+            avr_pdf_filename = None
+        return avr_pdf_filename
 
     @classmethod
     def get_antibody_file_uuid(cls, cursor, uuid):
         cursor.execute(
-            'SELECT avr_uuid FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
+            'SELECT avr_pdf_uuid FROM antibodies WHERE antibody_uuid = %(antibody_uuid)s',
             { 'antibody_uuid': uuid }
         )
         return cursor.fetchone()[0]
@@ -92,7 +92,7 @@ class TestPostCSVFile(AntibodyTesting):
                         'contentType': 'application/json',
                         'json': json.dumps({
                             'file_uuid': antibody['_pdf_uuid'],
-                            'filename': antibody['avr_filename']
+                            'filename': antibody['avr_pdf_filename']
                         })
                     }
                 },
@@ -410,7 +410,7 @@ class TestPostCSVFile(AntibodyTesting):
         data = {'file': (io.BytesIO(csv_file_with_random_avr_filenames), 'antibodies.csv')}
         pdf_files = []
         for antibody in antibody_data_multiple_with_pdfs['antibody']:
-            pdf_files.append((io.BytesIO(self.create_pdf()), antibody['avr_filename']))
+            pdf_files.append((io.BytesIO(self.create_pdf()), antibody['avr_pdf_filename']))
         data['pdf'] = pdf_files
         return data
 
@@ -520,7 +520,7 @@ class TestPostCSVFile(AntibodyTesting):
     ):
         """ Posting PDF files should get them saved"""
         for antibody in antibody_data_multiple_with_pdfs['antibody']:
-            assert antibody['avr_filename'] == self.get_antibody_file_name(
+            assert antibody['avr_pdf_filename'] == self.get_antibody_file_name(
                 cursor, antibody['_antibody_uuid']
             )
             assert antibody['_pdf_uuid'] == self.get_antibody_file_uuid(

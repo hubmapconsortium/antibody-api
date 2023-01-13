@@ -15,25 +15,38 @@ def index_antibody(antibody: dict):
     logger.info(f"*** Indexing: {antibody}")
     doc = {
         'antibody_uuid': antibody['antibody_uuid'],
-        'protocols_io_doi': antibody['protocols_io_doi'],
+        'protocols_doi': antibody['protocols_doi'],
+        'manuscript_doi': antibody['manuscript_doi'],
         'uniprot_accession_number': antibody['uniprot_accession_number'],
         'target_name': antibody['target_name'],
         'rrid': antibody['rrid'],
-        'antibody_name': antibody['antibody_name'],
-        'host_organism': antibody['host_organism'],
+        'host': antibody['host'],
         'clonality': antibody['clonality'],
         'vendor': antibody['vendor'],
         'catalog_number': antibody['catalog_number'],
         'lot_number': antibody['lot_number'],
         'recombinant': antibody['recombinant'],
-        'organ_or_tissue': antibody['organ_or_tissue'],
-        'hubmap_platform': antibody['hubmap_platform'],
-        'submitter_orcid': antibody['submitter_orcid'],
+        'organ': antibody['organ'],
+        'organ_uberon': antibody['organ_uberon'],
+        'omap_id': antibody['omap_id'],
+        'antigen_retrieval': antibody['antigen_retrieval'],
+        'hgnc_id': antibody['hgnc_id'],
+        'isotype': antibody['isotype'],
+        'concentration_value': antibody['concentration_value'],
+        'dilution': antibody['dilution'],
+        'conjugate': antibody['conjugate'],
+        'method': antibody['method'],
+        'tissue_preservation': antibody['tissue_preservation'],
+        'cycle_number': antibody['cycle_number'],
+        'fluorescent_reporter': antibody['fluorescent_reporter'],
+        'author_orcid': antibody['author_orcid'],
+        'vendor_affiliation': antibody['vendor_affiliation'],
+        'created_by_user_displayname': antibody['created_by_user_displayname'],
         'created_by_user_email': antibody['created_by_user_email']
     }
-    if 'avr_uuid' in antibody and 'avr_filename' in antibody and antibody['avr_filename'] != '':
-        doc['avr_uuid'] = antibody['avr_uuid']
-        doc['avr_filename'] = antibody['avr_filename']
+    if 'avr_pdf_uuid' in antibody and 'avr_pdf_filename' in antibody and antibody['avr_pdf_filename'] != '':
+        doc['avr_pdf_uuid'] = antibody['avr_pdf_uuid']
+        doc['avr_pdf_filename'] = antibody['avr_pdf_filename']
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     es_conn.index(index=antibody_elasticsearch_index, body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 
@@ -52,6 +65,7 @@ def execute_query_through_search_api(query):
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     # https://smart-api.info/ui/7aaf02b838022d564da776b03f357158#/search_by_index/search-post-by-index
     url: str = f"{searchapi_base_url}/{antibody_elasticsearch_index}/search"
+    logger.debug(f'execute_query_through_search_api() URL: {url}')
     response = requests.post(url, headers={"Content-Type": "application/json"}, json=query)
 
     if response.status_code != 200:
