@@ -122,11 +122,11 @@ def validate_row_data(row_i: int, row: dict) -> None:
 
     dilution_re: re.Pattern = re.compile('^[0-9]+:[0-9]+$')
     if row['dilution'] != '' and dilution_re.match(row['dilution']) is None:
-        abort(json_error(f"CSV file row# {row_i}: dilution '{row['dilution']}' must be of the form N:N+ (e.g. 1:100, 1:50,1:2000)", 406))
+        abort(json_error(f"CSV file row# {row_i}: dilution '{row['dilution']}' must be of the form <integer>:<integer> (e.g. 1:100, 1:50, 1:2000)", 406))
 
     omap_id_re: re.Pattern = re.compile('^OMAP-[1-9][0-9]*$')
     if row['omap_id'] != '' and omap_id_re.match(row['omap_id']) is None:
-        abort(json_error(f"CSV file row# {row_i}: omap_id '{row['omap_id']}' must be of the form OMAP-<number> (e.g. OMAP-1, OMAP-2) ", 406))
+        abort(json_error(f"CSV file row# {row_i}: omap_id '{row['omap_id']}' must be of the form OMAP-<integer> (e.g. OMAP-1, OMAP-2, ..., OMAP-n) ", 406))
 
 
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
