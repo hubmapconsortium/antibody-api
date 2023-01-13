@@ -1,7 +1,7 @@
 <!DOCTYPE html>
   <html>
   <head>
-    <title>HuBMAP AVR Upload</title>
+    <title>HuBMAP AVR Upload (v2)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
@@ -37,13 +37,13 @@
               </p>
               <p class="leading-relaxed text-base">
                   To upload a report, follow the steps outlined in the
-                  <a href="https://software.docs.hubmapconsortium.org/avr/avr-upload.html" target="_blank">Uploading new reports</a>
+                  <a href="https://software.docs.hubmapconsortium.org/avr/avr-upload-v2.html" target="_blank">Uploading new reports</a>
                   documentation.
                   You will need to create a .csv file according to the
-                  <a href="https://software.docs.hubmapconsortium.org/avr/csv-format.html" target="_blank">CSV Structure</a>
+                  <a href="https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html" target="_blank">CSV Structure</a>
                   documentation.
                   We have also provided a
-                  <a href="https://software.docs.hubmapconsortium.org/avr/avr-template.csv" target="_blank">template csv file</a>
+                  <a href="https://software.docs.hubmapconsortium.org/avr/avr-template-v2.csv" target="_blank">template csv file</a>
                   to get you started.
               </p>
           </div>
@@ -55,10 +55,26 @@
                 <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
                   <p>
                       Upload a single csv file describing the AVRs being uploaded (see
-                      <a href="https://software.docs.hubmapconsortium.org/avr/avr-upload.html" target="_blank">Uploading new reports</a>
+                      <a href="https://software.docs.hubmapconsortium.org/avr/avr-upload-v2.html" target="_blank">Uploading new reports</a>
                       and
-                      <a href="https://software.docs.hubmapconsortium.org/avr/csv-format.html" target="_blank">CSV Structure</a>
+                      <a href="https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html" target="_blank">CSV Structure</a>
                       ).
+                  </p>
+                  <p>
+                      In addition to checking that required fields are not empty, the following fields are checked as follows:
+                      <ol>
+                        <li><b>recombinant:</b> must be one of: yes,  no</li>
+                        <li><b>valid_clonality:</b> must be one of: polyclonal, oligoclonal, monoclonal</li>
+                        <li><b>concentration_value:</b> must be a float</li>
+                        <li><b>dilution:</b> must be of the form n:n (e.g. 1:100, 1:50, 1:2000)</li>
+                        <li><b>omap_id:</b> must be of the form OMAP-n (e.g. OMAP-1, OMAP-2, ..., OMAP-n)</li>
+                        <li><b>rrid(s):</b> are checked against scicrunch.org</li>
+                        <li><b>doi(s):</b> are checked against doi.org</li>
+                        <li><b>hgnc(s):</b> are checked against genenames.org</li>
+                        <li><b>ontology(s):</b> are checked against www.ebi.ac.uk</li>
+                        <li><b>orcid(s):</b> are checked against pub.orcid.org</li>
+                        <li><b>uniprot#(s):</b> are checked against www.uniprot.org</li>
+                      </ol>
                   </p>
                   <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="" required="" />
               </div>
