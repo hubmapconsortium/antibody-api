@@ -129,6 +129,37 @@ def validate_row_data(row_i: int, row: dict) -> None:
         abort(json_error(f"CSV file row# {row_i}: omap_id '{row['omap_id']}' must be of the form OMAP-<integer> (e.g. OMAP-1, OMAP-2, ..., OMAP-n) ", 406))
 
 
+def validate_protein_name(row_i: int, protein_name: str, primary_accession: str) -> None:
+    """
+    https://www.uniprot.org/help/api_queries
+    """
+    try:
+        protein_name_url_encoded: str = protein_name.replace(' ', '%20')
+        uniprot_rest_url: str = f"https://rest.uniprot.org/uniprotkb/search?query=protein_name:{protein_name_url_encoded}"
+        logger.debug(f'validate_protein_name() URL: {uniprot_rest_url}')
+        response = requests.get(uniprot_rest_url, headers={"Accept": "application/json"}, verify=False)
+        if response.status_code == 200:
+            response_json: dict = response.json()
+            response_results: List[dict] = response_json.get('results')
+            entry_list: List[dict] = [e for e in response_results if e.get('primaryAccession') == primary_accession]
+            if len(entry_list) == 1:
+                primary_accession_entry: dict = entry_list[0]
+                logger.debug(f'validate_protein_name() entry: {primary_accession_entry}')
+                if 'proteinDescription' in primary_accession_entry and \
+                    'recommendedName' in primary_accession_entry['proteinDescription'] and \
+                    'fullName' in primary_accession_entry['proteinDescription']['recommendedName'] and \
+                    'value' in primary_accession_entry['proteinDescription']['recommendedName']['fullName'] and \
+                    primary_accession_entry['proteinDescription']['recommendedName']['fullName']['value'] == protein_name:
+                    return
+        abort(json_error(f"CSV file row# {row_i}: Protein Name '{protein_name}' is not found in catalogue associated with uniprot_accession_number '{primary_accession}'", 406))
+    except requests.ConnectionError as error:
+        # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Protein Name '{protein_name}'", 406))
+    finally:
+        if response is not None:
+            response.close()
+
+
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
     try:
         uniprot_url: str = f"https://www.uniprot.org/uniprot/{uniprot_accession_number}.rdf?include=yes "
@@ -290,12 +321,13 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
 
     # All of these make callouts to other RestAPIs...
     validate_uniprot_accession_number(row_i, row['uniprot_accession_number'])
-    validate_orcid(row_i, row['author_orcid'])
+    validate_hgnc(row_i, row['hgnc_id'])
+    validate_protein_name(row_i, row['target_name'], row['uniprot_accession_number'])
     validate_rrid(row_i, row['rrid'])
     validate_doi(row_i, row['protocols_doi'])
-    validate_doi(row_i, row['manuscript_doi'])
+    validate_orcid(row_i, row['author_orcid'])
     validate_ontology(row_i, row['organ_uberon'])
-    validate_hgnc(row_i, row['hgnc_id'])
+    validate_doi(row_i, row['manuscript_doi'])
 
     return found_pdf
 

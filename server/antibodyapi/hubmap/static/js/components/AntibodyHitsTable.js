@@ -14,7 +14,7 @@ class AntibodyHitsTable extends React.Component {
       antibodies += `<tr key=${hit._id}>`;
       antibodies += `<td class="host_col">${hit._source.host}</td>`;
       antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
-      antibodies += `<td class="target_name_col">${hit._source.target_name}</td>`;
+      antibodies += '<td class="target_name_col" style="display:'+display.target_name+`"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_name}%22)%20AND%20(accession:${hit._source.uniprot_accession_number})" target="_blank">${hit._source.target_name}</a></td>`;
       antibodies += `<td class="avr_pdf_filename_col">`;
       if (hit._source.avr_pdf_filename != undefined) {
         antibodies += `<a href="${assets_url}/${hit._source.avr_pdf_uuid}/${hit._source.avr_pdf_filename}" target="_blank">${hit._source.avr_pdf_filename}</a>`;

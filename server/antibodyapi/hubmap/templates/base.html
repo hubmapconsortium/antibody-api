@@ -63,17 +63,18 @@
                   <p>
                       In addition to checking that required fields are not empty, the following fields are checked as follows:
                       <ol>
-                        <li><b>recombinant:</b> must be one of: yes,  no</li>
+                        <li><b>recombinant:</b> must be one of: yes, no</li>
                         <li><b>valid_clonality:</b> must be one of: polyclonal, oligoclonal, monoclonal</li>
                         <li><b>concentration_value:</b> must be a float</li>
                         <li><b>dilution:</b> must be of the form n:n (e.g. 1:100, 1:50, 1:2000)</li>
                         <li><b>omap_id:</b> must be of the form OMAP-n (e.g. OMAP-1, OMAP-2, ..., OMAP-n)</li>
-                        <li><b>rrid(s):</b> are checked against scicrunch.org</li>
+                        <li><b>uniprot_accession_number:</b> is checked against www.uniprot.org</li>
+                        <li><b>hgnc_id:</b> is checked against genenames.org</li>
+                        <li><b>target_name:</b> is checked against www.uniprot.org</li>
+                        <li><b>rrid:</b> is checked against scicrunch.org</li>
                         <li><b>doi(s):</b> are checked against doi.org</li>
-                        <li><b>hgnc(s):</b> are checked against genenames.org</li>
-                        <li><b>ontology(s):</b> are checked against www.ebi.ac.uk</li>
-                        <li><b>orcid(s):</b> are checked against pub.orcid.org</li>
-                        <li><b>uniprot#(s):</b> are checked against www.uniprot.org</li>
+                        <li><b>author_orcid:</b> is checked against pub.orcid.org</li>
+                        <li><b>organ_uberon:</b> is checked against www.ebi.ac.uk</li>
                       </ol>
                   </p>
                   <input accept=".csv" name="file" multiple="multiple" type="file" id="fileInput" class="" required="" />
