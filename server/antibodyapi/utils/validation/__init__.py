@@ -264,7 +264,7 @@ def validate_hgnc(row_i: int, hgnc: str) -> None:
             response.close()
 
 
-def validate_ontology(row_i: int, ontology_id: str) -> None:
+def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
     """
     https://www.ebi.ac.uk/ols/docs/api
     Ontology Search API
@@ -284,6 +284,14 @@ def validate_ontology(row_i: int, ontology_id: str) -> None:
         total_elements: int = response_json['page']['totalElements']
         if response.status_code != 200 or total_elements <= 0:
             abort(json_error(f"CSV file row# {row_i}: Ontology ID '{ontology_id}' is not found", 406))
+        if '_embedded' in response_json and 'terms' in response_json['_embedded']:
+            terms: List[dict] = response_json['_embedded']['terms']
+            for term in terms:
+                if 'annotation' in term and \
+                    'has_related_synonym' in term['annotation'] and \
+                    name in term['annotation']['has_related_synonym']:
+                    return
+        abort(json_error(f"CSV file row# {row_i}: Ontology ID '{ontology_id}'; related_synonym for '{name}' not found", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
@@ -326,7 +334,7 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
     validate_rrid(row_i, row['rrid'])
     validate_doi(row_i, row['protocols_doi'])
     validate_orcid(row_i, row['author_orcid'])
-    validate_ontology(row_i, row['organ_uberon'])
+    validate_ontology(row_i, row['organ_uberon'], row['organ'])
     validate_doi(row_i, row['manuscript_doi'])
 
     return found_pdf
