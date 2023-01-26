@@ -1,4 +1,5 @@
 import React from 'react';
+import Collapsible from 'react-collapsible';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
@@ -217,6 +218,35 @@ function Search(props) {
           size={10} limit={10}
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
+
+        <h3>Additional Columns</h3>
+
+        <Checkbox element="rrid" label="RRID"/>
+        <Checkbox element="clonality" label="Clonality"/>
+        <Checkbox element="catalog_number" label="Catalog#"/>
+        <Checkbox element="lot_number" label="Lot#"/>
+        <Checkbox element="vendor_name" label="Vendor"/>
+        <Checkbox element="recombinant" label="Recombinant"/>
+        <Checkbox element="organ" label="Organ"/>
+        <Checkbox element="method" label="Method"/>
+        <Checkbox element="author_orcid" label="Author ORCiD iD"/>
+
+        <Checkbox element="hgnc_id" label="HGNC ID"/>
+        <Checkbox element="isotype" label="Isotype"/>
+        <Checkbox element="concentration_value" label="Concentration"/>
+        <Checkbox element="dilution" label="Dilution"/>
+        <Checkbox element="conjugate" label="Conjugate"/>
+        <Checkbox element="tissue_preservation" label="Tissue Preservation"/>
+        <Checkbox element="cycle_number" label="Cycle#"/>
+        <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
+        <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
+        <Checkbox element="protocols_doi" label="Protocols DOI"/>
+        <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
+        <Checkbox element="organ_uberon" label="Organ UBERON"/>
+        <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
+        <Checkbox element="omap_id" label="OMAP"/>
+
+        <Checkbox element="created_by_user_email" label="Submitter Email"/>
       </SideBar>
 
       <LayoutResults>
@@ -231,40 +261,6 @@ function Search(props) {
           </ActionBarRow>
 
         </ActionBar>
-
-        <table>
-            <thead>
-                <tr>
-                    <td><b>Additional Columns:</b></td>
-                    <td><Checkbox element="rrid" label="RRID"/></td>
-                    <td><Checkbox element="clonality" label="Clonality"/></td>
-                    <td><Checkbox element="catalog_number" label="Catalog#"/></td>
-                    <td><Checkbox element="lot_number" label="Lot#"/></td>
-                    <td><Checkbox element="vendor_name" label="Vendor"/></td>
-                    <td><Checkbox element="recombinant" label="Recombinant"/></td>
-                    <td><Checkbox element="organ" label="Organ"/></td>
-                    <td><Checkbox element="method" label="Method"/></td>
-                    <td><Checkbox element="author_orcid" label="Author ORCiD iD"/></td>
-
-                    <td><Checkbox element="hgnc_id" label="HGNC ID"/></td>
-                    <td><Checkbox element="isotype" label="Isotype"/></td>
-                    <td><Checkbox element="concentration_value" label="Concentration"/></td>
-                    <td><Checkbox element="dilution" label="Dilution"/></td>
-                    <td><Checkbox element="conjugate" label="Conjugate"/></td>
-                    <td><Checkbox element="tissue_preservation" label="Tissue Preservation"/></td>
-                    <td><Checkbox element="cycle_number" label="Cycle#"/></td>
-                    <td><Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/></td>
-                    <td><Checkbox element="manuscript_doi" label="Manuscript DOI"/></td>
-                    <td><Checkbox element="protocols_doi" label="Protocols DOI"/></td>
-                    <td><Checkbox element="vendor_affiliation" label="Vendor Affiliation"/></td>
-                    <td><Checkbox element="organ_uberon" label="Organ UBERON"/></td>
-                    <td><Checkbox element="antigen_retrieval" label="Antigen Retrieval"/></td>
-                    <td><Checkbox element="omap_id" label="OMAP"/></td>
-
-                    <td><Checkbox element="created_by_user_email" label="Submitter Email"/></td>
-                </tr>
-            </thead>
-        </table>
 
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
