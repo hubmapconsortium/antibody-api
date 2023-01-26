@@ -68,7 +68,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="method_col_head" style={{"display": display.method}}>Method</th>
               <th id="author_orcid_col_head" style={{"display": display.author_orcid}}>Author ORCiD iD</th>
 
-              <th id="hgnc_id_col_head" style={{"display": display.hgnc_id}}>HGNC iD</th>
+              <th id="hgnc_id_col_head" style={{"display": display.hgnc_id}}>HGNC ID</th>
               <th id="isotype_col_head" style={{"display": display.isotype}}>Isotype</th>
               <th id="concentration_value_col_head" style={{"display": display.concentration_value}}>Concentration</th>
               <th id="dilution_col_head" style={{"display": display.dilution}}>Dilution</th>
@@ -80,7 +80,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="protocols_doi_col_head" style={{"display": display.protocols_doi}}>Protocols DOI</th>
               <th id="vendor_affiliation_col_head" style={{"display": display.vendor_affiliation}}>Vendor Affiliation</th>
               <th id="organ_uberon_col_head" style={{"display": display.organ_uberon}}>Organ UBERON</th>
-              <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>FAntigen Retrieval</th>
+              <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
               <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP</th>
 
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>
