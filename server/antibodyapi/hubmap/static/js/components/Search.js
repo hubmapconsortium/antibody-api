@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
-  HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats,
+  HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
@@ -24,8 +24,15 @@ function Search(props) {
       </a>
       <SearchBox
         autofocus={true}
+        queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
-        prefixQueryFields={["target_name^2","host", "vendor_name", "author_orcid"]}
+        queryFields={[
+            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number","target_name","rrid","host",
+            "clonality","vendor","catalog_number","lot_number","recombinant","organ","organ_uberon","omap_id",
+            "antigen_retrieval","hgnc_id","isotype","concentration_value","dilution","conjugate","method",
+            "tissue_preservation","cycle_number","fluorescent_reporter","author_orcid","vendor_affiliation",
+            "created_by_user_displayname","created_by_user_email","avr_pdf_filename"
+        ]}
         />
       <a href="/upload"
          style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
@@ -39,21 +46,177 @@ function Search(props) {
         <h3>Filters</h3>
 
         <ResetFilters />
-
-        <HierarchicalMenuFilter
-          fields={["target_name.keyword"]}
-          title="Target Name"
-          id="target_names" />
-        <HierarchicalMenuFilter
-          fields={["vendor_name.keyword"]}
-          title="Vendors"
-          id="vendors" />
         <RefinementListFilter
-          id="host_organism"
-          title="Host Organism"
-          field="host_organism.keyword"
+          id="host"
+          title="Host"
+          field="host.keyword"
           operator="OR"
-          size={10} />
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="uniprot_accession_number"
+          title="UniProt#"
+          field="uniprot_accession_number.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="target_name"
+          title="Target Name"
+          field="target_name.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="protocols_doi"
+          title="Protocols DOI"
+          field="protocols_doi.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="rrid"
+          title="RRID"
+          field="rrid.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="clonality"
+          title="Clonality"
+          field="clonality.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="catalog_number"
+          title="Catalog#"
+          field="catalog_number.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="vendor_name"
+          title="Vendor"
+          field="vendor_name.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="recombinant"
+          title="Recombinant"
+          field="recombinant.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="organ"
+          title="Organ"
+          field="organ.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="method"
+          title="Method"
+          field="method.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="author_orcid"
+          title="Author ORCiD iD"
+          field="author_orcid.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="hgnc_id"
+          title="HGNC ID"
+          field="hgnc_id.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="isotype"
+          title="Isotype"
+          field="isotype.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="fluorescent_reporter"
+          title="Fluorescent Reporter"
+          field="fluorescent_reporter.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="manuscript_doi"
+          title="Manuscript DOI"
+          field="manuscript_doi.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="protocols_doi"
+          title="Protocols DOI"
+          field="protocols_doi.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="organ_uberon"
+          title="Organ UBERON"
+          field="organ_uberon.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="omap_id"
+          title="OMAP"
+          field="omap_id.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
       </SideBar>
 
       <LayoutResults>
@@ -83,7 +246,7 @@ function Search(props) {
                     <td><Checkbox element="method" label="Method"/></td>
                     <td><Checkbox element="author_orcid" label="Author ORCiD iD"/></td>
 
-                    <td><Checkbox element="hgnc_id" label="HGNC iD"/></td>
+                    <td><Checkbox element="hgnc_id" label="HGNC ID"/></td>
                     <td><Checkbox element="isotype" label="Isotype"/></td>
                     <td><Checkbox element="concentration_value" label="Concentration"/></td>
                     <td><Checkbox element="dilution" label="Dilution"/></td>
@@ -106,15 +269,7 @@ function Search(props) {
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={[
-              "host", "uniprot_accession_number", "target_name", "rrid", "clonality",
-              "catalog_number", "lot_number", "vendor", "recombinant", "organ", "method",
-              "author_orcid", "hgnc_id", "isotype", "concentration_value", "dilution",
-              "conjugate", "tissue_preservation", "cycle_number", "fluorescent_reporter",
-              "manuscript_doi", "protocols_doi", "vendor_affiliation", "organ_uberon",
-              "antigen_retrieval", "omap_id",
-              "created_by_user_email", "avr_pdf_filename", "avr_pdf_uuid"
-          ]}/>
+          />
         <InitialLoader />
         <NoHits />
 
