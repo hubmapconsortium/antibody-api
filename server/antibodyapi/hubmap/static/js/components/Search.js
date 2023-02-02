@@ -9,6 +9,7 @@ import { Checkbox } from './Checkbox';
 import DownloadFile from './DownloadFile';
 import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
+import CookieConsent from 'react-cookie-consent';
 import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
 function Search(props) {
@@ -27,6 +28,7 @@ function Search(props) {
 
   return(
   <SearchkitProvider searchkit={searchkit}>
+    <CookieConsent>This website uses cookies to enhance the user experience.</CookieConsent>
   <Layout>
     <TopBar>
       <a href="https://portal.hubmapconsortium.org/">
