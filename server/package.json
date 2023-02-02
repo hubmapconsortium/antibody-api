@@ -9,7 +9,8 @@
     "@searchkit/elastic-ui": "^3.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-collapsible": "^2.10.0",
+    "reactjs-popup": "^2.0.5",
+    "react-cookie": "^4.1.1",
     "searchkit": "^2.4.4",
     "trim": "^0.0.3"
   },

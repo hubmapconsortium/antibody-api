@@ -1,5 +1,4 @@
 import React from 'react';
-import Collapsible from 'react-collapsible';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
@@ -8,11 +7,23 @@ import {
 import AntibodyHitsTable from './AntibodyHitsTable';
 import { Checkbox } from './Checkbox';
 import DownloadFile from './DownloadFile';
+import Popup from 'reactjs-popup';
+import { useCookies } from 'react-cookie';
 import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
 function Search(props) {
   const searchkit = new SearchkitManager("/");
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
+  //console.info('Search display: ', display);
+  const [cookies] = useCookies([]);
+  //console.info('Search cookies:', cookies);
+  // cookies override the display defaults of the server
+  for (const [key, value] of Object.entries(cookies)) {
+    if (value==='true') {
+      display[key] = "table-cell";
+    }
+  }
+  //console.info('Search display after cookie set: ', display);
 
   return(
   <SearchkitProvider searchkit={searchkit}>
@@ -219,37 +230,10 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
 
-        <h3>Additional Columns</h3>
-
-        <Checkbox element="rrid" label="RRID"/>
-        <Checkbox element="clonality" label="Clonality"/>
-        <Checkbox element="catalog_number" label="Catalog#"/>
-        <Checkbox element="lot_number" label="Lot#"/>
-        <Checkbox element="vendor_name" label="Vendor"/>
-        <Checkbox element="recombinant" label="Recombinant"/>
-        <Checkbox element="organ" label="Organ"/>
-        <Checkbox element="method" label="Method"/>
-        <Checkbox element="author_orcid" label="Author ORCiD iD"/>
-
-        <Checkbox element="hgnc_id" label="HGNC ID"/>
-        <Checkbox element="isotype" label="Isotype"/>
-        <Checkbox element="concentration_value" label="Concentration"/>
-        <Checkbox element="dilution" label="Dilution"/>
-        <Checkbox element="conjugate" label="Conjugate"/>
-        <Checkbox element="tissue_preservation" label="Tissue Preservation"/>
-        <Checkbox element="cycle_number" label="Cycle#"/>
-        <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
-        <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
-        <Checkbox element="protocols_doi" label="Protocols DOI"/>
-        <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
-        <Checkbox element="organ_uberon" label="Organ UBERON"/>
-        <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
-        <Checkbox element="omap_id" label="OMAP"/>
-
-        <Checkbox element="created_by_user_email" label="Submitter Email"/>
       </SideBar>
 
       <LayoutResults>
+
         <ActionBar>
 
           <ActionBarRow>
@@ -262,6 +246,46 @@ function Search(props) {
 
         </ActionBar>
 
+        <Popup trigger={<button>Configure Columns</button>}
+               modal>
+          {close => (
+              <div className="modal">
+                <button className="close" onClick={close}>
+                  &times;
+                </button>
+                <div className="header"><h3>Additional Columns</h3></div>
+                <div className="content">
+
+                  <Checkbox element="rrid" label="RRID"/>
+                  <Checkbox element="clonality" label="Clonality"/>
+                  <Checkbox element="catalog_number" label="Catalog#"/>
+                  <Checkbox element="lot_number" label="Lot#"/>
+                  <Checkbox element="vendor_name" label="Vendor"/>
+                  <Checkbox element="recombinant" label="Recombinant"/>
+                  <Checkbox element="organ" label="Organ"/>
+                  <Checkbox element="method" label="Method"/>
+                  <Checkbox element="author_orcid" label="Author ORCiD iD"/>
+
+                  <Checkbox element="hgnc_id" label="HGNC ID"/>
+                  <Checkbox element="isotype" label="Isotype"/>
+                  <Checkbox element="concentration_value" label="Concentration"/>
+                  <Checkbox element="dilution" label="Dilution"/>
+                  <Checkbox element="conjugate" label="Conjugate"/>
+                  <Checkbox element="tissue_preservation" label="Tissue Preservation"/>
+                  <Checkbox element="cycle_number" label="Cycle#"/>
+                  <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
+                  <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
+                  <Checkbox element="protocols_doi" label="Protocols DOI"/>
+                  <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
+                  <Checkbox element="organ_uberon" label="Organ UBERON"/>
+                  <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
+                  <Checkbox element="omap_id" label="OMAP"/>
+
+                  <Checkbox element="created_by_user_email" label="Submitter Email"/>
+                </div>
+              </div>
+          )}
+        </Popup>
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
