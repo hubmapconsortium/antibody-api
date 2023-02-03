@@ -222,14 +222,15 @@ function Search(props) {
         </ActionBar>
 
         <Popup trigger={<button>Configure Columns</button>}
+               contentStyle={{width: "280px"}}
                modal>
           {close => (
-              <div className="modal">
+              <div className="modal form-border">
                 <button className="close" onClick={close}>
                   &times;
                 </button>
                 <div className="header"><h3>Additional Columns</h3></div>
-                <div className="content">
+                <div className="content div-border">
 
                   <Checkbox element="rrid" label="RRID"/>
                   <Checkbox element="clonality" label="Clonality"/>
