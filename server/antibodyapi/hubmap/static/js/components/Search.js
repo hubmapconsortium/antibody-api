@@ -70,15 +70,6 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="uniprot_accession_number"
-          title="UniProt#"
-          field="uniprot_accession_number.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="target_name"
           title="Target Name"
           field="target_name.keyword"
@@ -97,27 +88,9 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="rrid"
-          title="RRID"
-          field="rrid.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="clonality"
           title="Clonality"
           field="clonality.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="catalog_number"
-          title="Catalog#"
-          field="catalog_number.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
@@ -249,14 +222,15 @@ function Search(props) {
         </ActionBar>
 
         <Popup trigger={<button>Configure Columns</button>}
+               contentStyle={{width: "280px"}}
                modal>
           {close => (
-              <div className="modal">
+              <div className="modal form-border">
                 <button className="close" onClick={close}>
                   &times;
                 </button>
                 <div className="header"><h3>Additional Columns</h3></div>
-                <div className="content">
+                <div className="content div-border">
 
                   <Checkbox element="rrid" label="RRID"/>
                   <Checkbox element="clonality" label="Clonality"/>
