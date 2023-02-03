@@ -70,15 +70,6 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="uniprot_accession_number"
-          title="UniProt#"
-          field="uniprot_accession_number.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="target_name"
           title="Target Name"
           field="target_name.keyword"
@@ -97,27 +88,9 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="rrid"
-          title="RRID"
-          field="rrid.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="clonality"
           title="Clonality"
           field="clonality.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="catalog_number"
-          title="Catalog#"
-          field="catalog_number.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
