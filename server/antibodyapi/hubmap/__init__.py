@@ -57,6 +57,7 @@ def hubmap_search():
         "cycle_number": "none",
         "fluorescent_reporter": "none",
         "manuscript_doi": "none",
+        "protocols_doi": "none",
         "vendor_affiliation": "none",
         "organ_uberon": "none",
         "antigen_retrieval": "none",
@@ -68,8 +69,8 @@ def hubmap_search():
         "rrid", "clonality", "catalog_number", "lot_number", "vendor_name",
         "recombinant", "organ", "method", "author_orcid", "hgnc_id", "isotype",
         "concentration_value", "dilution", "conjugate", "tissue_preservation",
-        "cycle_number", "fluorescent_reporter", "manuscript_doi", "vendor_affiliation",
-        "organ_uberon", "antigen_retrieval", "omap_id",
+        "cycle_number", "fluorescent_reporter", "manuscript_doi", "protocols_doi",
+        "vendor_affiliation", "organ_uberon", "antigen_retrieval", "omap_id",
         "created_by_user_email"
     ]
     return render_template(

@@ -22,7 +22,7 @@ def index_antibody(antibody: dict):
         'rrid': antibody['rrid'],
         'host': antibody['host'],
         'clonality': antibody['clonality'],
-        'vendor': antibody['vendor'],
+        'vendor_name': antibody['vendor'],
         'catalog_number': antibody['catalog_number'],
         'lot_number': antibody['lot_number'],
         'recombinant': antibody['recombinant'],
