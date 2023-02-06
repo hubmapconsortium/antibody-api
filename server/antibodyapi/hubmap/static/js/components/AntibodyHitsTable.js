@@ -81,7 +81,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="vendor_affiliation_col_head" style={{"display": display.vendor_affiliation}}>Vendor Affiliation</th>
               <th id="organ_uberon_col_head" style={{"display": display.organ_uberon}}>Organ UBERON</th>
               <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
-              <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP</th>
+              <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP ID</th>
 
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>
             </tr>

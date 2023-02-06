@@ -70,24 +70,6 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="target_name"
-          title="Target Name"
-          field="target_name.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="protocols_doi"
-          title="Protocols DOI"
-          field="protocols_doi.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="clonality"
           title="Clonality"
           field="clonality.keyword"
@@ -133,33 +115,6 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="author_orcid"
-          title="Author ORCiD iD"
-          field="author_orcid.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="hgnc_id"
-          title="HGNC ID"
-          field="hgnc_id.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="isotype"
-          title="Isotype"
-          field="isotype.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="fluorescent_reporter"
           title="Fluorescent Reporter"
           field="fluorescent_reporter.keyword"
@@ -169,36 +124,45 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="manuscript_doi"
-          title="Manuscript DOI"
-          field="manuscript_doi.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="protocols_doi"
-          title="Protocols DOI"
-          field="protocols_doi.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="organ_uberon"
-          title="Organ UBERON"
-          field="organ_uberon.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="omap_id"
-          title="OMAP"
+          title="OMAP ID"
           field="omap_id.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="vendor"
+          title="Vendor"
+          field="vendor.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="tissue_preservation"
+          title="Tissue Preservation"
+          field="tissue_preservation.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="conjugate"
+          title="Conjugate"
+          field="conjugate.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="created_by_user_email"
+          title="Submitter Email"
+          field="created_by_user_email.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
@@ -221,7 +185,7 @@ function Search(props) {
 
         </ActionBar>
 
-        <Popup trigger={<button>Configure Columns</button>}
+        <Popup trigger={<button className="button-placement">Configure Columns</button>}
                contentStyle={{width: "280px"}}
                modal>
           {close => (
@@ -255,7 +219,7 @@ function Search(props) {
                   <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
                   <Checkbox element="organ_uberon" label="Organ UBERON"/>
                   <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
-                  <Checkbox element="omap_id" label="OMAP"/>
+                  <Checkbox element="omap_id" label="OMAP ID"/>
 
                   <Checkbox element="created_by_user_email" label="Submitter Email"/>
                 </div>
