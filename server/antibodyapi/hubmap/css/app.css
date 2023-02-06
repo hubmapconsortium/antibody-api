@@ -454,3 +454,9 @@ body{
 [data-popup='tooltip'].popup-overlay {
   background: transparent;
 }
+
+.button-placement {
+  position: relative;
+  float: right;
+  margin-right: 8px;
+}
