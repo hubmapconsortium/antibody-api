@@ -357,7 +357,8 @@ def validate_antibodycsv(request_files: dict) -> list:
             file.stream.seek(0)
             logger.debug(f"validate_antibodycsv: processing filename '{file.filename}' with {len(lines)} lines")
             row_i = 1
-            for row in csv.DictReader(lines, delimiter=','):
+            for row_dr in csv.DictReader(lines, delimiter=','):
+                row = {k.lower(): v for k, v in row_dr.items()}
                 row_i = row_i + 1
                 found_pdf: str = validate_antibodycsv_row(row_i, row, request_files)
                 if found_pdf is not None:

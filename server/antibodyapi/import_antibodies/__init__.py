@@ -62,11 +62,11 @@ def import_antibodies(): # pylint: disable=too-many-branches
             logger.info(f"import_antibodies: processing filename: {filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
-                antibodycsv = csv.DictReader(csvfile, delimiter=',')
                 row_i = 1
-                for row in antibodycsv:
+                for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
-                    row = {k: only_printable(v) for (k, v) in row.items()}
+                    # and make all the keys lowercase so comparison is easy...
+                    row = {k.lower(): only_printable(v) for (k, v) in row_dr.items()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
