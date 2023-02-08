@@ -7,6 +7,9 @@ const SearchPage = () => {
     return <Search />;
 };
 
-ReactDOM.render(<CookiesProvider><SearchPage/></CookiesProvider>,
+ReactDOM.render(
+    <CookiesProvider>
+        <SearchPage/>
+    </CookiesProvider>,
     document.getElementById("render-react-here")
 );

@@ -20,7 +20,6 @@ body {
 }
 
 #navMenu{
-
   display: flex; /* or inline-flex */
   flex-flow: row nowrap; /* is default: columns along the main-axis (row) and no wrapping to next lines */
   align-items: flex-end; /* bottom */

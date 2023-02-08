@@ -16,7 +16,7 @@ function Checkbox(props) {
   const handleChange = () => {
     //console.info(elt, "checked on entry:", checked);
     setChecked(!checked);
-    setCookie(elt, checked?'false':'true', { path: "/" });
+    setCookie(elt, checked?'false':'true', { path: "/", sameSite: 'strict' });
     //console.info('cookie_checked after setCookie: ', cookies[elt]);
     if (checked) {
       display[elt]="none";
