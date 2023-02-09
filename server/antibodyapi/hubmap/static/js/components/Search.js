@@ -12,6 +12,20 @@ import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
+function collapseAllFilters() {
+  const filters_dev = document.querySelectorAll(".sk-layout__filters");
+  const header = filters_dev[0].querySelectorAll(".sk-panel__header.is-collapsable:not(.is-collapsed)")
+  Array.prototype.forEach.call(header, function(f) {
+    f.classList.add("is-collapsed");
+  });
+  const content = filters_dev[0].querySelectorAll(".sk-panel__content:not(.is-collapsed)")
+  Array.prototype.forEach.call(content, function(c) {
+    c.classList.add("is-collapsed");
+  });
+  //Array.prototype.forEach.call(filters_dev, function(h) {h.forceUpdate()});
+  window.location.reload();
+}
+
 function Search(props) {
   const searchkit = new SearchkitManager("/");
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
@@ -59,6 +73,7 @@ function Search(props) {
       <SideBar>
         <h3>Filters</h3>
 
+        <button onClick={collapseAllFilters}>Collapse All Filters</button>
         <ResetFilters />
         <RefinementListFilter
           id="host"

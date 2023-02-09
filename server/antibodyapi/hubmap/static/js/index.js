@@ -7,7 +7,10 @@ const SomePage = () => {
     return <SomeComponent />;
 };
 
-ReactDOM.render(<CookiesProvider><SomePage /></CookiesProvider>,
+ReactDOM.render(
+    <CookiesProvider>
+        <SomePage />
+    </CookiesProvider>,
     document.getElementById("render-react-here")
 );
 
