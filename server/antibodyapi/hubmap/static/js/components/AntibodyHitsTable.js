@@ -30,7 +30,6 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="vendor_name_col" style="display:'+display.vendor_name+`;">${hit._source.vendor_name}</td>`;
       antibodies += '<td class="recombinant_col" style="display:'+display.recombinant+`;">${hit._source.recombinant}</td>`;
       antibodies += '<td class="organ_col" style="display:'+display.organ+`;">${hit._source.organ}</td>`;
-      antibodies += '<td class="method_col" style="display:'+display.method+`;">${hit._source.method}</td>`;
       antibodies += '<td class="author_orcid_col" style="display:'+display.author_orcid+`;"><a href="https://orcid.org/${hit._source.author_orcid}" target="_blank">${hit._source.author_orcid}</a></td>`;
       antibodies += '<td class="hgnc_id_col" style="display:'+display.hgnc_id+`"><a href="https://www.genenames.org/tools/search/#!/?query=${hit._source.hgnc_id}" target="_blank">${hit._source.hgnc_id}</a></td>`;
       antibodies += '<td class="isotype_col" style="display:'+display.isotype+`;">${hit._source.isotype}</td>`;
