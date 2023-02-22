@@ -35,25 +35,26 @@ def hubmap_search():
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
     display: dict = {
-        "host": "table-cell",
-        "uniprot_accession_number": "table-cell",
         "target_name": "table-cell",
+        "uniprot_accession_number": "table-cell",
+        "clonality": "table-cell",
+        "method": "table-cell",
+        "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
+
+        "host": "none",
         "rrid": "none",
-        "clonality": "none",
         "catalog_number": "none",
         "lot_number": "none",
         "vendor_name": "none",
         "recombinant": "none",
         "organ": "none",
-        "method": "none",
         "author_orcid": "none",
         "hgnc_id": "none",
         "isotype": "none",
         "concentration_value": "none",
         "dilution": "none",
         "conjugate": "none",
-        "tissue_preservation": "none",
         "cycle_number": "none",
         "fluorescent_reporter": "none",
         "manuscript_doi": "none",
@@ -65,11 +66,12 @@ def hubmap_search():
         "created_by_user_email": "none"
     }
     csv_column_order: list = [
-        "host", "uniprot_accession_number", "target_name", "avr_pdf_filename",
-        "rrid", "clonality", "catalog_number", "lot_number", "vendor_name",
-        "recombinant", "organ", "method", "author_orcid", "hgnc_id", "isotype",
-        "concentration_value", "dilution", "conjugate", "tissue_preservation",
-        "cycle_number", "fluorescent_reporter", "manuscript_doi", "protocols_doi",
+        "target_name", "uniprot_accession_number", "clonality", "method", "tissue_preservation", "avr_pdf_filename",
+
+        "host", "rrid", "catalog_number", "lot_number", "vendor_name",
+        "recombinant", "organ", "author_orcid", "hgnc_id", "isotype",
+        "concentration_value", "dilution", "conjugate", "cycle_number",
+        "fluorescent_reporter", "manuscript_doi", "protocols_doi",
         "vendor_affiliation", "organ_uberon", "antigen_retrieval", "omap_id",
         "created_by_user_email"
     ]

@@ -130,24 +130,6 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="fluorescent_reporter"
-          title="Fluorescent Reporter"
-          field="fluorescent_reporter.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="omap_id"
-          title="OMAP ID"
-          field="omap_id.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="vendor"
           title="Vendor"
           field="vendor.keyword"
@@ -169,15 +151,6 @@ function Search(props) {
           id="conjugate"
           title="Conjugate"
           field="conjugate.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="created_by_user_email"
-          title="Submitter Email"
-          field="created_by_user_email.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
@@ -211,22 +184,19 @@ function Search(props) {
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 
+                  <Checkbox element="host" label="Host"/>
                   <Checkbox element="rrid" label="RRID"/>
-                  <Checkbox element="clonality" label="Clonality"/>
                   <Checkbox element="catalog_number" label="Catalog#"/>
                   <Checkbox element="lot_number" label="Lot#"/>
                   <Checkbox element="vendor_name" label="Vendor"/>
                   <Checkbox element="recombinant" label="Recombinant"/>
                   <Checkbox element="organ" label="Organ"/>
-                  <Checkbox element="method" label="Method"/>
                   <Checkbox element="author_orcid" label="Author ORCiD iD"/>
-
                   <Checkbox element="hgnc_id" label="HGNC ID"/>
                   <Checkbox element="isotype" label="Isotype"/>
                   <Checkbox element="concentration_value" label="Concentration"/>
                   <Checkbox element="dilution" label="Dilution"/>
                   <Checkbox element="conjugate" label="Conjugate"/>
-                  <Checkbox element="tissue_preservation" label="Tissue Preservation"/>
                   <Checkbox element="cycle_number" label="Cycle#"/>
                   <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
                   <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
@@ -235,7 +205,6 @@ function Search(props) {
                   <Checkbox element="organ_uberon" label="Organ UBERON"/>
                   <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
                   <Checkbox element="omap_id" label="OMAP ID"/>
-
                   <Checkbox element="created_by_user_email" label="Submitter Email"/>
                 </div>
               </div>
