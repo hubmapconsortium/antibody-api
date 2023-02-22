@@ -24,11 +24,11 @@ class DownloadFile extends SearchkitComponent {
         console.info('this.searchkit.results: ', JSON.parse(JSON.stringify(this.searchkit.results)));
 
         // Only the columns that the user is viewing, and not all of the columns...
-        var _source = [];
-        csv_column_order.forEach((key) => {
-            if (display[key] == 'table-cell') _source.push(key);
-        })
-        query._source = _source;
+        // var _source = [];
+        // csv_column_order.forEach((key) => {
+        //     if (display[key] == 'table-cell') _source.push(key);
+        // })
+        query._source = csv_column_order;
         if (this.avr_file_as_url && _source.includes('avr_pdf_filename')) {
             query._source = _source.concat('avr_pdf_uuid');
         }
