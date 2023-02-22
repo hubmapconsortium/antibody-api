@@ -58,7 +58,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="clonality_col_head">Clonality</th>
               <th id="method_col_head">Method</th>
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
-              <th id="avr_pdf_filename_col_head">PDF</th>
+              <th id="avr_pdf_filename_col_head">Validation Report</th>
 
               <th id="host_col_head" style={{"display": display.host}}>Host</th>
               <th id="rrid_col_head" style={{"display": display.rrid}}>RRID</th>
