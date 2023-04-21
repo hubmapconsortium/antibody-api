@@ -3,7 +3,7 @@ import io
 import PyPDF2
 import requests
 import re
-from flask import abort
+from flask import abort, make_response, jsonify
 from urllib.parse import quote
 import logging
 from typing import List
@@ -85,7 +85,7 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     ]
     logger.debug(f'validate_row_data_required_fields: row: {row}')
     for item_key in required_item_keys:
-        if len(row[item_key].strip()) == 0:
+        if item_key not in row or row[item_key] is None or len(row[item_key].strip()) == 0:
             abort(json_error(f"CSV file row# {row_i}: value for '{item_key}' is required", 406))
 
     # 'concentration_value' or 'dilution' but not both (e.g, xor).
@@ -149,6 +149,7 @@ def validate_protein_name(row_i: int, protein_name: str, primary_accession: str)
     """
     https://www.uniprot.org/help/api_queries
     """
+    response = None
     try:
         protein_name_url_encoded: str = protein_name.replace(' ', '%20')
         uniprot_rest_url: str = f"https://rest.uniprot.org/uniprotkb/search?query=protein_name:{protein_name_url_encoded}"
@@ -180,6 +181,7 @@ def validate_protein_name(row_i: int, protein_name: str, primary_accession: str)
 
 
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
+    response = None
     try:
         uniprot_url: str = f"https://www.uniprot.org/uniprot/{uniprot_accession_number}.rdf?include=yes"
         logger.debug(f'validate_uniprot_accession_number() URL: {uniprot_url}')
@@ -206,6 +208,7 @@ def validate_orcid(row_i: int, orcid: str) -> None:
     """
     This field can be a single entry or a comma delimated list of ORCIDs.
     """
+    response = None
     try:
         orcid_url: str = f"https://pub.orcid.org/{orcid}"
         logger.debug(f'validate_orcid() URL: {orcid_url}')
@@ -222,6 +225,7 @@ def validate_orcid(row_i: int, orcid: str) -> None:
 
 
 def validate_rrid(row_i: int, rrid: str) -> None:
+    response = None
     try:
         rrid_url: str = f"https://scicrunch.org/resolver/RRID:{rrid}.json"
         logger.debug(f'validate_rrid() URL: {rrid_url}')
@@ -264,6 +268,7 @@ def validate_doi(row_i: int, original_doi: str) -> None:
     100 : Handle Not Found. (HTTP 404 Not Found)
     200 : Values Not Found. The handle exists but has no values (or no values according to the types and indices specified). (HTTP 200 OK)
     """
+    response = None
     try:
         doi_url_base: str = "https://doi.org/api/handles/"
         doi: str = strip_doi_prefix(row_i, original_doi)
@@ -289,6 +294,7 @@ def validate_hgnc(row_i: int, hgnc: str) -> None:
 
     Valid if 'response.numFound > 0'
     """
+    response = None
     try:
         hgnc_url_base: str = "https://rest.genenames.org/fetch/hgnc_id/"
         hgnc_url: str = f"{hgnc_url_base}{hgnc}"
@@ -317,6 +323,7 @@ def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
 
     Valid if 'page.totalElements > 0'
     """
+    response = None
     try:
         ols_url_base: str = "http://www.ebi.ac.uk/ols/api/terms"
         ols_url: str = f"{ols_url_base}?id={ontology_id}"
