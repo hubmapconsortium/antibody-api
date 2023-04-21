@@ -37,6 +37,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
     """
     Currently this is called from 'server/antibodyapi/hubmap/templates/base.html' through the
     <form onsubmit="AJAXSubmit(this);..." enctype="..." action="/antibodies/import" method="post" ...>
+
+    NOTE: The maximum .pdf size is currently 10Mb.
     """
     authenticated = session.get('is_authenticated')
     if not authenticated:
@@ -101,8 +103,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                             'antibody_uuid': row['antibody_uuid']
                         })
                         index_antibody(row | {'vendor': vendor})
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
+                    except KeyError as ke:
+                        abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:
                         abort(json_error(f"CSV file row# {row_i}: Antibody not unique", 406))
         else:
