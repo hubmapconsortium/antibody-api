@@ -10,8 +10,16 @@
 
 import argparse
 import csv
+import os
+import psycopg2
 import elasticsearch
-from utils import *
+from utils import (
+    eprint, vprint,
+    make_db_connection, base_antibody_query,
+    map_string_to_bool, map_empty_string_to_none,
+    check_es_entry_to_db_row, check_pdf_file_upload,
+    SI
+)
 
 
 class RawTextArgumentDefaultsHelpFormatter(
@@ -65,12 +73,12 @@ def check_csv_row_to_db_row(csv_row, db_row) -> None:
     if csv_row['clonality'] != db_row[SI.CLONALITY]:
         eprint(
             f"ERROR: In file row {csv_row_number}; 'clonality' in .csv file is '{csv_row['clonality']}', but '{db_row[SI.CLONALITY]}' in database")
-    if map_string_to_bool(csv_row['recombinant']) != db_row[SI.RECOMBINATE]:
+    if map_string_to_bool(csv_row['recombinant']) != db_row[SI.RECOMBINANT]:
         eprint(
-            f"ERROR: In file row {csv_row_number}; 'recombinant' in .csv file is '{csv_row['recombinant']}', but '{db_row[SI.RECOMBINATE]}' in database")
-    if 'avr_filename' in csv_row and map_empty_string_to_none(csv_row['avr_filename']) != db_row[SI.AVR_FILENAME]:
+            f"ERROR: In file row {csv_row_number}; 'recombinant' in .csv file is '{csv_row['recombinant']}', but '{db_row[SI.RECOMBINANT]}' in database")
+    if 'avr_pdf_filename' in csv_row and map_empty_string_to_none(csv_row['avr_pdf_filename']) != db_row[SI.AVR_PDF_FILENAME]:
         eprint(
-            f"ERROR: In file row {csv_row_number}; 'avr_filename' in .csv file is '{csv_row['avr_filename']}', but '{db_row[SI.AVR_FILENAME]}' in database")
+            f"ERROR: In file row {csv_row_number}; 'avr_pdf_filename' in .csv file is '{csv_row['avr_pdf_filename']}', but '{db_row[SI.AVR_PDF_FILENAME]}' in database")
 
 
 vprint(f"Processing file '{args.csv_file}'")
@@ -115,9 +123,9 @@ try:
              for db_row in db_rows:
                  check_csv_row_to_db_row(csv_row, db_row)
                  check_es_entry_to_db_row(es_conn, args.elasticsearch_index, db_row)
-                 avr_filename = db_row[SI.AVR_FILENAME]
-                 if avr_filename is not None:
-                    check_pdf_file_upload(args.assets_url, db_row[SI.AVR_UUID], avr_filename)
+                 avr_pdf_filename = db_row[SI.AVR_PDF_FILENAME]
+                 if avr_pdf_filename is not None:
+                    check_pdf_file_upload(args.assets_url, db_row[SI.AVR_PDF_UUID], avr_pdf_filename)
 
 except psycopg2.Error as e:
     eprint(f"ERROR: Accessing database at {args.postgresql_url}: {e.pgerror}")

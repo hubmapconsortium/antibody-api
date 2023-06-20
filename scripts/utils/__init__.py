@@ -46,41 +46,53 @@ def make_es_connection(es_url: str):
 @unique
 class SI(IntEnum):
     ANTIBODY_UUID = 0
-    AVR_FILENAME = 1
-    AVR_UUID = 2
-    PROTOCOLS_IO_DOI = 3
+    AVR_PDF_FILENAME = 1
+    AVR_PDF_UUID = 2
+    PROTOCOLS_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
     TARGET_NAME = 5
     RRID = 6
-    ANTIBODY_NAME = 7
-    HOST_ORGANISM = 8
-    CLONALITY = 9
-    VENDOR_NAME = 10
-    CATALOG_NUMBER = 11
-    LOT_NUMBER = 12
-    RECOMBINATE = 13
-    ORGAN_OR_TISSSUE = 14
-    HUBMAP_PLATFORM = 15
-    SUBMITTER_ORCID = 16
-    CREATED_TIMESTAMP = 17
-    CREATED_BY_USER_DISPLAYNAME = 18
-    CREATED_BY_USER_EMAIL = 19
-    CREATED_BY_USER_SUB = 20
-    GROUP_UUID = 21
+    HOST = 7
+    CLONALITY = 8
+    VENDOR_NAME = 9
+    CATALOG_NUMBER = 10
+    LOT_NUMBER = 11
+    RECOMBINANT = 12
+    ORGAN = 13
+    METHOD = 14
+    AUTHOR_ORCID = 15
+    HGNC_ID = 16
+    ISOTYPE = 17
+    CONCENTRATION_VALUE = 18
+    DILUTION = 19
+    CONJUGATE = 20
+    TISSUE_PRESERVATION = 21
+    CYCLE_NUMBER = 22
+    FLUORESCENT_REPORTER = 23
+    MANUSCRIPT_DOI = 24
+    VENDOR_AFFILIATION = 25
+    ORGAN_UBERON = 26
+    ANTIGEN_RETRIEVAL = 27
+    OMAP_ID = 28
+    CREATED_TIMESTAMP = 29
+    CREATED_BY_USER_DISPLAYNAME = 30
+    CREATED_BY_USER_EMAIL = 31
+    CREATED_BY_USER_SUB = 32
+    GROUP_UUID = 33
 
 
 QUERY = '''
 SELECT
     a.antibody_uuid,
-    a.avr_filename, a.avr_uuid,
-    a.protocols_io_doi,
-    a.uniprot_accession_number,
-    a.target_name, a.rrid,
-    a.antibody_name, a.host_organism,
-    a.clonality, v.name,
-    a.catalog_number, a.lot_number,
-    a.recombinant, a.organ_or_tissue,
-    a.hubmap_platform, a.submitter_orcid,
+    a.avr_pdf_filename, a.avr_pdf_uuid,
+    a.protocols_doi, a.uniprot_accession_number,
+    a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.catalog_number, a.lot_number, a.recombinant, a.organ,
+    a.method, a.author_orcid, a.hgnc_id, a.isotype,
+    a.concentration_value, a.dilution, a.conjugate,
+    a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid
@@ -96,13 +108,11 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 
 
 def base_antibody_query(csv_row: dict):
-    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_io_doi', '') + \
+    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_doi', '') + \
             where_condition(csv_row, 'a.uniprot_accession_number') + \
             where_condition(csv_row, 'a.target_name') + where_condition(csv_row, 'a.rrid') + \
-            where_condition(csv_row, 'a.antibody_name') + where_condition(csv_row, 'a.host_organism') +\
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
-            where_condition(csv_row, 'a.organ_or_tissue') + where_condition(csv_row, 'a.hubmap_platform') +\
-            where_condition(csv_row, 'a.submitter_orcid') + where_condition(csv_row, 'a.hubmap_platform')
+            where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcid')
 
 
 def map_string_to_bool(value: str):
@@ -136,7 +146,7 @@ def check_hit(es_hit: dict, ds_key: str, db_row, db_row_index: int, antibody_uui
     elif ds_key == 'vendor':
         if map_string_to_bool(es_hit[ds_key]).upper() != db_row[db_row_index].upper():
             check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
-    elif ds_key == 'avr_uuid':
+    elif ds_key == 'avr_pdf_uuid':
         if es_hit[ds_key] != db_row[db_row_index].replace('-', ''):
             check_hit_not_match_error(es_hit, ds_key, db_row, db_row_index, antibody_uuid)
     else:
@@ -161,23 +171,38 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
         eprint(f"ERROR: ElasticSearch query: {es_query}; returned no hits {hits}")
         return
     source: dict = hits[0]['_source']
-    if 'avr_uuid' in source:
-        check_hit(source, 'avr_filename', db_row, SI.AVR_FILENAME, antibody_uuid)
-        check_hit(source, 'avr_uuid', db_row, SI.AVR_UUID, antibody_uuid)
-    check_hit(source, 'protocols_io_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
+    if 'avr_pdf_uuid' in source:
+        check_hit(source, 'avr_pdf_filename', db_row, SI.AVR_PDF_FILENAME, antibody_uuid)
+        check_hit(source, 'avr_pdf_uuid', db_row, SI.AVR_PDF_UUID, antibody_uuid)
+    check_hit(source, 'protocols_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_name', db_row, SI.TARGET_NAME, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
-    check_hit(source, 'antibody_name', db_row, SI.ANTIBODY_NAME, antibody_uuid)
-    check_hit(source, 'host_organism', db_row, SI.HOST_ORGANISM, antibody_uuid)
+    check_hit(source, 'host', db_row, SI.HOST, antibody_uuid)
     check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)
-    check_hit(source, 'vendor', db_row, SI.VENDOR_NAME, antibody_uuid)
+    check_hit(source, 'vendor_name', db_row, SI.VENDOR_NAME, antibody_uuid)
     check_hit(source, 'catalog_number', db_row, SI.CATALOG_NUMBER, antibody_uuid)
     check_hit(source, 'lot_number', db_row, SI.LOT_NUMBER, antibody_uuid)
-    check_hit(source, 'recombinant', db_row, SI.RECOMBINATE, antibody_uuid)
-    check_hit(source, 'organ_or_tissue', db_row, SI.ORGAN_OR_TISSSUE, antibody_uuid)
-    check_hit(source, 'hubmap_platform', db_row, SI.HUBMAP_PLATFORM, antibody_uuid)
-    check_hit(source, 'submitter_orcid', db_row, SI.SUBMITTER_ORCID, antibody_uuid)
+    check_hit(source, 'recombinant', db_row, SI.RECOMBINANT, antibody_uuid)
+    check_hit(source, 'organ', db_row, SI.ORGAN, antibody_uuid)
+
+    check_hit(source, 'method', db_row, SI.METHOD, antibody_uuid)
+    check_hit(source, 'author_orcid', db_row, SI.AUTHOR_ORCID, antibody_uuid)
+    check_hit(source, 'hgnc_id', db_row, SI.HGNC_ID, antibody_uuid)
+    check_hit(source, 'concentration_value', db_row, SI.CONCENTRATION_VALUE, antibody_uuid)
+    check_hit(source, 'dilution', db_row, SI.DILUTION, antibody_uuid)
+    check_hit(source, 'conjugate', db_row, SI.CONJUGATE, antibody_uuid)
+    check_hit(source, 'tissue_preservation', db_row, SI.TISSUE_PRESERVATION, antibody_uuid)
+    check_hit(source, 'cycle_number', db_row, SI.CYCLE_NUMBER, antibody_uuid)
+    check_hit(source, 'fluorescent_reporter', db_row, SI.FLUORESCENT_REPORTER, antibody_uuid)
+    check_hit(source, 'manuscript_doi', db_row, SI.MANUSCRIPT_DOI, antibody_uuid)
+    check_hit(source, 'vendor_affiliation', db_row, SI.VENDOR_AFFILIATION, antibody_uuid)
+    check_hit(source, 'organ_uberon', db_row, SI.ORGAN_UBERON, antibody_uuid)
+    check_hit(source, 'antigen_retrieval', db_row, SI.ANTIGEN_RETRIEVAL, antibody_uuid)
+    check_hit(source, 'omap_id', db_row, SI.OMAP_ID, antibody_uuid)
+    check_hit(source, 'created_timestamp', db_row, SI.CREATED_TIMESTAMP, antibody_uuid)
+    check_hit(source, 'created_by_user_displayname', db_row, SI.CREATED_BY_USER_DISPLAYNAME, antibody_uuid)
+
     check_hit(source, 'created_by_user_email', db_row, SI.CREATED_BY_USER_EMAIL, antibody_uuid)
 
 
@@ -187,8 +212,8 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
 # before you can access that file. It's really direct access to the file system through the <relative-file-path>.
 # The gateway file_auth checks on that <uuid> and queries the permission along with the users token to determine
 # if the user has access to the file.
-def check_pdf_file_upload(assets_url: str, avr_uuid: str, avr_filename: str):
-    url: str = f"{assets_url}/{avr_uuid.replace('-', '')}/{avr_filename}"
+def check_pdf_file_upload(assets_url: str, avr_pdf_uuid: str, avr_pdf_filename: str):
+    url: str = f"{assets_url}/{avr_pdf_uuid.replace('-', '')}/{avr_pdf_filename}"
     vprint(f"Checking for avr_file with request {url}", end='')
     response: requests.Response = requests.get(url)
     if response.status_code != 200:
@@ -199,6 +224,6 @@ def check_pdf_file_upload(assets_url: str, avr_uuid: str, avr_filename: str):
         PyPDF2.PdfFileReader(stream=io.BytesIO(content))
     except PyPDF2.utils.PdfReadError:
         vprint(f" INVALID .pdf file")
-        eprint(f"ERROR: avr_file {avr_filename} found, but not a valid .pdf file")
+        eprint(f"ERROR: avr_file {avr_pdf_filename} found, but not a valid .pdf file")
         return
     vprint(f" valid .pdf file")

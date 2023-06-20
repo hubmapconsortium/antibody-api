@@ -34,6 +34,12 @@ def only_printable(s: str) -> str:
 
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
 def import_antibodies(): # pylint: disable=too-many-branches
+    """
+    Currently this is called from 'server/antibodyapi/hubmap/templates/base.html' through the
+    <form onsubmit="AJAXSubmit(this);..." enctype="..." action="/antibodies/import" method="post" ...>
+
+    NOTE: The maximum .pdf size is currently 10Mb.
+    """
     authenticated = session.get('is_authenticated')
     if not authenticated:
         return redirect(url_for('login'))
@@ -45,10 +51,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
     cur = get_cursor(app)
     uuids_and_names = []
 
-    group_id = get_group_id(
-        app.config['INGEST_API_URL'], request.form.get('group_id')
-    )
-
+    group_id = get_group_id(app.config['INGEST_API_URL'], request.form.get('group_id'))
     if group_id is None:
         abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
@@ -61,11 +64,11 @@ def import_antibodies(): # pylint: disable=too-many-branches
             logger.info(f"import_antibodies: processing filename: {filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
-                antibodycsv = csv.DictReader(csvfile, delimiter=',')
                 row_i = 1
-                for row in antibodycsv:
+                for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
-                    row = {k: only_printable(v) for (k, v) in row.items()}
+                    # and make all the keys lowercase so comparison is easy...
+                    row = {k.lower(): only_printable(v) for (k, v) in row_dr.items()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
@@ -82,27 +85,26 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     # all uppercase and people seem to use Excel to make the .csv files
                     row['recombinant'] = row['recombinant'].lower()
                     query = insert_query()
-                    if 'avr_filename' in row.keys():
+                    if 'avr_pdf_filename' in row.keys():
                         if 'pdf' in request.files:
                             for avr_file in request.files.getlist('pdf'):
-                                if avr_file.filename == row['avr_filename']:
-                                    row['avr_uuid'] = get_file_uuid(
+                                if avr_file.filename == row['avr_pdf_filename']:
+                                    row['avr_pdf_uuid'] = get_file_uuid(
                                         app.config['INGEST_API_URL'],
                                         app.config['UPLOAD_FOLDER'],
                                         row['antibody_uuid'],
                                         avr_file
                                     )
                                     query = insert_query_with_avr_file_and_uuid()
-                                    row['avr_filename'] = secure_filename(row['avr_filename'])
+                                    row['avr_pdf_filename'] = secure_filename(row['avr_pdf_filename'])
                     try:
                         cur.execute(query, row)
                         uuids_and_names.append({
-                            'antibody_name': row['antibody_name'],
                             'antibody_uuid': row['antibody_uuid']
                         })
                         index_antibody(row | {'vendor': vendor})
-                    except KeyError:
-                        abort(json_error('CSV fields are wrong', 406))
+                    except KeyError as ke:
+                        abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:
                         abort(json_error(f"CSV file row# {row_i}: Antibody not unique", 406))
         else:

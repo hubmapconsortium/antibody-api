@@ -1,20 +1,48 @@
 import React from 'react';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
-  HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats,
+  HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
 import { Checkbox } from './Checkbox';
 import DownloadFile from './DownloadFile';
+import Popup from 'reactjs-popup';
+import { useCookies } from 'react-cookie';
+import CookieConsent from 'react-cookie-consent';
 import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
+
+function collapseAllFilters() {
+  const filters_dev = document.querySelectorAll(".sk-layout__filters");
+  const header = filters_dev[0].querySelectorAll(".sk-panel__header.is-collapsable:not(.is-collapsed)")
+  Array.prototype.forEach.call(header, function(f) {
+    f.classList.add("is-collapsed");
+  });
+  const content = filters_dev[0].querySelectorAll(".sk-panel__content:not(.is-collapsed)")
+  Array.prototype.forEach.call(content, function(c) {
+    c.classList.add("is-collapsed");
+  });
+  //Array.prototype.forEach.call(filters_dev, function(h) {h.forceUpdate()});
+  window.location.reload();
+}
 
 function Search(props) {
   const searchkit = new SearchkitManager("/");
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
+  //console.info('Search display: ', display);
+  const [cookies] = useCookies([]);
+  //console.info('Search cookies:', cookies);
+  // cookies override the display defaults of the server
+  for (const [key, value] of Object.entries(cookies)) {
+    if (value==='true') {
+      display[key] = "table-cell";
+    }
+  }
+  //console.info('Search display after cookie set: ', display);
 
   return(
   <SearchkitProvider searchkit={searchkit}>
+    <CookieConsent>This website uses cookies to enhance the user experience.</CookieConsent>
   <Layout>
     <TopBar>
       <a href="https://portal.hubmapconsortium.org/">
@@ -24,8 +52,15 @@ function Search(props) {
       </a>
       <SearchBox
         autofocus={true}
+        queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
-        prefixQueryFields={["antibody_name^3","target_name^2","host_organism", "vendor", "submitter_orcid"]}
+        queryFields={[
+            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number","target_name","rrid","host",
+            "clonality","vendor","catalog_number","lot_number","recombinant","organ","organ_uberon","omap_id",
+            "antigen_retrieval","hgnc_id","isotype","concentration_value","dilution","conjugate","method",
+            "tissue_preservation","cycle_number","fluorescent_reporter","author_orcid","vendor_affiliation",
+            "created_by_user_displayname","created_by_user_email","avr_pdf_filename"
+        ]}
         />
       <a href="/upload"
          style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
@@ -38,25 +73,94 @@ function Search(props) {
       <SideBar>
         <h3>Filters</h3>
 
+        <button onClick={collapseAllFilters}>Collapse All Filters</button>
         <ResetFilters />
-
-        <HierarchicalMenuFilter
-          fields={["target_name.keyword"]}
-          title="Target Name"
-          id="target_names" />
-        <HierarchicalMenuFilter
-          fields={["vendor.keyword"]}
-          title="Vendors"
-          id="vendors" />
         <RefinementListFilter
-          id="host_organism"
-          title="Host Organism"
-          field="host_organism.keyword"
+          id="host"
+          title="Host"
+          field="host.keyword"
           operator="OR"
-          size={10} />
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="clonality"
+          title="Clonality"
+          field="clonality.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="vendor_name"
+          title="Vendor"
+          field="vendor_name.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="recombinant"
+          title="Recombinant"
+          field="recombinant.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="organ"
+          title="Organ"
+          field="organ.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="method"
+          title="Method"
+          field="method.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="vendor"
+          title="Vendor"
+          field="vendor.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="tissue_preservation"
+          title="Tissue Preservation"
+          field="tissue_preservation.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="conjugate"
+          title="Conjugate"
+          field="conjugate.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+
       </SideBar>
 
       <LayoutResults>
+
         <ActionBar>
 
           <ActionBarRow>
@@ -69,28 +173,47 @@ function Search(props) {
 
         </ActionBar>
 
-        <table>
-            <thead>
-                <tr>
-                    <td><b>Additional Columns:</b></td>
-                    <td><Checkbox element="rrid" label="RRID"/></td>
-                    <td><Checkbox element="clonality" label="Clonality"/></td>
-                    <td><Checkbox element="catalog_number" label="Catalog#"/></td>
-                    <td><Checkbox element="lot_number" label="Lot#"/></td>
-                    <td><Checkbox element="vendor" label="Vendor"/></td>
-                    <td><Checkbox element="recombinant" label="Recombinant"/></td>
-                    <td><Checkbox element="organ_or_tissue" label="Organ/Tissue"/></td>
-                    <td><Checkbox element="hubmap_platform" label="HuBMAP Platform"/></td>
-                    <td><Checkbox element="submitter_orcid" label="Submitter ORCiD iD"/></td>
-                    <td><Checkbox element="created_by_user_email" label="Submitter Email"/></td>
-                </tr>
-            </thead>
-        </table>
+        <Popup trigger={<button className="button-placement">Configure Columns</button>}
+               contentStyle={{width: "280px"}}
+               modal>
+          {close => (
+              <div className="modal form-border">
+                <button className="close" onClick={close}>
+                  &times;
+                </button>
+                <div className="header"><h3>Additional Columns</h3></div>
+                <div className="content div-border">
 
+                  <Checkbox element="host" label="Host"/>
+                  <Checkbox element="rrid" label="RRID"/>
+                  <Checkbox element="catalog_number" label="Catalog#"/>
+                  <Checkbox element="lot_number" label="Lot#"/>
+                  <Checkbox element="vendor_name" label="Vendor"/>
+                  <Checkbox element="recombinant" label="Recombinant"/>
+                  <Checkbox element="organ" label="Organ"/>
+                  <Checkbox element="author_orcid" label="Author ORCiD iD"/>
+                  <Checkbox element="hgnc_id" label="HGNC ID"/>
+                  <Checkbox element="isotype" label="Isotype"/>
+                  <Checkbox element="concentration_value" label="Concentration"/>
+                  <Checkbox element="dilution" label="Dilution"/>
+                  <Checkbox element="conjugate" label="Conjugate"/>
+                  <Checkbox element="cycle_number" label="Cycle#"/>
+                  <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
+                  <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
+                  <Checkbox element="protocols_doi" label="Protocols DOI"/>
+                  <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
+                  <Checkbox element="organ_uberon" label="Organ UBERON"/>
+                  <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
+                  <Checkbox element="omap_id" label="OMAP ID"/>
+                  <Checkbox element="created_by_user_email" label="Submitter Email"/>
+                </div>
+              </div>
+          )}
+        </Popup>
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
-          sourceFilter={["antibody_name", "host_organism", "uniprot_accession_number", "target_name", "rrid", "clonality", "catalog_number", "lot_number", "vendor", "recombinant", "organ_or_tissue", "hubmap_platform", "submitter_orcid", "created_by_user_email", "avr_filename", "avr_uuid"]}/>
+          />
         <InitialLoader />
         <NoHits />
 

@@ -11,22 +11,12 @@ save_antibody_blueprint = Blueprint('save_antibody', __name__)
 
 @save_antibody_blueprint.route('/antibodies', methods=['POST'])
 def save_antibody():
-    # avr_uuid, and avr_filename are not required but are only present when a pdf is also uploaded.
+    # avr_pdf_uuid, and avr_pdf_filename are not required but are only present when a pdf is also uploaded.
     required_properties = (
-      'protocols_io_doi',
-      'uniprot_accession_number',
-      'target_name',
-      'rrid',
-      'antibody_name',
-      'host_organism',
-      'clonality',
-      'vendor',
-      'catalog_number',
-      'lot_number',
-      'recombinant',
-      'organ_or_tissue',
-      'hubmap_platform',
-      'submitter_orcid'
+        'uniprot_accession_number', 'hgnc_id', 'target_name', 'isotype', 'host', 'clonality',
+        'vendor', 'catalog_number', 'lot_number', 'recombinant',
+        'rrid', 'method', 'tissue_preservation', 'protocols_doi', 'manuscript_doi', 'author_orcid',
+        'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     )
     try:
         antibody = request.get_json()['antibody']

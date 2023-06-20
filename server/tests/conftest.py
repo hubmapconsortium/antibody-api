@@ -24,7 +24,6 @@ def raw_antibody_data():
         'uniprot_accession_number': faker.uuid4(),
         'target_name': faker.first_name(),
         'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
-        'antibody_name': faker.first_name(),
         'host_organism': faker.first_name(),
         'clonality': random.choice(('monoclonal','polyclonal','oligoclonal')),
         'vendor': faker.first_name(),
@@ -59,7 +58,7 @@ def antibody_data_multiple_with_pdfs():
     antibodies = []
     for _ in range(random.randint(2,8)):
         pdf_data = {
-            'avr_filename': faker.file_name(extension='pdf'),
+            'avr_pdf_filename': faker.file_name(extension='pdf'),
             '_pdf_uuid': str(uuid4())
         }
         antibodies.append(raw_antibody_data() | pdf_data)
