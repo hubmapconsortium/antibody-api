@@ -1,10 +1,20 @@
 # antibody-api
 
 This information will help you get the Antibody API up in running whether locally or on an environment.
-The Antibody API should be running on the following environments:
+
+### GUI
+
+The Antibody API GUI should be running on the following environments, and is available at:
 [Prod](https://avr.hubmapconsortium.org/),
 [Test](https://avr.test.hubmapconsortium.org/),
 [Dev](https://avr.dev.hubmapconsortium.org/).
+
+### Status
+
+The status of each environment is available at:
+[Prod](https://avr.hubmapconsortium.org/status),
+[Test](https://avr.test.hubmapconsortium.org/status),
+[Dev](https://avr.dev.hubmapconsortium.org/status).
 
 ## Build, Publish, Deploy Workflow
 These are the steps used to build, publish a Docker image, and then deploy it.
