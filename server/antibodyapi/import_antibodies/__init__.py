@@ -108,7 +108,9 @@ def import_antibodies(): # pylint: disable=too-many-branches
                                     query = insert_query_with_avr_file_and_uuid()
                                     row['avr_pdf_filename'] = secure_filename(row['avr_pdf_filename'])
                     try:
+                        logger.debug(f"import_antibodies: SQL inserting row: {row}")
                         cur.execute(query, row)
+                        logger.debug(f"import_antibodies: SQL inserting row SUCCESS!")
                         uuids_and_names.append({
                             'antibody_uuid': row['antibody_uuid']
                         })

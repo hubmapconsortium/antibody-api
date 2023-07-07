@@ -7,6 +7,8 @@ from flask import abort, make_response, jsonify
 from urllib.parse import quote
 import logging
 from typing import List
+import time
+import datetime
 
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
@@ -430,6 +432,7 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
     'target_symbol' which is a list that contains strings that can be searched for this target
     (i.e, aliases, previous, approved).
     """
+    start_time = time.time()
     pdf_files_processed: list = []
     target_datas: dict = {}
     for file in request_files.getlist('file'):
@@ -456,7 +459,9 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
                 target_datas |= target_data
                 # else:
                 #     logger.debug(f"validate_antibodycsv: CSV file row# {row_i}: valid PDF not found")
-    logger.debug(f"validate_antibodycsv: found valid PDF files '{pdf_files_processed}'")
+    logger.debug(f"validate_antibodycsv: found valid PDF files ({len(pdf_files_processed)}): '{pdf_files_processed}'")
+    logger.debug(f"validate_antibodycsv: found target_datas ({len(target_datas)}): '{target_datas}'")
+    logger.debug(f"validate_antibodycsv: run time: {datetime.timedelta(seconds=time.time() - start_time)}")
     return pdf_files_processed, target_datas
 
 
@@ -485,8 +490,6 @@ if __name__ == '__main__':
                                   content_type='multipart/form-data',
                                   data=data):
         ubkg_api_url: str = app.config['UBKG_API_URL']
-        import time
-        import datetime
 
         start = time.time()
         pdf_files_processed, target_datas =\

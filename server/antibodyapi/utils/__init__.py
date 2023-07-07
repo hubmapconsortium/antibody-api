@@ -190,7 +190,7 @@ def get_file_uuid(ingest_api_url: str, upload_folder: str, antibody_uuid: str, f
         abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req2.status_code}", 406))
 
     file_uuid = req2.json()['file_uuid']
-    logger.debug(f"utils/get_file_uuid: file_uuid = {file_uuid}")
+    logger.debug(f"utils/get_file_uuid: after file-commit; file_uuid = {file_uuid}")
     return file_uuid
 
 
