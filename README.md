@@ -171,6 +171,11 @@ If you delete one of the Docker images (say the "antibody-api_web-1 container) t
 $ ./scripts/run_local.sh
 ```
 
+You may need to rebuild an empty database if the schema has change or if no schema exists.
+```bash
+$ ./scripts/create_empty_db_local.sh
+```
+
 You will need to manually create the tables on the PostgreSQL database that is running in the container.
 The user, password, and database definitions are found in `server/antibodyapi/default_config.py`,
 and for deployment should be overwritten in `instance/app.conf` (which is not kept in the repo).
@@ -188,7 +193,7 @@ When running locally you will need to start an instance of `search-api`
 on your development machine because one is not included in the docker-config
 packages. To do this please see the section `Startup the Search API on localhost`.
 
-Once the data is loaded you can use the antibody search api located at [http://localhost:500/](http://localhost:5000)
+Once the data is loaded you can use the antibody search api located at [http://localhost:5000/](http://localhost:5000)
 
 Now that the tables exist, you will need to load some data into them.
 Find the file `server/manual_test_files/README.md`, and execute the sequence in the 'Manual test for 'upload' (.csv only)' section.
@@ -357,3 +362,9 @@ Open the following web page
 ```commandline
 http://localhost:5000
 ```
+
+### Determining your External IPv4 Address
+
+To determine your external IPv4 address you can use
+[WhatIsMyIP.com](https://www.whatismyip.com/) or
+[ifconfig.me](http://ifconfig.me/ip).

@@ -12,7 +12,7 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += `<td class="target_name_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_name}%22)%20AND%20(accession:${hit._source.uniprot_accession_number})" target="_blank">${hit._source.target_name}</a></td>`;
+      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)%20AND%20(accession:${hit._source.uniprot_accession_number})" target="_blank">${hit._source.target_symbol}</a></td>`;
       antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
       antibodies += `<td class="clonality_col">${hit._source.clonality}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
@@ -53,7 +53,7 @@ class AntibodyHitsTable extends React.Component {
         <table id="antibody-results-table" className="sk-table sk-table-striped" style={{width: '100%', boxSizing: 'border-box'}}>
           <thead>
             <tr>
-              <th id="target_name_col_head">Target Name</th>
+              <th id="target_symbol_col_head">Target Symbol</th>
               <th id="uniprot_accession_col_head">UniProt#</th>
               <th id="clonality_col_head">Clonality</th>
               <th id="method_col_head">Method</th>

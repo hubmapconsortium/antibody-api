@@ -10,7 +10,7 @@ info:
     name: MIT License
     url: 'https://github.com/hubmapconsortium/antibody-api/blob/master/license.txt'
 servers:
-  - url: 'https://antibody.api.hubmapconsortium.org'
+  - url: 'https://avr.hubmapconsortium.org/'
 components:
   securitySchemes:
     bearerAuth:
@@ -26,9 +26,9 @@ components:
         uniprot_accession_number:
           type: string
           description: "https://www.uniprot.org/help/accession_numbers"
-        target_name:
+        target_symbol:
           type: string
-          description: "The name of the antibody's target."
+          description: "Either a HGNC Approved Symbol, Previous Symbol or Alias Symbol which is resolved into an Approved Symbol."
         rrid:
           type: string
           description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)."

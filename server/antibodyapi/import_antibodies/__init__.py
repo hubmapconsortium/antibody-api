@@ -14,6 +14,7 @@ from antibodyapi.utils import (
 )
 from antibodyapi.utils.validation import validate_antibodycsv
 from antibodyapi.utils.elasticsearch import index_antibody
+from typing import List
 import string
 import logging
 
@@ -56,7 +57,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
         abort(json_error('Not a member of a data provider group or no group_id provided', 406))
 
     # Validate everything before saving anything...
-    pdf_files_processed: list = validate_antibodycsv(request.files)
+    pdf_files_processed, target_datas =\
+        validate_antibodycsv(request.files, app.config['UBKG_API_URL'])
 
     for file in request.files.getlist('file'):
         if file and allowed_file(file.filename):
@@ -76,6 +78,14 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
                     vendor = row['vendor']
                     del row['vendor']
+                    # The .csv file contains a 'target_symbol' field that is (possibly) resolved into a different
+                    # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
+                    # replaced by the 'target_symbol' returned by UBKG.
+                    target_symbol_from_csv: str = row['target_symbol']
+                    row['target_symbol'] = target_datas[target_symbol_from_csv]['target_symbol']
+                    # The target_aliases is a list of the other symbols that are associated with the target_symbol,
+                    # and it gets saved to ElasticSearch, but not the database.
+                    target_aliases: List[str] = target_datas[target_symbol_from_csv]['target_aliases']
                     row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
                     row['created_by_user_displayname'] = session['name']
                     row['created_by_user_email'] = session['email']
@@ -102,7 +112,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         uuids_and_names.append({
                             'antibody_uuid': row['antibody_uuid']
                         })
-                        index_antibody(row | {'vendor': vendor})
+                        index_antibody(row | {'vendor': vendor, 'target_aliases': target_aliases})
                     except KeyError as ke:
                         abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:

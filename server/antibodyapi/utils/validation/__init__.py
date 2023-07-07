@@ -31,7 +31,7 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
     csv_header = [
-        'uniprot_accession_number', 'hgnc_id', 'target_name', 'isotype', 'host', 'clonality',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
         'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution',
         'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
         'author_orcid', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
@@ -78,7 +78,7 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
     required_item_keys: list[str] = [
-        'uniprot_accession_number', 'hgnc_id', 'target_name', 'isotype', 'host', 'clonality',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
         'vendor', 'catalog_number', 'lot_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcid',
         'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
@@ -145,39 +145,33 @@ def validate_row_data(row_i: int, row: dict) -> None:
                          " must be of the form OMAP-<integer> (e.g. OMAP-1, OMAP-2, ..., OMAP-n) ", 406))
 
 
-def validate_target_names(row_i: int, target_names: str) -> None:
-    for target_name in target_names.split(','):
-        validate_target_name(row_i, target_name.strip(' '))
-
-
-def validate_target_name(row_i: int, target_name: str) -> None:
+def validate_target(row_i: int, target: str, ubkg_api_url: str) -> None:
     """
-    https://www.uniprot.org/help/api_queries
+    Look up the target using the UBKG API endpoint.
+
+    The UBKG endpoint will return a status of 200 if it finds the target with a dict for that
+    target containing target entries that are: approved, alias, and previous.
+    The approved is used rather than the target in the database as the target_symbol.
+    The user can then search on any of the entries returned for the target in target_aliases.
     """
     response = None
     try:
-        protein_name_url_encoded: str = target_name.replace(' ', '%20')
-        uniprot_rest_url: str = f"https://rest.uniprot.org/uniprotkb/search?query=protein_name:{protein_name_url_encoded}"
-        logger.debug(f'validate_protein_name() URL: {uniprot_rest_url}')
-        response = requests.get(uniprot_rest_url, headers={"Accept": "application/json"}, verify=False)
+        target_encoded: str = target.replace(' ', '%20')
+        ubkg_rest_url: str = f"{ubkg_api_url}/relationships/gene/{target_encoded}"
+        logger.debug(f'validate_target() URL: {ubkg_rest_url}')
+        response = requests.get(ubkg_rest_url, headers={"Accept": "application/json"}, verify=False)
         if response.status_code == 200:
-            return
             response_json: dict = response.json()
-            # response_results: List[dict] = response_json.get('results')
-            # entry_list: List[dict] = [e for e in response_results if e.get('primaryAccession') == primary_accession]
-            # if len(entry_list) == 1:
-            #     primary_accession_entry: dict = entry_list[0]
-            #     logger.debug(f'validate_protein_name() entry: {primary_accession_entry}')
-            #     if 'proteinDescription' in primary_accession_entry and \
-            #         'recommendedName' in primary_accession_entry['proteinDescription'] and \
-            #         'fullName' in primary_accession_entry['proteinDescription']['recommendedName'] and \
-            #         'value' in primary_accession_entry['proteinDescription']['recommendedName']['fullName'] and \
-            #         primary_accession_entry['proteinDescription']['recommendedName']['fullName']['value'] == protein_name:
-            #         return
-        abort(json_error(f"CSV file row# {row_i}: Protein Name '{target_name}' is not found in catalogue", 406))
+            target_symbol: str = response_json["symbol-approved"][0]
+            target_aliases: list = [target_symbol] + response_json["symbol-alias"] + response_json["symbol-previous"]
+            return {target: {"target_symbol": target_symbol, "target_aliases": target_aliases}}
+        elif response.status_code == 404:
+            abort(json_error(f"CSV file row# {row_i}: target_symbol '{target}' is not found", 406))
+        else:
+            abort(json_error(f"CSV file row# {row_i}: Problem encountered validating target_symbol '{target}'", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
-        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Protein Name '{target_name}'", 406))
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating target_symbol '{target}'", 406))
     finally:
         if response is not None:
             response.close()
@@ -364,7 +358,13 @@ def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
             response.close()
 
 
-def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
+def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_api_url: str):
+    """
+    This routine will behave as follows.
+    1) if any of the validation tests are found to fail it will throw an abort message with http status code,
+    2) if all tests pass, it will return some data that it found while validating which would otherwise
+    need to be looked up again.
+    """
     logger.debug(f"validate_antibodycsv_row: row# {row_i}: {row}")
 
     validate_row_keys(row_i, row)
@@ -397,7 +397,10 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
     # All of these make callouts to other RestAPIs...
     validate_uniprot_accession_numbers(row_i, row['uniprot_accession_number'])
     validate_hgncs(row_i, row['hgnc_id'])
-    validate_target_names(row_i, row['target_name'])
+    # target_name (then) was changed to a list by Elen, but back to a single entry by Bill and at the same time
+    # renamed to target_symbol; see:
+    # https://github.com/hubmapconsortium/antibody-api/issues/103
+    target_data: dict = validate_target(row_i, row['target_symbol'], ubkg_api_url)
     validate_rrid(row_i, row['rrid'])
     validate_doi(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcid'])
@@ -405,14 +408,30 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict) -> str:
     if row['manuscript_doi'] != '':
         validate_doi(row_i, row['manuscript_doi'])
 
-    return found_pdf
+    return found_pdf, target_data
 
 
-def validate_antibodycsv(request_files: dict) -> list:
+def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
     """
-    Currently called from import_antibodies (endpoint implementation of '/antibodies/import'.
+    Used to validate the content of the uploaded .csv file.
+
+    Currently called from import_antibodies/__init__.py/import_antibodies()
+    (endpoint implementation of '/antibodies/import', methods=['POST']).
+
+    This routing will attempt to validate fields. Some fields can be looked up
+    in alternate databases using MSAPI calls. In some cases it will try to validate
+    the format of the data in the field, or in the case of a .pdf file it's validity
+    as a .pdf file.
+
+    It returns:
+    1) A list of validated .pdf files (pdf_files_processed) that it has found in the .csv file,
+    2) A dictionary that maps the 'target_symbol' string given in the .csv file to the
+    'target_symbol' (i.e., approved name for the target from UBKG), and also 'target_aliases' for the
+    'target_symbol' which is a list that contains strings that can be searched for this target
+    (i.e, aliases, previous, approved).
     """
     pdf_files_processed: list = []
+    target_datas: dict = {}
     for file in request_files.getlist('file'):
         if not file or file.filename == '':
             abort(json_error('Filename missing in uploaded files', 406))
@@ -428,31 +447,34 @@ def validate_antibodycsv(request_files: dict) -> list:
             for row_dr in csv.DictReader(lines, delimiter=','):
                 row = {k.lower(): v for k, v in row_dr.items()}
                 row_i = row_i + 1
-                found_pdf: str = validate_antibodycsv_row(row_i, row, request_files)
+                found_pdf, target_data =\
+                    validate_antibodycsv_row(row_i, row, request_files, ubkg_api_url)
                 if found_pdf is not None:
                     logger.debug(f"validate_antibodycsv: CSV file row# {row_i}:"
                                  f" found PDF file '{found_pdf}' as valid PDF")
                     pdf_files_processed.append(found_pdf)
+                target_datas |= target_data
                 # else:
                 #     logger.debug(f"validate_antibodycsv: CSV file row# {row_i}: valid PDF not found")
     logger.debug(f"validate_antibodycsv: found valid PDF files '{pdf_files_processed}'")
-    return pdf_files_processed
+    return pdf_files_processed, target_datas
 
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Run the validation code on one .csv file'
+        description='Allow testing the validation code through the command line.'
     )
     parser.add_argument('csv_file',
-                        help='the .csv file used in the upload which may contain references to a .pdf file')
+                        help='The .csv file used in the upload which may contain references to a .pdf file')
     parser.add_argument('pdf_file',
-                        help='the .pdf file referenced in .csv file. IMPORTANT: The exact path must be used in the .csv file!!!')
+                        help='A .pdf file referenced in .csv file. All lines should reference this file. IMPORTANT: The exact path must be used in the .csv file!!!')
     args = parser.parse_args()
 
     from flask import Flask, request
     app = Flask(__name__)
+    app.config.from_pyfile('../../../../instance/app.conf')
     data: dict = {
         'file': [open(args.csv_file, 'rb')
                  ],
@@ -462,4 +484,14 @@ if __name__ == '__main__':
     with app.test_request_context(method='POST',
                                   content_type='multipart/form-data',
                                   data=data):
-        result = validate_antibodycsv(request.files)
+        ubkg_api_url: str = app.config['UBKG_API_URL']
+        import time
+        import datetime
+
+        start = time.time()
+        pdf_files_processed, target_datas =\
+            validate_antibodycsv(request.files, ubkg_api_url)
+        end = time.time()
+        print(f"pdf_files_processed ({len(pdf_files_processed)}): {pdf_files_processed}")
+        print(f"target_datas ({len(target_datas)}): {target_datas}")
+        print(f"Run time: {datetime.timedelta(seconds = end - start)}")

@@ -35,7 +35,7 @@ def hubmap_search():
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
     display: dict = {
-        "target_name": "table-cell",
+        "target_symbol": "table-cell",
         "uniprot_accession_number": "table-cell",
         "clonality": "table-cell",
         "method": "table-cell",
@@ -66,7 +66,7 @@ def hubmap_search():
         "created_by_user_email": "none"
     }
     csv_column_order: list = [
-        "target_name", "uniprot_accession_number", "clonality", "method", "tissue_preservation", "avr_pdf_filename",
+        "target_symbol", "uniprot_accession_number", "clonality", "method", "tissue_preservation", "avr_pdf_filename",
 
         "host", "rrid", "catalog_number", "lot_number", "vendor_name",
         "recombinant", "organ", "author_orcid", "hgnc_id", "isotype",

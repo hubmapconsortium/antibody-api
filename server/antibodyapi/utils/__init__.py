@@ -30,7 +30,7 @@ class SI(IntEnum):
     AVR_PDF_UUID = 2
     PROTOCOLS_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
-    TARGET_NAME = 5
+    TARGET_SYMBOL = 5
     RRID = 6
     HOST = 7
     CLONALITY = 8
@@ -66,7 +66,7 @@ SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocols_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcid, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
@@ -90,7 +90,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'antibody_uuid': antibody[SI.ANTIBODY_UUID].replace('-', ''),
         'protocols_doi': antibody[SI.PROTOCOLS_DOI],
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
-        'target_name': antibody[SI.TARGET_NAME],
+        'target_symbol': antibody[SI.TARGET_SYMBOL],
         'rrid': antibody[SI.RRID],
         'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
@@ -273,7 +273,7 @@ def insert_query():
 INSERT INTO antibodies (
     antibody_uuid,
     protocols_doi, uniprot_accession_number,
-    target_name, rrid, host, clonality, vendor_id,
+    target_symbol, rrid, host, clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcid, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
@@ -287,7 +287,7 @@ INSERT INTO antibodies (
 VALUES (
     %(antibody_uuid)s,
     %(protocols_doi)s, %(uniprot_accession_number)s,
-    %(target_name)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,
@@ -307,7 +307,7 @@ INSERT INTO antibodies (
     antibody_uuid,
     avr_pdf_uuid, avr_pdf_filename,
     protocols_doi, uniprot_accession_number,
-    target_name, rrid, host, clonality, vendor_id,
+    target_symbol, rrid, host, clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcid, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
@@ -322,7 +322,7 @@ VALUES (
     %(antibody_uuid)s,
     %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
     %(protocols_doi)s, %(uniprot_accession_number)s,
-    %(target_name)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,
