@@ -116,7 +116,8 @@ def validate_row_data(row_i: int, row: dict) -> None:
 
     # Validate specific values in an item....
 
-    valid_recombinat: list[str] = ['y', 'n']
+    # TODO: Later normalize this so that when it's stored in the DB it's either 'y' or 'n'
+    valid_recombinat: list[str] = ['y', 'yes', 'n', 'no']
     if row['recombinant'].lower() not in valid_recombinat:
         abort(json_error(f"CSV file row# {row_i}: recombinant value '{row['recombinant']}'"
                          f" is not one of: {', '.join(valid_recombinat)}", 406))

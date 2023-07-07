@@ -12,7 +12,7 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)%20AND%20(accession:${hit._source.uniprot_accession_number})" target="_blank">${hit._source.target_symbol}</a></td>`;
+      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)" target="_blank">${hit._source.target_symbol}</a></td>`;
       antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
       antibodies += `<td class="clonality_col">${hit._source.clonality}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
@@ -38,8 +38,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="conjugate_col" style="display:'+display.conjugate+`;">${hit._source.conjugate}</td>`;
       antibodies += '<td class="cycle_number_col" style="display:'+display.cycle_number+`;">${hit._source.cycle_number}</td>`;
       antibodies += '<td class="fluorescent_reporter_col" style="display:'+display.fluorescent_reporter+`;">${hit._source.fluorescent_reporter}</td>`;
-      antibodies += '<td class="manuscript_doi_col" style="display:'+display.manuscript_doi+`;"><a href="https://www.doi.org/${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a></td>`;
-      antibodies += '<td class="protocols_doi_col" style="display:'+display.protocols_doi+`;"><a href="https://www.doi.org/${hit._source.protocols_doi}" target="_blank">${hit._source.protocols_doi}</a></td>`;
+      antibodies += '<td class="manuscript_doi_col" style="display:'+display.manuscript_doi+`;"><a href="${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a></td>`;
+      antibodies += '<td class="protocols_doi_col" style="display:'+display.protocols_doi+`;"><a href="${hit._source.protocols_doi}" target="_blank">${hit._source.protocols_doi}</a></td>`;
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_url_encode = hit._source.organ_uberon.replace(':','%3A');
       antibodies += '<td class="organ_uberon_col" style="display:'+display.organ_uberon+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon}</a></td>`;
