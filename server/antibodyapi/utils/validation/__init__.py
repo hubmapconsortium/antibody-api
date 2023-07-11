@@ -123,11 +123,12 @@ def validate_row_data(row_i: int, row: dict) -> None:
                          f" is not one of: {', '.join(valid_recombinat)}", 406))
 
     # https://en.wikipedia.org/wiki/Clone_(cell_biology)
-    # valid_clonality: list[str] = ['polyclonal', 'oligoclonal']
-    # if row['clonality'] not in valid_clonality:
-    #     # TODO: At this point the value needs to be a monoclonal antibody, so check that it's real
-    #     abort(json_error(f"CSV file row# {row_i}: clonality value '{row['clonality']}'"
-    #                      f" is not one of: {', '.join(valid_clonality)}", 406))
+    # This needs to match the database enumm for clonality_types in:
+    # './development/postgresql_init_scripts/create_tables.sql'
+    valid_clonality: list[str] = ['monoclonal', 'polyclonal', 'oligoclonal']
+    if row['clonality'] not in valid_clonality:
+        abort(json_error(f"CSV file row# {row_i}: clonality value '{row['clonality']}'"
+                         f" is not one of: {', '.join(valid_clonality)}", 406))
 
     if row['concentration_value'] != '':
         try:
