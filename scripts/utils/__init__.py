@@ -50,7 +50,7 @@ class SI(IntEnum):
     AVR_PDF_UUID = 2
     PROTOCOLS_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
-    TARGET_NAME = 5
+    TARGET_SYMBOL = 5
     RRID = 6
     HOST = 7
     CLONALITY = 8
@@ -86,7 +86,7 @@ SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocols_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcid, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
@@ -110,7 +110,7 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 def base_antibody_query(csv_row: dict):
     return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_doi', '') + \
             where_condition(csv_row, 'a.uniprot_accession_number') + \
-            where_condition(csv_row, 'a.target_name') + where_condition(csv_row, 'a.rrid') + \
+            where_condition(csv_row, 'a.target_symbol') + where_condition(csv_row, 'a.rrid') + \
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
             where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcid')
 
@@ -176,7 +176,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
         check_hit(source, 'avr_pdf_uuid', db_row, SI.AVR_PDF_UUID, antibody_uuid)
     check_hit(source, 'protocols_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
-    check_hit(source, 'target_name', db_row, SI.TARGET_NAME, antibody_uuid)
+    check_hit(source, 'target_symbol', db_row, SI.TARGET_SYMBOL, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
     check_hit(source, 'host', db_row, SI.HOST, antibody_uuid)
     check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)

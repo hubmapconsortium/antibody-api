@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "avr_pdf_uuid" uuid,
     "protocols_doi" text NOT NULL,
     "uniprot_accession_number" text NOT NULL,
-    "target_name" text NOT NULL,
+    "target_symbol" text NOT NULL,
     "rrid" text NOT NULL,
     "host" text NOT NULL,
     "clonality" clonality_types NOT NULL,

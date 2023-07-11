@@ -55,11 +55,12 @@ function Search(props) {
         queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
         queryFields={[
-            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number","target_name","rrid","host",
-            "clonality","vendor","catalog_number","lot_number","recombinant","organ","organ_uberon","omap_id",
-            "antigen_retrieval","hgnc_id","isotype","concentration_value","dilution","conjugate","method",
-            "tissue_preservation","cycle_number","fluorescent_reporter","author_orcid","vendor_affiliation",
-            "created_by_user_displayname","created_by_user_email","avr_pdf_filename"
+            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number",
+            "target_symbol","target_aliases","rrid","host","clonality","vendor","catalog_number","lot_number",
+            "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
+            "concentration_value","dilution","conjugate","method","tissue_preservation","cycle_number",
+            "fluorescent_reporter","author_orcid","vendor_affiliation","created_by_user_displayname",
+            "created_by_user_email","avr_pdf_filename"
         ]}
         />
       <a href="/upload"
@@ -76,15 +77,6 @@ function Search(props) {
         <button onClick={collapseAllFilters}>Collapse All Filters</button>
         <ResetFilters />
         <RefinementListFilter
-          id="host"
-          title="Host"
-          field="host.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
           id="clonality"
           title="Clonality"
           field="clonality.keyword"
@@ -94,27 +86,18 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="vendor_name"
-          title="Vendor"
-          field="vendor_name.keyword"
+          id="conjugate"
+          title="Conjugate"
+          field="conjugate.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="recombinant"
-          title="Recombinant"
-          field="recombinant.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
-        <RefinementListFilter
-          id="organ"
-          title="Organ"
-          field="organ.keyword"
+          id="host"
+          title="Host"
+          field="host.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
@@ -130,9 +113,27 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="vendor"
-          title="Vendor"
-          field="vendor.keyword"
+          id="organ"
+          title="Organ"
+          field="organ.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="recombinant"
+          title="Recombinant"
+          field="recombinant.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="target_symbol"
+          title="Target Symbol"
+          field="target_symbol.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}
@@ -148,9 +149,9 @@ function Search(props) {
           containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
         />
         <RefinementListFilter
-          id="conjugate"
-          title="Conjugate"
-          field="conjugate.keyword"
+          id="vendor_name"
+          title="Vendor"
+          field="vendor_name.keyword"
           operator="OR"
           searchable={true}
           size={10} limit={10}

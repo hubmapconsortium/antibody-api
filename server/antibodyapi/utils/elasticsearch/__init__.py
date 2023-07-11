@@ -8,9 +8,14 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
 logger = logging.getLogger(__name__)
 
 
-# This is called within the code for the endpoint at "server.save_antibody()", and "server.import_antibodies()"
-# after the antibody information is successfully saved to the PostgreSQL database.
 def index_antibody(antibody: dict):
+    """
+    This will save the antibody information to Elastic Search.
+
+    It should be called within the code for the endpoint at server.save_antibody(),
+    and server.import_antibodies() after the antibody information is successfully saved
+    to the PostgreSQL database.
+    """
     es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
     logger.info(f"*** Indexing: {antibody}")
     doc = {
@@ -18,7 +23,8 @@ def index_antibody(antibody: dict):
         'protocols_doi': antibody['protocols_doi'],
         'manuscript_doi': antibody['manuscript_doi'],
         'uniprot_accession_number': antibody['uniprot_accession_number'],
-        'target_name': antibody['target_name'],
+        'target_symbol': antibody['target_symbol'],
+        'target_aliases': antibody['target_aliases'],
         'rrid': antibody['rrid'],
         'host': antibody['host'],
         'clonality': antibody['clonality'],
