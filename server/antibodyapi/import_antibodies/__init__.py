@@ -12,7 +12,7 @@ from antibodyapi.utils import (
     insert_query, insert_query_with_avr_file_and_uuid,
     json_error
 )
-from antibodyapi.utils.validation import validate_antibodycsv
+from antibodyapi.utils.validation import validate_antibodycsv, CanonicalizeYNResponse
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
 import string
@@ -91,9 +91,15 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
                     row['group_uuid'] = group_id
-                    # do an auto lower case on anything is 'true' or 'false' as Excel likes
-                    # all uppercase and people seem to use Excel to make the .csv files
-                    row['recombinant'] = row['recombinant'].lower()
+
+                    # Canonicalize entries that we can so that they are always saved under the same string...
+                    row['clonality'] = row['clonality'].capitalize()
+                    row['host_organism'] = row['host_organism'].capitalize()
+                    row['catalog_number'] = row['catalog_number'].upper()
+                    canonicalize_yn_response = CanonicalizeYNResponse()
+                    row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
+                    row['organ'] = row['organ'].lower()
+
                     query = insert_query()
                     if 'avr_pdf_filename' in row.keys():
                         if 'pdf' in request.files:

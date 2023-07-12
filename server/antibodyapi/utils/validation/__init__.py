@@ -21,6 +21,27 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in {'csv'}
 
 
+class CanonicalizeYNResponse:
+    """
+    Used to canonicalize or to convert the 'one of many' acceptable values of 'resp' into a single standard form.
+    This allows for consistency when storing the 'resp' in a database.
+
+    The standard form of 'resp' is returned, or None if there is no match.
+    """
+    affermative: List[str] = ['yes', 'y', 'true', 't']
+    negative: List[str] = ['no', 'n', 'false', 'f']
+
+    def canonicalize(self, resp: str):
+        if resp.lower() in self.affermative:
+            return self.affermative[0].capitalize()
+        if resp.lower() in self.negative:
+            return self.negative[0].capitalize()
+        return None
+
+    def valid(self):
+        return [].extend(self.affermative).extend(self.negative)
+
+
 def json_error(message: str, error_code: int):
     logger.info(f'JSON_ERROR Response; message: {message}; error_code: {error_code}')
     return make_response(jsonify(message=message), error_code)
@@ -117,10 +138,10 @@ def validate_row_data(row_i: int, row: dict) -> None:
     # Validate specific values in an item....
 
     # TODO: Later normalize this so that when it's stored in the DB it's either 'y' or 'n'
-    valid_recombinat: list[str] = ['y', 'yes', 'n', 'no']
-    if row['recombinant'].lower() not in valid_recombinat:
+    canonicalize_yn_response = CanonicalizeYNResponse()
+    if canonicalize_yn_response.canonicalize(row['recombinant']) is None:
         abort(json_error(f"CSV file row# {row_i}: recombinant value '{row['recombinant']}'"
-                         f" is not one of: {', '.join(valid_recombinat)}", 406))
+                         f" is not one of: {', '.join(canonicalize_yn_response.valid())}", 406))
 
     # https://en.wikipedia.org/wiki/Clone_(cell_biology)
     # This needs to match the database enumm for clonality_types in:
@@ -356,7 +377,7 @@ def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
         # abort(json_error(f"CSV file row# {row_i}: Ontology ID '{ontology_id}'; related_synonym for '{name}' not found", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
-        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating RRID '{rrid}'", 406))
+        abort(json_error(f"CSV file row# {row_i}: Problem encountered validating ontology_id '{ontology_id}'", 406))
     finally:
         if response is not None:
             response.close()
