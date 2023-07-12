@@ -38,8 +38,12 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="conjugate_col" style="display:'+display.conjugate+`;">${hit._source.conjugate}</td>`;
       antibodies += '<td class="cycle_number_col" style="display:'+display.cycle_number+`;">${hit._source.cycle_number}</td>`;
       antibodies += '<td class="fluorescent_reporter_col" style="display:'+display.fluorescent_reporter+`;">${hit._source.fluorescent_reporter}</td>`;
-      antibodies += '<td class="manuscript_doi_col" style="display:'+display.manuscript_doi+`;"><a href="${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a></td>`;
-      antibodies += '<td class="protocols_doi_col" style="display:'+display.protocols_doi+`;"><a href="${hit._source.protocols_doi}" target="_blank">${hit._source.protocols_doi}</a></td>`;
+      antibodies += '<td class="manuscript_doi_col" style="display:'+display.manuscript_doi+';">' ;
+      if (hit._source.manuscript_doi != '') {
+        antibodies += `<a href="https://doi.org/${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a>`;
+      }
+      antibodies += '</td>';
+      antibodies += '<td class="protocols_doi_col" style="display:'+display.protocols_doi+`;"><a href="https://doi.org/${hit._source.protocols_doi}" target="_blank">${hit._source.protocols_doi}</a></td>`;
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_url_encode = hit._source.organ_uberon.replace(':','%3A');
       antibodies += '<td class="organ_uberon_col" style="display:'+display.organ_uberon+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon}</a></td>`;

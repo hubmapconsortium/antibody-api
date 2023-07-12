@@ -12,7 +12,7 @@ from antibodyapi.utils import (
     insert_query, insert_query_with_avr_file_and_uuid,
     json_error
 )
-from antibodyapi.utils.validation import validate_antibodycsv, CanonicalizeYNResponse
+from antibodyapi.utils.validation import validate_antibodycsv, CanonicalizeYNResponse, CanonicalizeDOI
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
 import string
@@ -95,10 +95,15 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     # Canonicalize entries that we can so that they are always saved under the same string...
                     row['clonality'] = row['clonality'].lower()
                     row['host'] = row['host'].capitalize()
-                    row['catalog_number'] = row['catalog_number'].upper()
+                    row['organ'] = row['organ'].lower()
+                    # NOTE: The validation step will try to canonicalize and if it can't throw an error.
+                    # So, by the time that we get here canonicalize will return a string.
                     canonicalize_yn_response = CanonicalizeYNResponse()
                     row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
-                    row['organ'] = row['organ'].lower()
+                    canonicalize_doi = CanonicalizeDOI()
+                    row['protocols_doi'] = canonicalize_doi.canonicalize(row['protocols_doi'])
+                    if row['manuscript_doi'] != '':
+                        row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
 
                     query = insert_query()
                     if 'avr_pdf_filename' in row.keys():

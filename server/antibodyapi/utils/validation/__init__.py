@@ -42,6 +42,27 @@ class CanonicalizeYNResponse:
         return [].extend(self.affermative).extend(self.negative)
 
 
+class CanonicalizeDOI:
+    """
+    Used to canonicalize the DOI.
+
+    We look for one of three prefixes and strip it returning the DOI or None if no prefixes are found.
+
+    The official DOI handbook: doi:10.1000/182
+    The SOP: AVR construction lists: https://doi.org/… or https://dx.doi.org/…
+    """
+    prefixes: List[str] = ['doi:', 'https://doi.org/', 'https://dx.doi.org/']
+
+    def canonicalize(self, original_doi: str):
+        for prefix in self.prefixes:
+            doi = original_doi.removeprefix(prefix)
+            if len(doi) < len(original_doi):
+                return doi
+        return None
+
+    def valid(self):
+        return self.prefixes
+
 def json_error(message: str, error_code: int):
     logger.info(f'JSON_ERROR Response; message: {message}; error_code: {error_code}')
     return make_response(jsonify(message=message), error_code)
@@ -267,21 +288,6 @@ def validate_rrid(row_i: int, rrid: str) -> None:
             response.close()
 
 
-def strip_doi_prefix(row_i: int, original_doi: str) -> str:
-    """
-    We look for one of three prefixes and strip it...
-
-    The official DOI handbook: doi:10.1000/182
-    The SOP: AVR construction lists: https://doi.org/… or https://dx.doi.org/…
-    """
-    prefixes: List[str] = ['doi:', 'https://doi.org/', 'https://dx.doi.org/']
-    for prefix in prefixes:
-        doi = original_doi.removeprefix(prefix)
-        if len(doi) < len(original_doi):
-            return doi
-    abort(json_error(f"CSV file row# {row_i}: DOI '{original_doi}' none of the prefixes {','.join(prefixes)} matched", 406))
-
-
 def validate_doi(row_i: int, original_doi: str) -> None:
     """
     https://www.doi.org/factsheets/DOIProxy.html
@@ -298,7 +304,11 @@ def validate_doi(row_i: int, original_doi: str) -> None:
     response = None
     try:
         doi_url_base: str = "https://doi.org/api/handles/"
-        doi: str = strip_doi_prefix(row_i, original_doi)
+        canonicalize_doi = CanonicalizeDOI()
+        doi: str = canonicalize_doi.canonicalize(original_doi)
+        if doi is None:
+            abort(json_error(
+                f"CSV file row# {row_i}: DOI '{original_doi}' none of the prefixes {','.join(canonicalize_doi.valid())} matched", 406))
         doi_url: str = f"{doi_url_base}{quote(doi)}?type=URL"
         logger.debug(f'validate_doi() URL: {doi_url}')
         response = requests.get(doi_url, headers={"Accept": "application/json"}, verify=False)
