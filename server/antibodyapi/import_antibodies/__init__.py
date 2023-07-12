@@ -93,7 +93,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['group_uuid'] = group_id
 
                     # Canonicalize entries that we can so that they are always saved under the same string...
-                    row['clonality'] = row['clonality'].capitalize()
+                    row['clonality'] = row['clonality'].lower()
                     row['host'] = row['host'].capitalize()
                     row['catalog_number'] = row['catalog_number'].upper()
                     canonicalize_yn_response = CanonicalizeYNResponse()
