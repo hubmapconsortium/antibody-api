@@ -5,6 +5,20 @@ class AntibodyHitsTable extends React.Component {
   render(){
     const { hits } = this.props;
 
+    function uniprot_accession_number_td(uan_s) {
+      let cs = `<td class="uniprot_accession_number_col">`;
+      const uan_l = uan_s.split(',');
+      for (let i = 0; i < uan_l.length; i++ ) {
+        let uan = uan_l[i].trim();
+        if (i > 0) {
+          cs += ',';
+        }
+        cs += `<a href="https://www.uniprot.org/uniprot/${uan}#section_general" target="_blank">${uan}</a>`;
+      }
+      cs += '</td>';
+      return cs;
+    }
+
     //console.info('display: ', display);
     //console.info('assets_url: ', assets_url);
     var antibodies = '';
@@ -12,7 +26,7 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)" target="_blank">${hit._source.target_symbol}</a></td>`;
+      antibodies += uniprot_accession_number_td(hit._source.uniprot_accession_number)
       antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
       antibodies += `<td class="clonality_col">${hit._source.clonality}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
