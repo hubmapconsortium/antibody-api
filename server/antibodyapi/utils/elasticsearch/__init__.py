@@ -45,7 +45,7 @@ def index_antibody(antibody: dict):
         'tissue_preservation': antibody['tissue_preservation'],
         'cycle_number': antibody['cycle_number'],
         'fluorescent_reporter': antibody['fluorescent_reporter'],
-        'author_orcid': antibody['author_orcid'],
+        'author_orcids': antibody['author_orcids'],
         'vendor_affiliation': antibody['vendor_affiliation'],
         'created_by_user_displayname': antibody['created_by_user_displayname'],
         'created_by_user_email': antibody['created_by_user_email']

@@ -59,7 +59,7 @@ function Search(props) {
             "target_symbol","target_aliases","rrid","host","clonality","vendor","catalog_number","lot_number",
             "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
             "concentration_value","dilution","conjugate","method","tissue_preservation","cycle_number",
-            "fluorescent_reporter","author_orcid","vendor_affiliation","created_by_user_displayname",
+            "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
             "created_by_user_email","avr_pdf_filename"
         ]}
         />
@@ -192,7 +192,7 @@ function Search(props) {
                   <Checkbox element="vendor_name" label="Vendor"/>
                   <Checkbox element="recombinant" label="Recombinant"/>
                   <Checkbox element="organ" label="Organ"/>
-                  <Checkbox element="author_orcid" label="Author ORCiD iD"/>
+                  <Checkbox element="author_orcids" label="Author ORCiD iD"/>
                   <Checkbox element="hgnc_id" label="HGNC ID"/>
                   <Checkbox element="isotype" label="Isotype"/>
                   <Checkbox element="concentration_value" label="Concentration"/>

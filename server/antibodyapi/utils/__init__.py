@@ -40,7 +40,7 @@ class SI(IntEnum):
     RECOMBINANT = 12
     ORGAN = 13
     METHOD = 14
-    AUTHOR_ORCID = 15
+    AUTHOR_ORCIDS = 15
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
@@ -68,7 +68,7 @@ SELECT
     a.protocols_doi, a.uniprot_accession_number,
     a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
-    a.method, a.author_orcid, a.hgnc_id, a.isotype,
+    a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
     a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
@@ -100,7 +100,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'recombinant': antibody[SI.RECOMBINANT],
         'organ': antibody[SI.ORGAN],
         'method': antibody[SI.METHOD],
-        'author_orcid': antibody[SI.AUTHOR_ORCID],
+        'author_orcids': antibody[SI.AUTHOR_ORCIDS],
         'hgnc_id': antibody[SI.HGNC_ID],
         'isotype': antibody[SI.ISOTYPE],
         'concentration_value': antibody[SI.CONCENTRATION_VALUE],
@@ -275,7 +275,7 @@ INSERT INTO antibodies (
     protocols_doi, uniprot_accession_number,
     target_symbol, rrid, host, clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
-    method, author_orcid, hgnc_id, isotype,
+    method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
     manuscript_doi, vendor_affiliation, organ_uberon,
@@ -289,7 +289,7 @@ VALUES (
     %(protocols_doi)s, %(uniprot_accession_number)s,
     %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
-    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
+    %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
     %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
@@ -309,7 +309,7 @@ INSERT INTO antibodies (
     protocols_doi, uniprot_accession_number,
     target_symbol, rrid, host, clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
-    method, author_orcid, hgnc_id, isotype,
+    method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
     manuscript_doi, vendor_affiliation, organ_uberon,
@@ -324,7 +324,7 @@ VALUES (
     %(protocols_doi)s, %(uniprot_accession_number)s,
     %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
-    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
+    %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
     %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,

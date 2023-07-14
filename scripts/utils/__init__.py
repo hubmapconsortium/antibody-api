@@ -60,7 +60,7 @@ class SI(IntEnum):
     RECOMBINANT = 12
     ORGAN = 13
     METHOD = 14
-    AUTHOR_ORCID = 15
+    AUTHOR_ORCIDS = 15
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
@@ -88,7 +88,7 @@ SELECT
     a.protocols_doi, a.uniprot_accession_number,
     a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
-    a.method, a.author_orcid, a.hgnc_id, a.isotype,
+    a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
     a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
@@ -112,7 +112,7 @@ def base_antibody_query(csv_row: dict):
             where_condition(csv_row, 'a.uniprot_accession_number') + \
             where_condition(csv_row, 'a.target_symbol') + where_condition(csv_row, 'a.rrid') + \
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
-            where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcid')
+            where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcids')
 
 
 def map_string_to_bool(value: str):
@@ -187,7 +187,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'organ', db_row, SI.ORGAN, antibody_uuid)
 
     check_hit(source, 'method', db_row, SI.METHOD, antibody_uuid)
-    check_hit(source, 'author_orcid', db_row, SI.AUTHOR_ORCID, antibody_uuid)
+    check_hit(source, 'author_orcids', db_row, SI.AUTHOR_ORCIDS, antibody_uuid)
     check_hit(source, 'hgnc_id', db_row, SI.HGNC_ID, antibody_uuid)
     check_hit(source, 'concentration_value', db_row, SI.CONCENTRATION_VALUE, antibody_uuid)
     check_hit(source, 'dilution', db_row, SI.DILUTION, antibody_uuid)

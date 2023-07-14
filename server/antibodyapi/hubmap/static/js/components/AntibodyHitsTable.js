@@ -45,8 +45,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="vendor_name_col" style="display:'+display.vendor_name+`;">${hit._source.vendor_name}</td>`;
       antibodies += '<td class="recombinant_col" style="display:'+display.recombinant+`;">${hit._source.recombinant}</td>`;
       antibodies += '<td class="organ_col" style="display:'+display.organ+`;">${hit._source.organ}</td>`;
-      antibodies += '<td class="author_orcid_col" style="display:'+display.author_orcid+';">';
-      antibodies += a_hrefs('https://orcid.org/', '', hit._source.author_orcid);
+      antibodies += '<td class="author_orcids_col" style="display:'+display.author_orcids+';">';
+      antibodies += a_hrefs('https://orcid.org/', '', hit._source.author_orcids);
       antibodies += '</td>';
       antibodies += '<td class="hgnc_id_col" style="display:'+display.hgnc_id+'">';
       antibodies += a_hrefs('https://www.genenames.org/tools/search/#!/?query=', '', hit._source.hgnc_id);
@@ -90,7 +90,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="vendor_name_col_head" style={{"display": display.vendor_name}}>Vendor</th>
               <th id="recombinant_col_head" style={{"display": display.recombinant}}>Recombinant</th>
               <th id="organ_col_head" style={{"display": display.organ}}>Organ</th>
-              <th id="author_orcid_col_head" style={{"display": display.author_orcid}}>Author ORCiD iD</th>
+              <th id="author_orcids_col_head" style={{"display": display.author_orcids}}>Author ORCiD iD</th>
               <th id="hgnc_id_col_head" style={{"display": display.hgnc_id}}>HGNC ID</th>
               <th id="isotype_col_head" style={{"display": display.isotype}}>Isotype</th>
               <th id="concentration_value_col_head" style={{"display": display.concentration_value}}>Concentration</th>

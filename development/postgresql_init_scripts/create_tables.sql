@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "recombinant" text NOT NULL,
     "organ" text NOT NULL,
     "method" text NOT NULL,
-    "author_orcid" text NOT NULL,
+    "author_orcids" text NOT NULL,
     "hgnc_id" text NOT NULL,
     "isotype" text NOT NULL,
     "concentration_value" text,

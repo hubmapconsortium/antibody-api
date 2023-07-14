@@ -15,7 +15,7 @@ def save_antibody():
     required_properties = (
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
         'vendor', 'catalog_number', 'lot_number', 'recombinant',
-        'rrid', 'method', 'tissue_preservation', 'protocols_doi', 'manuscript_doi', 'author_orcid',
+        'rrid', 'method', 'tissue_preservation', 'protocols_doi', 'manuscript_doi', 'author_orcids',
         'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     )
     try:
