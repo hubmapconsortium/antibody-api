@@ -5,17 +5,16 @@ class AntibodyHitsTable extends React.Component {
   render(){
     const { hits } = this.props;
 
-    function uniprot_accession_number_td(uan_s) {
-      let cs = `<td class="uniprot_accession_number_col">`;
-      const uan_l = uan_s.split(',');
-      for (let i = 0; i < uan_l.length; i++ ) {
-        let uan = uan_l[i].trim();
+    function a_hrefs(url_prefix, url_suffix, data_s) {
+      let cs = '';
+      const data_l = data_s.split(',');
+      for (let i = 0; i < data_l.length; i++ ) {
+        let data = data_l[i].trim();
         if (i > 0) {
           cs += ',';
         }
-        cs += `<a href="https://www.uniprot.org/uniprot/${uan}#section_general" target="_blank">${uan}</a>`;
+        cs += `<a href="${url_prefix}${data}${url_suffix}" target="_blank">${data}</a>`;
       }
-      cs += '</td>';
       return cs;
     }
 
@@ -26,8 +25,10 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += uniprot_accession_number_td(hit._source.uniprot_accession_number)
-      antibodies += `<td class="uniprot_accession_number_col"><a href="https://www.uniprot.org/uniprot/${hit._source.uniprot_accession_number}#section_general" target="_blank">${hit._source.uniprot_accession_number}</a></td>`;
+      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)" target="_blank">${hit._source.target_symbol}</a></td>`;
+      antibodies += '<td class="uniprot_accession_number_col">';
+      antibodies += a_hrefs('https://www.uniprot.org/uniprot/', '#section_general', hit._source.uniprot_accession_number);
+      antibodies += '</td>';
       antibodies += `<td class="clonality_col">${hit._source.clonality}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
       antibodies += `<td class="tissue_preservation_col">${hit._source.tissue_preservation}</td>`;
@@ -35,7 +36,7 @@ class AntibodyHitsTable extends React.Component {
       if (hit._source.avr_pdf_filename != undefined) {
         antibodies += `<a href="${assets_url}/${hit._source.avr_pdf_uuid}/${hit._source.avr_pdf_filename}" target="_blank">${hit._source.avr_pdf_filename}</a>`;
       }
-      antibodies += `</td>`;
+      antibodies += '</td>';
 
       antibodies += '<td class="host_col" style="display:'+display.lot_number+`;">${hit._source.host}</td>`;
       antibodies += '<td class="rrid_col" style="display:'+display.rrid+`;"><a href="https://scicrunch.org/resolver/RRID:${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
@@ -44,8 +45,12 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="vendor_name_col" style="display:'+display.vendor_name+`;">${hit._source.vendor_name}</td>`;
       antibodies += '<td class="recombinant_col" style="display:'+display.recombinant+`;">${hit._source.recombinant}</td>`;
       antibodies += '<td class="organ_col" style="display:'+display.organ+`;">${hit._source.organ}</td>`;
-      antibodies += '<td class="author_orcid_col" style="display:'+display.author_orcid+`;"><a href="https://orcid.org/${hit._source.author_orcid}" target="_blank">${hit._source.author_orcid}</a></td>`;
-      antibodies += '<td class="hgnc_id_col" style="display:'+display.hgnc_id+`"><a href="https://www.genenames.org/tools/search/#!/?query=${hit._source.hgnc_id}" target="_blank">${hit._source.hgnc_id}</a></td>`;
+      antibodies += '<td class="author_orcid_col" style="display:'+display.author_orcid+';">';
+      antibodies += a_hrefs('https://orcid.org/', '', hit._source.author_orcid);
+      antibodies += '</td>';
+      antibodies += '<td class="hgnc_id_col" style="display:'+display.hgnc_id+'">';
+      antibodies += a_hrefs('https://www.genenames.org/tools/search/#!/?query=', '', hit._source.hgnc_id);
+      antibodies += '</td>';
       antibodies += '<td class="isotype_col" style="display:'+display.isotype+`;">${hit._source.isotype}</td>`;
       antibodies += '<td class="concentration_value_col" style="display:'+display.concentration_value+`;">${hit._source.concentration_value}</td>`;
       antibodies += '<td class="dilution_col" style="display:'+display.dilution+`;">${hit._source.dilution}</td>`;
