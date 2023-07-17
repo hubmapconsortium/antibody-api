@@ -92,7 +92,7 @@ class DownloadFile extends SearchkitComponent {
             <div id="downloadfile">
                 <button onClick={this.downloadData}
                         className={"button-placement"}>
-                    Download Selected AVR Information as CSV
+                    Download AVR Information as CSV
                 </button>
                 <p/>
             </div>
