@@ -42,9 +42,9 @@ def hubmap_search():
         "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
 
+        "host": "none",
         "cell_line": "none",
         "cell_line_ontology_id": "none",
-        "host": "none",
         "rrid": "none",
         "catalog_number": "none",
         "lot_number": "none",
