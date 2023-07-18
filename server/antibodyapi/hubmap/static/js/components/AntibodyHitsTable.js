@@ -86,7 +86,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="avr_pdf_filename_col_head">Validation Report</th>
 
               <th id="cell_line_col_head" style={{"display": display.cell_line}}>Cell Line</th>
-              <th id="cell_line_ontoloty_id_col_head" style={{"display": display.cell_line_ontoloty_id}}>Cell Line Ontology ID</th>
+              <th id="cell_line_ontology_id_col_head" style={{"display": display.cell_line_ontology_id}}>Cell Line Ontology ID</th>
               <th id="host_col_head" style={{"display": display.host}}>Host</th>
               <th id="rrid_col_head" style={{"display": display.rrid}}>RRID</th>
               <th id="catalog_number_col_head" style={{"display": display.catalog_number}}>Catalog#</th>
