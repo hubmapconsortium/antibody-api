@@ -22,7 +22,7 @@ def restore_elasticsearch():
     es_conn = elasticsearch.Elasticsearch([server])
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     print(f'Deleting Elastic Search index {antibody_elasticsearch_index} on server {server}')
-    es_conn.options(ignore_status=[400, 404]).indices.delete(index=antibody_elasticsearch_index)
+    es_conn.indices.delete(index=antibody_elasticsearch_index, ignore=[400, 404])
 
     print(f'Restoring Elastic Search index {antibody_elasticsearch_index} on server {server}')
     cur = get_cursor(current_app)
