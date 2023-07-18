@@ -192,7 +192,7 @@ function Search(props) {
                   <Checkbox element="vendor_name" label="Vendor"/>
                   <Checkbox element="recombinant" label="Recombinant"/>
                   <Checkbox element="organ" label="Organ"/>
-                  <Checkbox element="author_orcids" label="Author ORCiD iD"/>
+                  <Checkbox element="author_orcids" label="Author ORCiDs"/>
                   <Checkbox element="hgnc_id" label="HGNC ID"/>
                   <Checkbox element="isotype" label="Isotype"/>
                   <Checkbox element="concentration_value" label="Concentration"/>
