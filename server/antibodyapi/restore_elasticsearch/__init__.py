@@ -21,10 +21,10 @@ def restore_elasticsearch():
     ubkg_api_url: str = current_app.config['UBKG_API_URL']
     es_conn = elasticsearch.Elasticsearch([server])
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
-    print(f'Restoring Elastic Search index {antibody_elasticsearch_index} on server {server}')
-    if es_conn.indices.exists(index=antibody_elasticsearch_index):
-        es_conn.indices.delete(index=antibody_elasticsearch_index, ignore=[400, 404])
+    print(f'Deleting Elastic Search index {antibody_elasticsearch_index} on server {server}')
+    es_conn.options(ignore_status=[400, 404]).indices.delete(index=antibody_elasticsearch_index)
 
+    print(f'Restoring Elastic Search index {antibody_elasticsearch_index} on server {server}')
     cur = get_cursor(current_app)
     cur.execute(base_antibody_query() + ' ORDER BY a.id ASC')
     print(f'Rows retrieved: {cur.rowcount}')
