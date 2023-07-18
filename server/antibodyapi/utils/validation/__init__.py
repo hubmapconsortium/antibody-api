@@ -77,7 +77,7 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     csv_header = [
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
         'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution',
-        'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocols_doi', 'manuscript_doi',
+        'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
         'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
         'omap_id', 'cycle_number', 'fluorescent_reporter'
     ]
@@ -124,7 +124,7 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     required_item_keys: list[str] = [
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
         'vendor', 'catalog_number', 'lot_number', 'recombinant',
-        'rrid', 'method', 'tissue_preservation', 'protocols_doi','author_orcids',
+        'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcids',
         'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     ]
     logger.debug(f'validate_row_data_required_fields: row: {row}')
@@ -437,7 +437,7 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     # https://github.com/hubmapconsortium/antibody-api/issues/103
     target_data: dict = validate_target(row_i, row['target_symbol'], ubkg_api_url)
     validate_rrid(row_i, row['rrid'])
-    validate_doi(row_i, row['protocols_doi'])
+    validate_doi(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])
     validate_ontology(row_i, row['organ_uberon'], row['organ'])
     if row['manuscript_doi'] != '':

@@ -2,7 +2,7 @@ def base_antibody_query():
     return '''
 SELECT 
     a.antibody_uuid,
-    a.protocols_doi, a.uniprot_accession_number,
+    a.protocol_doi, a.uniprot_accession_number,
     a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
@@ -20,7 +20,7 @@ JOIN vendors v ON a.vendor_id = v.id
 def base_antibody_query_without_antibody_uuid():
     return '''
 SELECT 
-    a.protocols_doi, a.uniprot_accession_number,
+    a.protocol_doi, a.uniprot_accession_number,
     a.target_name, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,

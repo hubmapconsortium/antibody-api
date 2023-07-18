@@ -55,7 +55,7 @@ function Search(props) {
         queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
         queryFields={[
-            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number",
+            "antibody_uuid","protocol_doi","manuscript_doi","uniprot_accession_number",
             "target_symbol","target_aliases","rrid","host","clonality","vendor","catalog_number","lot_number",
             "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
             "concentration_value","dilution","conjugate","method","tissue_preservation","cycle_number",
@@ -201,7 +201,7 @@ function Search(props) {
                   <Checkbox element="cycle_number" label="Cycle#"/>
                   <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
                   <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
-                  <Checkbox element="protocols_doi" label="Protocols DOI"/>
+                  <Checkbox element="protocol_doi" label="Protocol DOI"/>
                   <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
                   <Checkbox element="organ_uberon" label="Organ UBERON"/>
                   <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>

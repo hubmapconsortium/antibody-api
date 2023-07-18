@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "antibody_uuid" uuid NOT NULL,
     "avr_pdf_filename" text,
     "avr_pdf_uuid" uuid,
-    "protocols_doi" text NOT NULL,
+    "protocol_doi" text NOT NULL,
     "uniprot_accession_number" text NOT NULL,
     "target_symbol" text NOT NULL,
     "rrid" text NOT NULL,

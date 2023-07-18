@@ -20,7 +20,7 @@ components:
     Antibody:
       type: object
       properties:
-        protocols_io_doi:
+        protocol_doi:
           type: string
           description: "The protocols.io digital object identifier for the protocol under which the sample was obtained and/or prepared."
         uniprot_accession_number:

@@ -48,7 +48,7 @@ class SI(IntEnum):
     ANTIBODY_UUID = 0
     AVR_PDF_FILENAME = 1
     AVR_PDF_UUID = 2
-    PROTOCOLS_DOI = 3
+    PROTOCOL_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
     TARGET_SYMBOL = 5
     RRID = 6
@@ -85,7 +85,7 @@ QUERY = '''
 SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
-    a.protocols_doi, a.uniprot_accession_number,
+    a.protocol_doi, a.uniprot_accession_number,
     a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
@@ -108,7 +108,7 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 
 
 def base_antibody_query(csv_row: dict):
-    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_doi', '') + \
+    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocol_doi', '') + \
             where_condition(csv_row, 'a.uniprot_accession_number') + \
             where_condition(csv_row, 'a.target_symbol') + where_condition(csv_row, 'a.rrid') + \
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
@@ -174,7 +174,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     if 'avr_pdf_uuid' in source:
         check_hit(source, 'avr_pdf_filename', db_row, SI.AVR_PDF_FILENAME, antibody_uuid)
         check_hit(source, 'avr_pdf_uuid', db_row, SI.AVR_PDF_UUID, antibody_uuid)
-    check_hit(source, 'protocols_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
+    check_hit(source, 'protocol_doi', db_row, SI.PROTOCOL_DOI, antibody_uuid)
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_symbol', db_row, SI.TARGET_SYMBOL, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)

@@ -62,7 +62,7 @@ class AntibodyHitsTable extends React.Component {
         antibodies += `<a href="https://doi.org/${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a>`;
       }
       antibodies += '</td>';
-      antibodies += '<td class="protocols_doi_col" style="display:'+display.protocols_doi+`;"><a href="https://doi.org/${hit._source.protocols_doi}" target="_blank">${hit._source.protocols_doi}</a></td>`;
+      antibodies += '<td class="protocol_doi_col" style="display:'+display.protocol_doi+`;"><a href="https://doi.org/${hit._source.protocol_doi}" target="_blank">${hit._source.protocol_doi}</a></td>`;
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_url_encode = hit._source.organ_uberon.replace(':','%3A');
       antibodies += '<td class="organ_uberon_col" style="display:'+display.organ_uberon+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon}</a></td>`;
@@ -99,7 +99,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="cycle_number_col_head" style={{"display": display.cycle_number}}>Cycle#</th>
               <th id="fluorescent_reporter_col_head" style={{"display": display.fluorescent_reporter}}>Fluorescent Reporter</th>
               <th id="manuscript_doi_col_head" style={{"display": display.manuscript_doi}}>Manuscript DOI</th>
-              <th id="protocols_doi_col_head" style={{"display": display.protocols_doi}}>Protocols DOI</th>
+              <th id="protocol_doi_col_head" style={{"display": display.protocol_doi}}>Protocol DOI</th>
               <th id="vendor_affiliation_col_head" style={{"display": display.vendor_affiliation}}>Vendor Affiliation</th>
               <th id="organ_uberon_col_head" style={{"display": display.organ_uberon}}>Organ UBERON</th>
               <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
