@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "uniprot_accession_number" text NOT NULL,
     "target_symbol" text NOT NULL,
     "rrid" text NOT NULL,
+    "cell_line" text NOT NULL,
+    "cell_line_ontology_id" text NOT NULL,
     "host" text NOT NULL,
     "clonality" clonality_types NOT NULL,
     "vendor_id" integer REFERENCES vendors(id),

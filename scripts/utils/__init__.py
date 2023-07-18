@@ -79,6 +79,8 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
+    CELL_LINE = 34
+    CELL_LINE_ONTOLOGY_ID = 35
 
 
 QUERY = '''
@@ -86,7 +88,8 @@ SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
@@ -178,6 +181,8 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_symbol', db_row, SI.TARGET_SYMBOL, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
+    check_hit(source, 'cell_line', db_row, SI.CELL_LINE, antibody_uuid)
+    check_hit(source, 'cell_line_ontology_id', db_row, SI.CELL_LINE_ONTOLOGY_ID, antibody_uuid)
     check_hit(source, 'host', db_row, SI.HOST, antibody_uuid)
     check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)
     check_hit(source, 'vendor_name', db_row, SI.VENDOR_NAME, antibody_uuid)

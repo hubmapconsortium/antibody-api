@@ -32,7 +32,13 @@ components:
         rrid:
           type: string
           description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)."
-        host_organism:
+        cell_line:
+          type: string
+          description: "Name of the cell line."
+        cell_line_ontology_id:
+          type: string
+          description: "The Cell Line Ontology (e.g., CLO:0007606 from https://www.ebi.ac.uk/ols4/ontologies/clo)."
+        host:
           type: string
           description: "The antibody's host organism."
         clonality:

@@ -63,6 +63,7 @@ class CanonicalizeDOI:
     def valid(self):
         return self.prefixes
 
+
 def json_error(message: str, error_code: int):
     logger.info(f'JSON_ERROR Response; message: {message}; error_code: {error_code}')
     return make_response(jsonify(message=message), error_code)
@@ -75,8 +76,8 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
     csv_header = [
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
-        'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
+        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution',
         'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
         'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
         'omap_id', 'cycle_number', 'fluorescent_reporter'
@@ -122,8 +123,8 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
     required_item_keys: list[str] = [
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
-        'vendor', 'catalog_number', 'lot_number', 'recombinant',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
+        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcids',
         'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     ]
@@ -356,7 +357,23 @@ def validate_hgnc(row_i: int, hgnc: str) -> None:
             response.close()
 
 
-def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
+def validate_uberon(row_i: int, ontology_id: str) -> None:
+    required_prefix: str = "UBERON:"
+    if ontology_id[0:len(required_prefix)] != required_prefix:
+        abort(json_error(f"CSV file row# {row_i}: UBERON Ontoloty ID "
+                         f"'{ontology_id}' must begin with '{required_prefix}'", 406))
+    validate_ontology(row_i, ontology_id)
+
+
+def validate_cell_line_ontology_id(row_i: int, cell_line_ontology_id: str) -> None:
+    required_prefix: str = "CLO:"
+    if cell_line_ontology_id[0:len(required_prefix)] != required_prefix:
+        abort(json_error(f"CSV file row# {row_i}: Cell Line Ontoloogy ID "
+                         f"'{cell_line_ontology_id}' must begin with '{required_prefix}'", 406))
+    validate_ontology(row_i, cell_line_ontology_id)
+
+
+def validate_ontology(row_i: int, ontology_id: str) -> None:
     """
     https://www.ebi.ac.uk/ols/docs/api
     Ontology Search API
@@ -373,18 +390,6 @@ def validate_ontology(row_i: int, ontology_id: str, name: str) -> None:
         response = requests.get(ols_url, headers={"Accept": "application/json"}, verify=False, allow_redirects=True)
         if response.status_code != 200:
             abort(json_error(f"CSV file row# {row_i}: Ontology ID '{ontology_id}' is not found", 406))
-        # response_json: dict = response.json()
-        # if 'page' not in response_json or 'totalElements' not in response_json['page']:
-        #     abort(json_error(f"CSV file row# {row_i}: Problem encountered validating Ontology ID '{ontology_id}'", 406))
-        # total_elements: int = response_json['page']['totalElements']
-        # if total_elements >= 0 and '_embedded' in response_json and 'terms' in response_json['_embedded']:
-        #     terms: List[dict] = response_json['_embedded']['terms']
-        #     for term in terms:
-        #         if 'annotation' in term and \
-        #             'has_related_synonym' in term['annotation'] and \
-        #             name in term['annotation']['has_related_synonym']:
-        #             return
-        # abort(json_error(f"CSV file row# {row_i}: Ontology ID '{ontology_id}'; related_synonym for '{name}' not found", 406))
     except requests.ConnectionError as error:
         # TODO: This should probably return a 502 and the frontend needs to be modified to handle it.
         abort(json_error(f"CSV file row# {row_i}: Problem encountered validating ontology_id '{ontology_id}'", 406))
@@ -439,7 +444,8 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     validate_rrid(row_i, row['rrid'])
     validate_doi(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])
-    validate_ontology(row_i, row['organ_uberon'], row['organ'])
+    validate_uberon(row_i, row['organ_uberon'])
+    validate_cell_line_ontology_id(row_i, row['cell_line_ontology_id'])
     if row['manuscript_doi'] != '':
         validate_doi(row_i, row['manuscript_doi'])
 

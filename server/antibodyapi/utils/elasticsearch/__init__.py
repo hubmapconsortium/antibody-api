@@ -26,6 +26,8 @@ def index_antibody(antibody: dict):
         'target_symbol': antibody['target_symbol'],
         'target_aliases': antibody['target_aliases'],
         'rrid': antibody['rrid'],
+        'cell_line': antibody['cell_line'],
+        'cell_line_ontology_id': antibody['cell_line_ontology_id'],
         'host': antibody['host'],
         'clonality': antibody['clonality'],
         'vendor_name': antibody['vendor'],

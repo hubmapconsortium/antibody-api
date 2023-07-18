@@ -38,6 +38,8 @@ class AntibodyHitsTable extends React.Component {
       }
       antibodies += '</td>';
 
+      antibodies += '<td class="cell_line_col" style="display:'+display.cell_line+`;">${hit._source.cell_line}</td>`;
+      antibodies += '<td class="cell_line_ontology_id_col" style="display:'+display.cell_line_ontology_id+`;"><a href="https://www.ebi.ac.uk/ols4/search?q=${hit._source.cell_line_ontology_id}" target="_blank">${hit._source.cell_line_ontology_id}</a></td>`;
       antibodies += '<td class="host_col" style="display:'+display.lot_number+`;">${hit._source.host}</td>`;
       antibodies += '<td class="rrid_col" style="display:'+display.rrid+`;"><a href="https://scicrunch.org/resolver/RRID:${hit._source.rrid}" target="_blank">${hit._source.rrid}</a></td>`;
       antibodies += '<td class="catalog_number_col" style="display:'+display.catalog_number+`;">${hit._source.catalog_number}</td>`;
@@ -83,6 +85,8 @@ class AntibodyHitsTable extends React.Component {
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
               <th id="avr_pdf_filename_col_head">Validation Report</th>
 
+              <th id="cell_line_col_head" style={{"display": display.cell_line}}>Cell Line</th>
+              <th id="cell_line_ontoloty_id_col_head" style={{"display": display.cell_line_ontoloty_id}}>Cell Line Ontology ID</th>
               <th id="host_col_head" style={{"display": display.host}}>Host</th>
               <th id="rrid_col_head" style={{"display": display.rrid}}>RRID</th>
               <th id="catalog_number_col_head" style={{"display": display.catalog_number}}>Catalog#</th>

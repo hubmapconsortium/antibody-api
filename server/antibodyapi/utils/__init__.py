@@ -59,6 +59,8 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
+    CELL_LINE = 34
+    CELL_LINE_ONTOLOGY_ID = 35
 
 
 QUERY = '''
@@ -66,7 +68,8 @@ SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution, a.conjugate,
@@ -92,6 +95,8 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
         'target_symbol': antibody[SI.TARGET_SYMBOL],
         'rrid': antibody[SI.RRID],
+        'cell_line': antibody[SI.CELL_LINE],
+        'cell_line_ontology_id': antibody[SI.CELL_LINE_ONTOLOGY_ID],
         'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
         'vendor_name': antibody[SI.VENDOR_NAME],
@@ -273,7 +278,8 @@ def insert_query():
 INSERT INTO antibodies (
     antibody_uuid,
     protocol_doi, uniprot_accession_number,
-    target_symbol, rrid, host, clonality, vendor_id,
+    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
@@ -287,7 +293,8 @@ INSERT INTO antibodies (
 VALUES (
     %(antibody_uuid)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,
@@ -307,7 +314,8 @@ INSERT INTO antibodies (
     antibody_uuid,
     avr_pdf_uuid, avr_pdf_filename,
     protocol_doi, uniprot_accession_number,
-    target_symbol, rrid, host, clonality, vendor_id,
+    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution, conjugate,
@@ -322,7 +330,8 @@ VALUES (
     %(antibody_uuid)s,
     %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution)s, %(conjugate)s,

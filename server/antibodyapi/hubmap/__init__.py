@@ -42,6 +42,8 @@ def hubmap_search():
         "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
 
+        "cell_line": "none",
+        "cell_line_ontology_id": "none",
         "host": "none",
         "rrid": "none",
         "catalog_number": "none",
@@ -68,7 +70,8 @@ def hubmap_search():
     csv_column_order: list = [
         "target_symbol", "uniprot_accession_number", "clonality", "method", "tissue_preservation", "avr_pdf_filename",
 
-        "host", "rrid", "catalog_number", "lot_number", "vendor_name",
+        "host", "cell_line", "cell_line_ontoloty_id",
+        "rrid", "catalog_number", "lot_number", "vendor_name",
         "recombinant", "organ", "author_orcids", "hgnc_id", "isotype",
         "concentration_value", "dilution", "conjugate", "cycle_number",
         "fluorescent_reporter", "manuscript_doi", "protocol_doi",
