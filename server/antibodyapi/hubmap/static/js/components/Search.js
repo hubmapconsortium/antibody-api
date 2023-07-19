@@ -5,7 +5,7 @@ import {
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
-import { Checkbox } from './Checkbox';
+import { Checkbox, CheckboxSet } from './Checkbox';
 import DownloadFile from './DownloadFile';
 import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
@@ -183,6 +183,7 @@ function Search(props) {
                 <button className="close" onClick={close}>
                   &times;
                 </button>
+                <CheckboxSet label="Set or Clear All"/>
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 

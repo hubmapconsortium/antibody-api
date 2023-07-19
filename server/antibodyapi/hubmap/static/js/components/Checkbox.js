@@ -50,4 +50,38 @@ function Checkbox(props) {
   );
 };
 
-export {Checkbox};
+function CheckboxSet(props) {
+
+  const [cookies, setCookie] = useCookies([]);
+
+  console.info('display on entry: ', display);
+  console.info('cookies: on entry', cookies);
+
+  const handleChange = () => {
+    const display_item = true;
+    const never_modify =
+        ['target_symbol','uniprot_accession_number','clonality:','method','tissue_preservation','avr_pdf_filename']
+    for (let elt in display) {
+      if (!never_modify.includes(elt)) {
+        display[elt] = display_item?"table-cell":"none";
+        setCookie(elt, display_item?'true':'false', {path: "/", sameSite: 'strict'})
+        var [checked, setChecked] = useState(cookies[elt]===display_item?'true':'false');
+        setChecked(display_item);
+      }
+      var id_header = elt + '_col' + "_head";
+      var table_header_elt=document.getElementById(id_header);
+      table_header_elt.style.display=display[elt];
+    }
+  };
+
+  return (
+    <div>
+      <input type="checkbox"
+             onChange={handleChange}
+      />
+      {label}
+    </div>
+  );
+};
+
+export {Checkbox, CheckboxSet};
