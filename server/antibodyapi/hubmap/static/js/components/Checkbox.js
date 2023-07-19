@@ -3,6 +3,7 @@ import { useCookies } from 'react-cookie';
 
 function Checkbox(props) {
 
+  const label = props.label;
   const elt = props.element;
   const id_col = elt + '_col';
   const id_header = id_col + "_head";
@@ -44,13 +45,14 @@ function Checkbox(props) {
              onChange={handleChange}
              checked={checked}
       />
-      {props.label}
+      {label}
     </div>
   );
 };
 
 function CheckboxSet(props) {
 
+  const label = props.label;
   const [cookies, setCookie] = useCookies([]);
 
   console.info('display on entry: ', display);
@@ -78,7 +80,7 @@ function CheckboxSet(props) {
       <input type="checkbox"
              onChange={handleChange}
       />
-      {props.label}
+      {label}
     </div>
   );
 };
