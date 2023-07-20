@@ -44,7 +44,7 @@ class SI(IntEnum):
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
-    DILUTION = 19
+    DILUTION_FACTOR = 19
     CONJUGATE = 20
     TISSUE_PRESERVATION = 21
     CYCLE_NUMBER = 22
@@ -72,7 +72,7 @@ SELECT
     a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
-    a.concentration_value, a.dilution, a.conjugate,
+    a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
     a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
     a.antigen_retrieval, a.omap_id,
@@ -109,7 +109,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'hgnc_id': antibody[SI.HGNC_ID],
         'isotype': antibody[SI.ISOTYPE],
         'concentration_value': antibody[SI.CONCENTRATION_VALUE],
-        'dilution': antibody[SI.DILUTION],
+        'dilution_factor': antibody[SI.DILUTION_FACTOR],
         'conjugate': antibody[SI.CONJUGATE],
         'tissue_preservation': antibody[SI.TISSUE_PRESERVATION],
         'cycle_number': antibody[SI.CYCLE_NUMBER],
@@ -282,7 +282,7 @@ INSERT INTO antibodies (
     clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
-    concentration_value, dilution, conjugate,
+    concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
     manuscript_doi, vendor_affiliation, organ_uberon,
     antigen_retrieval, omap_id,
@@ -297,7 +297,7 @@ VALUES (
     %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
-    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
     %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
     %(antigen_retrieval)s, %(omap_id)s,
@@ -318,7 +318,7 @@ INSERT INTO antibodies (
     clonality, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
-    concentration_value, dilution, conjugate,
+    concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
     manuscript_doi, vendor_affiliation, organ_uberon,
     antigen_retrieval, omap_id,
@@ -334,7 +334,7 @@ VALUES (
     %(clonality)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
-    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
     %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
     %(antigen_retrieval)s, %(omap_id)s,

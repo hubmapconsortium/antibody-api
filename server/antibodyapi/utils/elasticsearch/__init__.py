@@ -41,7 +41,7 @@ def index_antibody(antibody: dict):
         'hgnc_id': antibody['hgnc_id'],
         'isotype': antibody['isotype'],
         'concentration_value': antibody['concentration_value'],
-        'dilution': antibody['dilution'],
+        'dilution_factor': antibody['dilution_factor'],
         'conjugate': antibody['conjugate'],
         'method': antibody['method'],
         'tissue_preservation': antibody['tissue_preservation'],

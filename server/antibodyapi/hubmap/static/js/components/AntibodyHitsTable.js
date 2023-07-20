@@ -55,7 +55,7 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '</td>';
       antibodies += '<td class="isotype_col" style="display:'+display.isotype+`;">${hit._source.isotype}</td>`;
       antibodies += '<td class="concentration_value_col" style="display:'+display.concentration_value+`;">${hit._source.concentration_value}</td>`;
-      antibodies += '<td class="dilution_col" style="display:'+display.dilution+`;">${hit._source.dilution}</td>`;
+      antibodies += '<td class="dilution_factor_col" style="display:'+display.dilution_factor+`;">${hit._source.dilution_factor}</td>`;
       antibodies += '<td class="conjugate_col" style="display:'+display.conjugate+`;">${hit._source.conjugate}</td>`;
       antibodies += '<td class="cycle_number_col" style="display:'+display.cycle_number+`;">${hit._source.cycle_number}</td>`;
       antibodies += '<td class="fluorescent_reporter_col" style="display:'+display.fluorescent_reporter+`;">${hit._source.fluorescent_reporter}</td>`;
@@ -98,7 +98,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="hgnc_id_col_head" style={{"display": display.hgnc_id}}>HGNC ID</th>
               <th id="isotype_col_head" style={{"display": display.isotype}}>Isotype</th>
               <th id="concentration_value_col_head" style={{"display": display.concentration_value}}>Concentration</th>
-              <th id="dilution_col_head" style={{"display": display.dilution}}>Dilution</th>
+              <th id="dilution_factor_col_head" style={{"display": display.dilution_factor}}>Dilution Factor</th>
               <th id="conjugate_col_head" style={{"display": display.conjugate}}>Conjugate</th>
               <th id="cycle_number_col_head" style={{"display": display.cycle_number}}>Cycle#</th>
               <th id="fluorescent_reporter_col_head" style={{"display": display.fluorescent_reporter}}>Fluorescent Reporter</th>

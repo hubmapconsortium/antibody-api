@@ -55,7 +55,7 @@ def hubmap_search():
         "hgnc_id": "none",
         "isotype": "none",
         "concentration_value": "none",
-        "dilution": "none",
+        "dilution_factor": "none",
         "conjugate": "none",
         "cycle_number": "none",
         "fluorescent_reporter": "none",
@@ -73,7 +73,7 @@ def hubmap_search():
         "host", "cell_line", "cell_line_ontoloty_id",
         "rrid", "catalog_number", "lot_number", "vendor_name",
         "recombinant", "organ", "author_orcids", "hgnc_id", "isotype",
-        "concentration_value", "dilution", "conjugate", "cycle_number",
+        "concentration_value", "dilution_factor", "conjugate", "cycle_number",
         "fluorescent_reporter", "manuscript_doi", "protocol_doi",
         "vendor_affiliation", "organ_uberon", "antigen_retrieval", "omap_id",
         "created_by_user_email"

@@ -59,7 +59,7 @@ function Search(props) {
             "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
             "clonality","vendor","catalog_number","lot_number",
             "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
-            "concentration_value","dilution","conjugate","method","tissue_preservation","cycle_number",
+            "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
             "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
             "created_by_user_email","avr_pdf_filename"
         ]}
@@ -200,7 +200,7 @@ function Search(props) {
                   <Checkbox element="hgnc_id" label="HGNC ID"/>
                   <Checkbox element="isotype" label="Isotype"/>
                   <Checkbox element="concentration_value" label="Concentration"/>
-                  <Checkbox element="dilution" label="Dilution"/>
+                  <Checkbox element="dilution_factor" label="Dilution Factor"/>
                   <Checkbox element="conjugate" label="Conjugate"/>
                   <Checkbox element="cycle_number" label="Cycle#"/>
                   <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>

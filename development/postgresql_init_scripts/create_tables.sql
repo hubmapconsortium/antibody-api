@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "hgnc_id" text NOT NULL,
     "isotype" text NOT NULL,
     "concentration_value" text,
-    "dilution" text,
+    "dilution_factor" text,
     "conjugate" text,
     "tissue_preservation" text NOT NULL,
     "cycle_number" text NOT NULL,

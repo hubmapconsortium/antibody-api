@@ -64,7 +64,7 @@ class SI(IntEnum):
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
-    DILUTION = 19
+    DILUTION_FACTOR = 19
     CONJUGATE = 20
     TISSUE_PRESERVATION = 21
     CYCLE_NUMBER = 22
@@ -92,7 +92,7 @@ SELECT
     a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
-    a.concentration_value, a.dilution, a.conjugate,
+    a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
     a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
     a.antigen_retrieval, a.omap_id,
@@ -195,7 +195,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'author_orcids', db_row, SI.AUTHOR_ORCIDS, antibody_uuid)
     check_hit(source, 'hgnc_id', db_row, SI.HGNC_ID, antibody_uuid)
     check_hit(source, 'concentration_value', db_row, SI.CONCENTRATION_VALUE, antibody_uuid)
-    check_hit(source, 'dilution', db_row, SI.DILUTION, antibody_uuid)
+    check_hit(source, 'dilution_factor', db_row, SI.DILUTION_FACTOR, antibody_uuid)
     check_hit(source, 'conjugate', db_row, SI.CONJUGATE, antibody_uuid)
     check_hit(source, 'tissue_preservation', db_row, SI.TISSUE_PRESERVATION, antibody_uuid)
     check_hit(source, 'cycle_number', db_row, SI.CYCLE_NUMBER, antibody_uuid)

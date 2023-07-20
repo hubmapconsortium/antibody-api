@@ -77,7 +77,7 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     """
     csv_header = [
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
-        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution',
+        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution_factor',
         'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
         'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
         'omap_id', 'cycle_number', 'fluorescent_reporter'
@@ -123,22 +123,35 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
     required_item_keys: list[str] = [
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host',
         'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcids',
-        'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
+        'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     ]
     logger.debug(f'validate_row_data_required_fields: row: {row}')
     for item_key in required_item_keys:
         if item_key not in row or row[item_key] is None or len(row[item_key].strip()) == 0:
             abort(json_error(f"CSV file row# {row_i}: value for '{item_key}' is required", 406))
 
-    # 'concentration_value' or 'dilution' but not both (e.g, xor).
+    # 'concentration_value' or 'dilution_factor' but not both (e.g, xor).
     concentration_value_present: bool = value_present_in_row('concentration_value', row)
-    dilution_present: bool = value_present_in_row('dilution', row)
-    if not (concentration_value_present ^ dilution_present):
-        abort(json_error(f"CSV file row# {row_i}: 'concentration_value' or 'dilution'"
+    dilution_factor_present: bool = value_present_in_row('dilution_factor', row)
+    if not (concentration_value_present ^ dilution_factor_present):
+        abort(json_error(f"CSV file row# {row_i}: 'concentration_value' or 'dilution_factor'"
                          " but not both, and one must be present", 406))
+
+    # 'cell_line' or 'organ' must be present but not both (e.g, xor). Ellen in Slack on Jul 20, 2023
+    cell_line_value_present: bool = value_present_in_row('cell_line', row)
+    organ_present: bool = value_present_in_row('organ', row)
+    if not (cell_line_value_present ^ organ_present):
+        abort(json_error(f"CSV file row# {row_i}: 'cell_line' or 'organ'"
+                         " but not both, and one must be present", 406))
+
+    # if 'cell_line' is present then 'cell_line_ontology_id' must be present. Ellen in Slack on Jul 20, 2023
+    cell_line_ontology_id_value_present: bool = value_present_in_row('cell_line_ontology_id', row)
+    if not (cell_line_value_present & cell_line_ontology_id_value_present):
+        abort(json_error(f"CSV file row# {row_i}: Both 'cell_line' and 'cell_line_ontology_id'"
+                         " must be present if any one of them are present", 406))
 
     # 'cycle_number' and 'fluorescent_reporter' are required fields if 'omap_id' is present.
     # cycle_number_present: bool = value_present_in_row('cycle_number', row)
@@ -181,10 +194,10 @@ def validate_row_data(row_i: int, row: dict) -> None:
                 f"CSV file row# {row_i}: concentration_value '{row['concentration_value']}' must be numeric",
                 406))
 
-    dilution_re: re.Pattern = re.compile('^[0-9]+:[0-9]+$')
-    if row['dilution'] != '' and dilution_re.match(row['dilution']) is None:
-        abort(json_error(f"CSV file row# {row_i}: dilution '{row['dilution']}'"
-                         " must be of the form <integer>:<integer> (e.g. 1:100, 1:50, 1:2000)", 406))
+    dilution_factor_re: re.Pattern = re.compile('^[0-9]+$')
+    if row['dilution_factor'] != '' and dilution_factor_re.match(row['dilution_factor']) is None:
+        abort(json_error(f"CSV file row# {row_i}: dilution_factor '{row['dilution_factor']}'"
+                         " must be of the form <integer> (e.g. 100, 50, 2000)", 406))
 
     omap_id_re: re.Pattern = re.compile('^OMAP-[1-9][0-9]*$')
     if row['omap_id'] != '' and omap_id_re.match(row['omap_id']) is None:
