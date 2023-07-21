@@ -149,7 +149,7 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
 
     # if 'cell_line' is present then 'cell_line_ontology_id' must be present. Ellen in Slack on Jul 20, 2023
     cell_line_ontology_id_value_present: bool = value_present_in_row('cell_line_ontology_id', row)
-    if not (cell_line_value_present & cell_line_ontology_id_value_present):
+    if cell_line_value_present ^ cell_line_ontology_id_value_present:
         abort(json_error(f"CSV file row# {row_i}: Both 'cell_line' and 'cell_line_ontology_id'"
                          " must be present if any one of them are present", 406))
 
@@ -458,7 +458,8 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     validate_doi(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])
     validate_uberon(row_i, row['organ_uberon'])
-    validate_cell_line_ontology_id(row_i, row['cell_line_ontology_id'])
+    if row['cell_line_ontology_id'] != '':
+        validate_cell_line_ontology_id(row_i, row['cell_line_ontology_id'])
     if row['manuscript_doi'] != '':
         validate_doi(row_i, row['manuscript_doi'])
 
@@ -525,7 +526,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('csv_file',
                         help='The .csv file used in the upload which may contain references to a .pdf file')
-    parser.add_argument('pdf_file',
+    parser.add_argument('pdf_file', nargs='*',
                         help='A .pdf file referenced in .csv file. All lines should reference this file. IMPORTANT: The exact path must be used in the .csv file!!!')
     args = parser.parse_args()
 
@@ -533,10 +534,8 @@ if __name__ == '__main__':
     app = Flask(__name__)
     app.config.from_pyfile('../../../../instance/app.conf')
     data: dict = {
-        'file': [open(args.csv_file, 'rb')
-                 ],
-        'pdf': [open(args.pdf_file, 'rb')
-                ]
+        'file': [open(args.csv_file, 'rb')],
+        'pdf': [open(pdf_file, 'rb') for pdf_file in args.pdf_file]
     }
     with app.test_request_context(method='POST',
                                   content_type='multipart/form-data',
