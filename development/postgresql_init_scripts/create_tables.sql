@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "cell_line_ontology_id" text NOT NULL,
     "host" text NOT NULL,
     "clonality" clonality_types NOT NULL,
+    "clone_id" text NOT NULL,
     "vendor_id" integer REFERENCES vendors(id),
     "catalog_number" text NOT NULL,
     "lot_number" text NOT NULL,

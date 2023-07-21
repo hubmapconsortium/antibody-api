@@ -30,6 +30,7 @@ def index_antibody(antibody: dict):
         'cell_line_ontology_id': antibody['cell_line_ontology_id'],
         'host': antibody['host'],
         'clonality': antibody['clonality'],
+        'clone_id': antibody['clone_id'],
         'vendor_name': antibody['vendor'],
         'catalog_number': antibody['catalog_number'],
         'lot_number': antibody['lot_number'],

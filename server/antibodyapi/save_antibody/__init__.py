@@ -13,8 +13,8 @@ save_antibody_blueprint = Blueprint('save_antibody', __name__)
 def save_antibody():
     # avr_pdf_uuid, and avr_pdf_filename are not required but are only present when a pdf is also uploaded.
     required_properties = (
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'clonality',
-        'vendor', 'catalog_number', 'lot_number', 'recombinant',
+        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host',
+        'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi', 'author_orcids',
         'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
     )
