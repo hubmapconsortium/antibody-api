@@ -48,6 +48,9 @@ components:
             - polyclonal
             - oligoclonal
           description: "One of the values: monoclonal (one), oligoclonal (few), and polyclonal (many)."
+        clone_id:
+          type: string
+          description: "The id of the clone when clonality is monoclonal."
         vendor:
           type: string
           description: "The antibody's vendor."

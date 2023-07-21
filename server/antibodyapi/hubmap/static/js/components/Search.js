@@ -57,7 +57,7 @@ function Search(props) {
         queryFields={[
             "antibody_uuid","protocol_doi","manuscript_doi","uniprot_accession_number",
             "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
-            "clonality","vendor","catalog_number","lot_number",
+            "clonality","clone_id","vendor","catalog_number","lot_number",
             "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
             "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
             "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",

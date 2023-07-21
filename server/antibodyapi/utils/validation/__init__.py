@@ -77,8 +77,8 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     """
     csv_header = [
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
-        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value', 'dilution_factor',
-        'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
+        'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value',
+        'dilution_factor', 'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
         'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
         'omap_id', 'cycle_number', 'fluorescent_reporter'
     ]
@@ -152,6 +152,15 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     if cell_line_value_present ^ cell_line_ontology_id_value_present:
         abort(json_error(f"CSV file row# {row_i}: Both 'cell_line' and 'cell_line_ontology_id'"
                          " must be present if any one of them are present", 406))
+
+    # clone_id will be non-blank when 'clonality' contains 'monoclonal', if clonality contains polyclonal then clone_id
+    # will/should be blank. Ellen in Slack on Jul 20, 2023
+    clonality: str = row['clonality']
+    clone_id: str = row['clone_id']
+    if (clonality == 'monoclonal' and len(clone_id) == 0) or\
+            (clonality != 'monoclonal' and len(clone_id) > 0):
+        abort(json_error(f"CSV file row# {row_i}: When clonality is 'monoclonal' then 'clone_id'"
+                         " must be specified otherwise 'clone_id' should not be specified", 406))
 
     # 'cycle_number' and 'fluorescent_reporter' are required fields if 'omap_id' is present.
     # cycle_number_present: bool = value_present_in_row('cycle_number', row)

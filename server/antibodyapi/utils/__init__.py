@@ -61,6 +61,7 @@ class SI(IntEnum):
     GROUP_UUID = 33
     CELL_LINE = 34
     CELL_LINE_ONTOLOGY_ID = 35
+    CLONE_ID = 36
 
 
 QUERY = '''
@@ -69,7 +70,7 @@ SELECT
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
     a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
-    a.clonality, v.vendor_name,
+    a.clonality, a.clone_id, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
@@ -99,6 +100,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'cell_line_ontology_id': antibody[SI.CELL_LINE_ONTOLOGY_ID],
         'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
+        'clone_id': antibody[SI.CLONE_ID],
         'vendor_name': antibody[SI.VENDOR_NAME],
         'catalog_number': antibody[SI.CATALOG_NUMBER],
         'lot_number': antibody[SI.LOT_NUMBER],
@@ -279,7 +281,7 @@ INSERT INTO antibodies (
     antibody_uuid,
     protocol_doi, uniprot_accession_number,
     target_symbol, rrid, host, cell_line, cell_line_ontology_id,
-    clonality, vendor_id,
+    clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution_factor, conjugate,
@@ -294,7 +296,7 @@ VALUES (
     %(antibody_uuid)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
     %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
-    %(clonality)s, %(vendor_id)s,
+    %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
@@ -315,7 +317,7 @@ INSERT INTO antibodies (
     avr_pdf_uuid, avr_pdf_filename,
     protocol_doi, uniprot_accession_number,
     target_symbol, rrid, host, cell_line, cell_line_ontology_id,
-    clonality, vendor_id,
+    clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution_factor, conjugate,
@@ -331,7 +333,7 @@ VALUES (
     %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
     %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
-    %(clonality)s, %(vendor_id)s,
+    %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,

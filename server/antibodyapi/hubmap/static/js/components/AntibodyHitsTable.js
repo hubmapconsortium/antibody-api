@@ -30,6 +30,7 @@ class AntibodyHitsTable extends React.Component {
       antibodies += a_hrefs('https://www.uniprot.org/uniprot/', '#section_general', hit._source.uniprot_accession_number);
       antibodies += '</td>';
       antibodies += `<td class="clonality_col">${hit._source.clonality}</td>`;
+      antibodies += `<td class="clone_id_col">${hit._source.clone_id}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
       antibodies += `<td class="tissue_preservation_col">${hit._source.tissue_preservation}</td>`;
       antibodies += `<td class="avr_pdf_filename_col">`;
@@ -81,6 +82,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="target_symbol_col_head">Target Symbol</th>
               <th id="uniprot_accession_col_head">UniProt#</th>
               <th id="clonality_col_head">Clonality</th>
+              <th id="clone_id_col_head">Clone ID</th>
               <th id="method_col_head">Method</th>
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
               <th id="avr_pdf_filename_col_head">Validation Report</th>
