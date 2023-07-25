@@ -69,23 +69,38 @@ def json_error(message: str, error_code: int):
     return make_response(jsonify(message=message), error_code)
 
 
+csv_header_keys: List[str] = [
+    'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
+    'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value',
+    'dilution_factor', 'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
+    'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon_id', 'antigen_retrieval', 'avr_pdf_filename',
+    'omap_id', 'cycle_number', 'fluorescent_reporter'
+]
+
+
+def validate_header_keys(header: str):
+    keys: List[str] = [x.lower().strip() for x in header.split(',')]
+    csv_header_keys_found: List[str] = []
+    for key in keys:
+        if key in csv_header_keys_found:
+            abort(json_error(f"CSV header: Duplicate key '{key}' should be one of {', '.join(csv_header_keys)}", 406))
+        if key not in csv_header_keys:
+            abort(json_error(f"CSV header: Unknown key '{key}' should be one of {', '.join(csv_header_keys)}", 406))
+        csv_header_keys_found.append(key)
+    if len(keys) != len(csv_header_keys):
+        abort(json_error(f"CSV header: Does not haave the right number of keys should be one of {', '.join(csv_header_keys)}", 406))
+
+
 # This test should be the first one because subsequent tests depend on these keys existing in the row dict...
 def validate_row_keys(row_i: int, row: dict) -> None:
     """
     For a list and definitions of these fields please see:
     https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
-    csv_header = [
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
-        'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value',
-        'dilution_factor', 'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
-        'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon_id', 'antigen_retrieval', 'avr_pdf_filename',
-        'omap_id', 'cycle_number', 'fluorescent_reporter'
-    ]
 
-    if len(row) != len(csv_header):
-        abort(json_error(f"CSV file row# {row_i}: Has {len(row)} elements but should have {len(csv_header)}", 406))
-    for key in csv_header:
+    if len(row) != len(csv_header_keys):
+        abort(json_error(f"CSV file row# {row_i}: Has {len(row)} elements but should have {len(csv_header_keys)}", 406))
+    for key in csv_header_keys:
         if key not in row:
             abort(json_error(f"CSV file row# {row_i}: Key '{key}' is not present", 406))
 
@@ -148,7 +163,7 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
 
     # clone_id will be non-blank when 'clonality' contains 'monoclonal', if clonality contains polyclonal then clone_id
     # will/should be blank. Ellen in Slack on Jul 20, 2023
-    clonality: str = row['clonality']
+    clonality: str = row['clonality'].lower()
     clone_id: str = row['clone_id']
     if (clonality == 'monoclonal' and len(clone_id) == 0) or\
             (clonality != 'monoclonal' and len(clone_id) > 0):
@@ -183,7 +198,7 @@ def validate_row_data(row_i: int, row: dict) -> None:
     # This needs to match the database enumm for clonality_types in:
     # './development/postgresql_init_scripts/create_tables.sql'
     valid_clonality: list[str] = ['monoclonal', 'polyclonal', 'oligoclonal']
-    if row['clonality'] not in valid_clonality:
+    if row['clonality'].lower() not in valid_clonality:
         abort(json_error(f"CSV file row# {row_i}: clonality value '{row['clonality']}'"
                          f" is not one of: {', '.join(valid_clonality)}", 406))
 
@@ -459,7 +474,10 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     # target_name (then) was changed to a list by Elen, but back to a single entry by Bill and at the same time
     # renamed to target_symbol; see:
     # https://github.com/hubmapconsortium/antibody-api/issues/103
-    target_data: dict = validate_target(row_i, row['target_symbol'], ubkg_api_url)
+    target_symbol: str = row['target_symbol']
+    if len(target_symbol.split(',')) > 1:
+        abort(json_error(f"CSV file row# {row_i}: only one target_symbol may be specified: '{target_symbol}'", 406))
+    target_data: dict = validate_target(row_i, target_symbol, ubkg_api_url)
     validate_rrid(row_i, row['rrid'])
     validate_dois(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])
@@ -498,16 +516,17 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
         if not file or file.filename == '':
             abort(json_error('Filename missing in uploaded files', 406))
         if file and allowed_file(file.filename):
-            # TODO: remove any non-utf-8 characters from the stream both here and when processing it.
-            lines: [str] = [x.decode("utf-8") for x in file.stream.read().splitlines()]
+            # Remove any non-ascii characters from the stream both here and when processing it.
+            lines: [str] = [x.decode("ascii", "ignore") for x in file.stream.read().splitlines()]
             logger.debug(f'Lines: {lines}')
+            validate_header_keys(lines[0])
             # Since this is a stream, we need to go back to the beginning or the next time that it is read
             # it will be read from the end where there are no characters providing an empty file.
             file.stream.seek(0)
             logger.debug(f"validate_antibodycsv: processing filename '{file.filename}' with {len(lines)} lines")
             row_i = 1
             for row_dr in csv.DictReader(lines, delimiter=','):
-                row = {k.lower(): v.strip() for k, v in row_dr.items()}
+                row = {k.lower().strip(): v.strip() for k, v in row_dr.items()}
                 row_i = row_i + 1
                 found_pdf, target_data =\
                     validate_antibodycsv_row(row_i, row, request_files, ubkg_api_url)
