@@ -79,7 +79,7 @@ def validate_row_keys(row_i: int, row: dict) -> None:
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host', 'cell_line', 'cell_line_ontology_id',
         'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value',
         'dilution_factor', 'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
-        'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon', 'antigen_retrieval', 'avr_pdf_filename',
+        'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon_id', 'antigen_retrieval', 'avr_pdf_filename',
         'omap_id', 'cycle_number', 'fluorescent_reporter'
     ]
 
@@ -88,13 +88,6 @@ def validate_row_keys(row_i: int, row: dict) -> None:
     for key in csv_header:
         if key not in row:
             abort(json_error(f"CSV file row# {row_i}: Key '{key}' is not present", 406))
-
-
-def validate_row_data_item_not_leading_trailing_whitespace(row_i: int, item: str) -> None:
-    if len(item) > 0 and (item[0].isspace() or item[-1].isspace()):
-        abort(json_error(
-            f"CSV file row# {row_i}: a leading or trailing whitespace characters are not permitted in a data item",
-            406))
 
 
 def validate_row_data_item_isprintable(row_i: int, item: str) -> None:
@@ -124,9 +117,9 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     """
     required_item_keys: list[str] = [
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host',
-        'clonality', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
+        'clonality', 'vendor', 'catalog_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcids',
-        'organ_uberon', 'avr_pdf_filename', 'cycle_number'
+        'organ_uberon_id', 'avr_pdf_filename', 'cycle_number'
     ]
     logger.debug(f'validate_row_data_required_fields: row: {row}')
     for item_key in required_item_keys:
@@ -175,7 +168,6 @@ def validate_row_data(row_i: int, row: dict) -> None:
     validate_row_data_required_fields(row_i, row)
 
     for item in row.values():
-        validate_row_data_item_not_leading_trailing_whitespace(row_i, item)
         validate_row_data_item_isprintable(row_i, item)
         validate_row_data_item_not_linebreaks(row_i, item)
 
@@ -311,6 +303,11 @@ def validate_rrid(row_i: int, rrid: str) -> None:
             response.close()
 
 
+def validate_dois(row_i: int, dois: str) -> None:
+    for doi in dois.split(','):
+        validate_doi(row_i, doi.strip(' '))
+
+
 def validate_doi(row_i: int, original_doi: str) -> None:
     """
     https://www.doi.org/factsheets/DOIProxy.html
@@ -379,7 +376,7 @@ def validate_hgnc(row_i: int, hgnc: str) -> None:
             response.close()
 
 
-def validate_uberon(row_i: int, ontology_id: str) -> None:
+def validate_uberon_id(row_i: int, ontology_id: str) -> None:
     required_prefix: str = "UBERON:"
     if ontology_id[0:len(required_prefix)] != required_prefix:
         abort(json_error(f"CSV file row# {row_i}: UBERON Ontoloty ID "
@@ -464,9 +461,9 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     # https://github.com/hubmapconsortium/antibody-api/issues/103
     target_data: dict = validate_target(row_i, row['target_symbol'], ubkg_api_url)
     validate_rrid(row_i, row['rrid'])
-    validate_doi(row_i, row['protocol_doi'])
+    validate_dois(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])
-    validate_uberon(row_i, row['organ_uberon'])
+    validate_uberon_id(row_i, row['organ_uberon_id'])
     if row['cell_line_ontology_id'] != '':
         validate_cell_line_ontology_id(row_i, row['cell_line_ontology_id'])
     if row['manuscript_doi'] != '':
@@ -510,7 +507,7 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
             logger.debug(f"validate_antibodycsv: processing filename '{file.filename}' with {len(lines)} lines")
             row_i = 1
             for row_dr in csv.DictReader(lines, delimiter=','):
-                row = {k.lower(): v for k, v in row_dr.items()}
+                row = {k.lower(): v.strip() for k, v in row_dr.items()}
                 row_i = row_i + 1
                 found_pdf, target_data =\
                     validate_antibodycsv_row(row_i, row, request_files, ubkg_api_url)
@@ -539,6 +536,7 @@ if __name__ == '__main__':
                         help='A .pdf file referenced in .csv file. All lines should reference this file. IMPORTANT: The exact path must be used in the .csv file!!!')
     args = parser.parse_args()
 
+    # Since 'validate_antibodycsv' is intended to be called within a Flask App, we need to dummy one up here.
     from flask import Flask, request
     app = Flask(__name__)
     app.config.from_pyfile('../../../../instance/app.conf')

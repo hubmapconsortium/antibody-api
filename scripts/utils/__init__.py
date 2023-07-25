@@ -71,7 +71,7 @@ class SI(IntEnum):
     FLUORESCENT_REPORTER = 23
     MANUSCRIPT_DOI = 24
     VENDOR_AFFILIATION = 25
-    ORGAN_UBERON = 26
+    ORGAN_UBERON_id = 26
     ANTIGEN_RETRIEVAL = 27
     OMAP_ID = 28
     CREATED_TIMESTAMP = 29
@@ -94,7 +94,7 @@ SELECT
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
-    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon_id,
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
@@ -202,7 +202,7 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'fluorescent_reporter', db_row, SI.FLUORESCENT_REPORTER, antibody_uuid)
     check_hit(source, 'manuscript_doi', db_row, SI.MANUSCRIPT_DOI, antibody_uuid)
     check_hit(source, 'vendor_affiliation', db_row, SI.VENDOR_AFFILIATION, antibody_uuid)
-    check_hit(source, 'organ_uberon', db_row, SI.ORGAN_UBERON, antibody_uuid)
+    check_hit(source, 'organ_uberon_id', db_row, SI.ORGAN_UBERON_ID, antibody_uuid)
     check_hit(source, 'antigen_retrieval', db_row, SI.ANTIGEN_RETRIEVAL, antibody_uuid)
     check_hit(source, 'omap_id', db_row, SI.OMAP_ID, antibody_uuid)
     check_hit(source, 'created_timestamp', db_row, SI.CREATED_TIMESTAMP, antibody_uuid)

@@ -51,7 +51,7 @@ class SI(IntEnum):
     FLUORESCENT_REPORTER = 23
     MANUSCRIPT_DOI = 24
     VENDOR_AFFILIATION = 25
-    ORGAN_UBERON = 26
+    ORGAN_UBERON_ID = 26
     ANTIGEN_RETRIEVAL = 27
     OMAP_ID = 28
     CREATED_TIMESTAMP = 29
@@ -75,7 +75,7 @@ SELECT
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
-    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon_id,
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
@@ -118,7 +118,7 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'fluorescent_reporter': antibody[SI.FLUORESCENT_REPORTER],
         'manuscript_doi': antibody[SI.MANUSCRIPT_DOI],
         'vendor_affiliation': antibody[SI.VENDOR_AFFILIATION],
-        'organ_uberon': antibody[SI.ORGAN_UBERON],
+        'organ_uberon_id': antibody[SI.ORGAN_UBERON_ID],
         'antigen_retrieval': antibody[SI.ANTIGEN_RETRIEVAL],
         'omap_id': antibody[SI.OMAP_ID],
         # 'created_timestamp': antibody[SI.CREATED_TIMESTAMP]
@@ -286,7 +286,7 @@ INSERT INTO antibodies (
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
-    manuscript_doi, vendor_affiliation, organ_uberon,
+    manuscript_doi, vendor_affiliation, organ_uberon_id,
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
@@ -301,7 +301,7 @@ VALUES (
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
-    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon_id)s,
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
@@ -322,7 +322,7 @@ INSERT INTO antibodies (
     method, author_orcids, hgnc_id, isotype,
     concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
-    manuscript_doi, vendor_affiliation, organ_uberon,
+    manuscript_doi, vendor_affiliation, organ_uberon_id,
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
@@ -338,7 +338,7 @@ VALUES (
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
     %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
-    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon_id)s,
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,

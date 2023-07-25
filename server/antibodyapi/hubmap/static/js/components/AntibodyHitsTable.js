@@ -21,7 +21,7 @@ class AntibodyHitsTable extends React.Component {
     //console.info('display: ', display);
     //console.info('assets_url: ', assets_url);
     var antibodies = '';
-    var organ_uberon_url_encode = '';
+    var organ_uberon_id_url_encode = '';
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
@@ -67,8 +67,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '</td>';
       antibodies += '<td class="protocol_doi_col" style="display:'+display.protocol_doi+`;"><a href="https://doi.org/${hit._source.protocol_doi}" target="_blank">${hit._source.protocol_doi}</a></td>`;
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
-      organ_uberon_url_encode = hit._source.organ_uberon.replace(':','%3A');
-      antibodies += '<td class="organ_uberon_col" style="display:'+display.organ_uberon+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon}</a></td>`;
+      organ_uberon_id_url_encode = hit._source.organ_uberon_id.replace(':','%3A');
+      antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
       antibodies += '<td class="antigen_retrieval_col" style="display:'+display.antigen_retrieval+`;">${hit._source.antigen_retrieval}</td>`;
       antibodies += '<td class="omap_id_col" style="display:'+display.omap_id+`;">${hit._source.omap_id}</td>`;
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
@@ -107,7 +107,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="manuscript_doi_col_head" style={{"display": display.manuscript_doi}}>Manuscript DOI</th>
               <th id="protocol_doi_col_head" style={{"display": display.protocol_doi}}>Protocol DOI</th>
               <th id="vendor_affiliation_col_head" style={{"display": display.vendor_affiliation}}>Vendor Affiliation</th>
-              <th id="organ_uberon_col_head" style={{"display": display.organ_uberon}}>Organ UBERON</th>
+              <th id="organ_uberon_id_col_head" style={{"display": display.organ_uberon_id}}>Organ UBERON ID</th>
               <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
               <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP ID</th>
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>

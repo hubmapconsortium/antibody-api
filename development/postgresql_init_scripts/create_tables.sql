@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "fluorescent_reporter" text NOT NULL,
     "manuscript_doi" text NOT NULL,
     "vendor_affiliation" text,
-    "organ_uberon" text NOT NULL,
+    "organ_uberon_id" text NOT NULL,
     "antigen_retrieval" text NOT NULL,
     "omap_id" text,
 

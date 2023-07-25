@@ -16,7 +16,7 @@ def save_antibody():
         'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host',
         'clonality', 'clone_id', 'vendor', 'catalog_number', 'lot_number', 'recombinant',
         'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi', 'author_orcids',
-        'organ', 'organ_uberon', 'avr_pdf_filename', 'cycle_number'
+        'organ', 'organ_uberon_id', 'avr_pdf_filename', 'cycle_number'
     )
     try:
         antibody = request.get_json()['antibody']

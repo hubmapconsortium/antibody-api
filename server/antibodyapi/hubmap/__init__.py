@@ -63,7 +63,7 @@ def hubmap_search():
         "manuscript_doi": "none",
         "protocol_doi": "none",
         "vendor_affiliation": "none",
-        "organ_uberon": "none",
+        "organ_uberon_id": "none",
         "antigen_retrieval": "none",
         "omap_id": "none",
         "created_by_user_email": "none"
@@ -76,7 +76,7 @@ def hubmap_search():
         "recombinant", "organ", "author_orcids", "hgnc_id", "isotype",
         "concentration_value", "dilution_factor", "conjugate", "cycle_number",
         "fluorescent_reporter", "manuscript_doi", "protocol_doi",
-        "vendor_affiliation", "organ_uberon", "antigen_retrieval", "omap_id",
+        "vendor_affiliation", "organ_uberon_id", "antigen_retrieval", "omap_id",
         "created_by_user_email"
     ]
     return render_template(

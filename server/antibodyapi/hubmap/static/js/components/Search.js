@@ -58,7 +58,7 @@ function Search(props) {
             "antibody_uuid","protocol_doi","manuscript_doi","uniprot_accession_number",
             "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
             "clonality","clone_id","vendor","catalog_number","lot_number",
-            "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
+            "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
             "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
             "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
             "created_by_user_email","avr_pdf_filename"
@@ -207,7 +207,7 @@ function Search(props) {
                   <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
                   <Checkbox element="protocol_doi" label="Protocol DOI"/>
                   <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
-                  <Checkbox element="organ_uberon" label="Organ UBERON"/>
+                  <Checkbox element="organ_uberon_id" label="Organ UBERON ID"/>
                   <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
                   <Checkbox element="omap_id" label="OMAP ID"/>
                   <Checkbox element="created_by_user_email" label="Submitter Email"/>

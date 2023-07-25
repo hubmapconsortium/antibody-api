@@ -26,11 +26,11 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
 logger = logging.getLogger(__name__)
 
 
-def only_printable(s: str) -> str:
+def only_printable_and_strip(s: str) -> str:
     # This does not work because (apparently) the TM symbol is a unicode character.
     # s.encode('utf-8', errors='ignore').decode('utf-8')
     # So, we use the more restrictive string.printable which does not contain unicode characters.
-    return ''.join(c for c in s if c in string.printable)
+    return ''.join(c for c in s if c in string.printable).strip()
 
 
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
@@ -70,7 +70,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                 for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
                     # and make all the keys lowercase so comparison is easy...
-                    row = {k.lower(): only_printable(v) for (k, v) in row_dr.items()}
+                    row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])

@@ -36,7 +36,7 @@ def index_antibody(antibody: dict):
         'lot_number': antibody['lot_number'],
         'recombinant': antibody['recombinant'],
         'organ': antibody['organ'],
-        'organ_uberon': antibody['organ_uberon'],
+        'organ_uberon_id': antibody['organ_uberon_id'],
         'omap_id': antibody['omap_id'],
         'antigen_retrieval': antibody['antigen_retrieval'],
         'hgnc_id': antibody['hgnc_id'],
