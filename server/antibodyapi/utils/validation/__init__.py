@@ -60,6 +60,16 @@ class CanonicalizeDOI:
                 return doi
         return None
 
+    def canonicalize_multiple(self, original_dois: str) -> str:
+        canonicalised_dois: str = ""
+        for doi in original_dois.split(','):
+            canonicalised_doi = self.canonicalize(doi.strip(' '))
+            if canonicalised_doi is not None:
+                if canonicalised_dois != "":
+                    canonicalised_dois += ","
+                canonicalised_dois += canonicalised_doi
+        return canonicalised_dois
+
     def valid(self):
         return self.prefixes
 

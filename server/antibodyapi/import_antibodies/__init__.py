@@ -101,7 +101,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     canonicalize_yn_response = CanonicalizeYNResponse()
                     row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
                     canonicalize_doi = CanonicalizeDOI()
-                    row['protocol_doi'] = canonicalize_doi.canonicalize(row['protocol_doi'])
+                    row['protocol_doi'] = canonicalize_doi.canonicalize_multiple(row['protocol_doi'])
                     if row['manuscript_doi'] != '':
                         row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
 
