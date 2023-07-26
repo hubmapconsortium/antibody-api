@@ -66,7 +66,7 @@ class AntibodyHitsTable extends React.Component {
       }
       antibodies += '</td>';
       antibodies += '<td class="protocol_doi_col" style="display:'+display.protocol_doi+'">';
-      antibodies += a_hrefs('https://doi.org/', '', hit._source.protocol_doi;
+      antibodies += a_hrefs('https://doi.org/', '', hit._source.protocol_doi);
       antibodies += '</td>';
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_id_url_encode = hit._source.organ_uberon_id.replace(':','%3A');
