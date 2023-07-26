@@ -65,7 +65,9 @@ class AntibodyHitsTable extends React.Component {
         antibodies += `<a href="https://doi.org/${hit._source.manuscript_doi}" target="_blank">${hit._source.manuscript_doi}</a>`;
       }
       antibodies += '</td>';
-      antibodies += '<td class="protocol_doi_col" style="display:'+display.protocol_doi+`;"><a href="https://doi.org/${hit._source.protocol_doi}" target="_blank">${hit._source.protocol_doi}</a></td>`;
+      antibodies += '<td class="protocol_doi_col" style="display:'+display.protocol_doi+'">';
+      antibodies += a_hrefs('https://doi.org/', '', hit._source.protocol_doi;
+      antibodies += '</td>';
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_id_url_encode = hit._source.organ_uberon_id.replace(':','%3A');
       antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
