@@ -75,8 +75,17 @@ function Search(props) {
       <SideBar>
         <h3>Filters</h3>
 
-        <button onClick={collapseAllFilters}>Collapse All Filters</button>
+        <button onClick={collapseAllFilters}>Collapse all filters</button>
         <ResetFilters />
+        <RefinementListFilter
+          id="cell_line"
+          title="Cell Line"
+          field="cell_line.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
         <RefinementListFilter
           id="clonality"
           title="Clonality"
@@ -183,7 +192,7 @@ function Search(props) {
                 <button className="close" onClick={close}>
                   &times;
                 </button>
-                <CheckboxSet label="Set or Clear All"/>
+                <CheckboxSet label="Select or Clear All"/>
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 
