@@ -65,7 +65,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
             filename = secure_filename(file.filename)
             logger.info(f"import_antibodies: processing filename: {filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
+            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), encoding="ascii", errors="ignore") as csvfile:
                 row_i = 1
                 for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
