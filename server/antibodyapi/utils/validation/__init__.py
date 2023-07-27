@@ -63,7 +63,7 @@ class CanonicalizeDOI:
     def canonicalize_multiple(self, original_dois: str) -> str:
         canonicalised_dois: str = ""
         for doi in original_dois.split(','):
-            canonicalised_doi = self.canonicalize(doi.strip(' '))
+            canonicalised_doi = self.canonicalize(doi.strip())
             if canonicalised_doi is not None:
                 if canonicalised_dois != "":
                     canonicalised_dois += ","
@@ -231,7 +231,27 @@ def validate_row_data(row_i: int, row: dict) -> None:
                          " must be of the form OMAP-<integer> (e.g. OMAP-1, OMAP-2, ..., OMAP-n) ", 406))
 
 
-def validate_target(row_i: int, target: str, ubkg_api_url: str) -> None:
+def validate_targets(row_i: int, targets: str, ubkg_api_url: str) -> dict:
+    """
+    Since the target_symbol can be a comma delimited string, the validated target_symbol must also be one.
+    The aliases of each to the array of aliases must be combine so that they can all be searched on through
+    ElasticSearch.
+    """
+    result: dict = {targets: {"target_symbol": "", "target_aliases": []}}
+    for target in targets.split(','):
+        target_strip = target.strip()
+        validated = validate_target(row_i, target_strip, ubkg_api_url)
+        validated_data = validated[target_strip]
+        if result[targets]["target_symbol"] != "":
+            result[targets]["target_symbol"] += ","
+        result[targets]["target_symbol"] += validated_data["target_symbol"]
+        result[targets]["target_aliases"] += validated_data["target_aliases"]
+    # remove duplicates from the target_aliases
+    result[targets]["target_aliases"] = list(set(result[targets]["target_aliases"]))
+    return result
+
+
+def validate_target(row_i: int, target: str, ubkg_api_url: str) -> dict:
     """
     Look up the target using the UBKG API endpoint.
 
@@ -265,7 +285,7 @@ def validate_target(row_i: int, target: str, ubkg_api_url: str) -> None:
 
 def validate_uniprot_accession_numbers(row_i: int, uniprot_accession_numbers: str) -> None:
     for uniprot_accession_number in uniprot_accession_numbers.split(','):
-        validate_uniprot_accession_number(row_i, uniprot_accession_number.strip(' '))
+        validate_uniprot_accession_number(row_i, uniprot_accession_number.strip())
 
 
 def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str) -> None:
@@ -289,7 +309,7 @@ def validate_uniprot_accession_number(row_i: int, uniprot_accession_number: str)
 
 def validate_orcids(row_i: int, orcids: str) -> None:
     for orcid in orcids.split(','):
-        validate_orcid(row_i, orcid.strip(' '))
+        validate_orcid(row_i, orcid.strip())
 
 
 def validate_orcid(row_i: int, orcid: str) -> None:
@@ -330,7 +350,7 @@ def validate_rrid(row_i: int, rrid: str) -> None:
 
 def validate_dois(row_i: int, dois: str) -> None:
     for doi in dois.split(','):
-        validate_doi(row_i, doi.strip(' '))
+        validate_doi(row_i, doi.strip())
 
 
 def validate_doi(row_i: int, original_doi: str) -> None:
@@ -370,7 +390,7 @@ def validate_doi(row_i: int, original_doi: str) -> None:
 
 def validate_hgncs(row_i: int, hgncs: str) -> None:
     for hgnc in hgncs.split(','):
-        validate_hgnc(row_i, hgnc.strip(' '))
+        validate_hgnc(row_i, hgnc.strip())
 
 
 def validate_hgnc(row_i: int, hgnc: str) -> None:
@@ -481,13 +501,7 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     # All of these make callouts to other RestAPIs...
     validate_uniprot_accession_numbers(row_i, row['uniprot_accession_number'])
     validate_hgncs(row_i, row['hgnc_id'])
-    # target_name (then) was changed to a list by Elen, but back to a single entry by Bill and at the same time
-    # renamed to target_symbol; see:
-    # https://github.com/hubmapconsortium/antibody-api/issues/103
-    target_symbol: str = row['target_symbol']
-    if len(target_symbol.split(',')) > 1:
-        abort(json_error(f"CSV file row# {row_i}: only one target_symbol may be specified: '{target_symbol}'", 406))
-    target_data: dict = validate_target(row_i, target_symbol, ubkg_api_url)
+    target_data: dict = validate_targets(row_i, row['target_symbol'], ubkg_api_url)
     validate_rrid(row_i, row['rrid'])
     validate_dois(row_i, row['protocol_doi'])
     validate_orcids(row_i, row['author_orcids'])

@@ -25,7 +25,9 @@ class AntibodyHitsTable extends React.Component {
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
       antibodies += `<tr key=${hit._id}>`;
-      antibodies += `<td class="target_symbol_col"><a href="https://www.uniprot.org/uniprotkb?query=(protein_name:%22${hit._source.target_symbol}%22)" target="_blank">${hit._source.target_symbol}</a></td>`;
+      antibodies += '<td class="target_symbol_col">';
+      antibodies += a_hrefs('https://www.uniprot.org/uniprotkb?query=(protein_name:%22', '%22)', hit._source.target_symbol);
+      antibodies += '</td>';
       antibodies += '<td class="uniprot_accession_number_col">';
       antibodies += a_hrefs('https://www.uniprot.org/uniprot/', '#section_general', hit._source.uniprot_accession_number);
       antibodies += '</td>';
