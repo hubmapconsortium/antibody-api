@@ -56,7 +56,7 @@ function CheckboxSet(props) {
   const handleChange = () => {
     const display_item = true;
     const never_modify =
-        ['target_symbol','uniprot_accession_number','clonality', 'clone_id','method','tissue_preservation','avr_pdf_filename']
+        ['target_symbol','uniprot_accession_number','clonality','method','tissue_preservation','avr_pdf_filename']
     for (let elt in display) {
       if (!never_modify.includes(elt)) {
         console.info('CheckboxSet: modifying display_item: ', display_item, ' elt: ', elt);

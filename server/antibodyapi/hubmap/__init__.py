@@ -38,11 +38,11 @@ def hubmap_search():
         "target_symbol": "table-cell",
         "uniprot_accession_number": "table-cell",
         "clonality": "table-cell",
-        "clone_id": "table-cell",
         "method": "table-cell",
         "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
 
+        "clone_id": "none",
         "host": "none",
         "cell_line": "none",
         "cell_line_ontology_id": "none",

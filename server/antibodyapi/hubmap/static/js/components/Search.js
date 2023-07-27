@@ -196,6 +196,7 @@ function Search(props) {
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 
+                  <Checkbox element="clone_id" label="Clone ID"/>
                   <Checkbox element="cell_line" label="Cell Line"/>
                   <Checkbox element="cell_line_ontology_id" label="Cell Line Ontology ID"/>
                   <Checkbox element="host" label="Host"/>
