@@ -59,15 +59,20 @@ function ButtonSetAll() {
       if (!never_modify.includes(elt)) {
         console.info('ButtonSetAll: modifying display_item: ', display_item, ' elt: ', elt);
         var [checked, setChecked] = useState(cookies[elt]===display_item?'true':'false');
+        console.info('ButtonSetAll: setChecked');
         setChecked(display_item);
+        console.info('ButtonSetAll: setCookie');
         setCookie(elt, display_item?'true':'false', {path: "/", sameSite: 'strict'})
+        console.info('ButtonSetAll: setting display[elt]');
         display[elt] = display_item?"table-cell":"none";
         var id_col = elt + '_col';
+        console.info('ButtonSetAll: getting id_col: ', id_col);
         const all_col=document.getElementsByClassName(id_col);
         for (var i=0;i<all_col.length;i++) {
            all_col[i].style.display=display[elt];
         }
         var id_header = id_col + "_head";
+        console.info('ButtonSetAll: getElementById: ', id_header);
         var table_header_elt=document.getElementById(id_header);
         if (table_header_elt !== null) {
           table_header_elt.style.display=display[elt];
