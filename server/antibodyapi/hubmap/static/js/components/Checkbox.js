@@ -51,7 +51,7 @@ function ButtonSetAll() {
   console.info('ButtonSetAll: display on entry: ', display);
   console.info('ButtonSetAll: cookies: on entry', cookies);
 
-  const handleChange = () => {
+  const handleClick = () => {
     const display_item = true;
     const never_modify =
         ['target_symbol','uniprot_accession_number','clonality','method','tissue_preservation','avr_pdf_filename']
@@ -78,10 +78,9 @@ function ButtonSetAll() {
 
   return (
     <div>
-      <input type="button"
-             value="Set All"
-             onChange={handleChange}
-      />
+      <button onClick={handleClick} />
+        Set All
+      </button>
     </div>
   );
 };
