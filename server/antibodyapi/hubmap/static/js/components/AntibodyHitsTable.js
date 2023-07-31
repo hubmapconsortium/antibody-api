@@ -11,7 +11,7 @@ class AntibodyHitsTable extends React.Component {
       for (let i = 0; i < data_l.length; i++ ) {
         let data = data_l[i].trim();
         if (i > 0) {
-          cs += ',';
+          cs += ', ';
         }
         cs += `<a href="${url_prefix}${data}${url_suffix}" target="_blank">${data}</a>`;
       }
