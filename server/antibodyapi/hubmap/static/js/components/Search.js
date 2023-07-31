@@ -192,7 +192,7 @@ function Search(props) {
                 <button className="close" onClick={close}>
                   &times;
                 </button>
-                <CheckboxSet label="Select or Clear All"/>
+                <ButtonSetAll/>
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 
