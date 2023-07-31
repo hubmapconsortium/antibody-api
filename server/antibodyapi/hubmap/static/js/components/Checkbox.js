@@ -82,7 +82,6 @@ function ButtonSetAll() {
              value="Set All"
              onChange={handleChange}
       />
-      {label}
     </div>
   );
 };
