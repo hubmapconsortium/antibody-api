@@ -58,10 +58,6 @@ function ButtonSetAll() {
     for (let elt in display) {
       if (!never_modify.includes(elt)) {
         console.info('ButtonSetAll: modifying display_item: ', display_item, ' elt: ', elt);
-        var [checked, setChecked] = useState(cookies[elt]===display_item?'true':'false');
-        console.info('ButtonSetAll: setChecked');
-        setChecked(display_item);
-        console.info('ButtonSetAll: setCookie');
         setCookie(elt, display_item?'true':'false', {path: "/", sameSite: 'strict'})
         console.info('ButtonSetAll: setting display[elt]');
         display[elt] = display_item?"table-cell":"none";
