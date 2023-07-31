@@ -5,7 +5,7 @@ import {
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
-import { Checkbox, CheckboxSet } from './Checkbox';
+import { Checkbox, ButtonSetAll } from './Checkbox';
 import DownloadFile from './DownloadFile';
 import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
