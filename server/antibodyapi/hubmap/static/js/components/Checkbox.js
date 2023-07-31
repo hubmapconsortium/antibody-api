@@ -78,7 +78,7 @@ function ButtonSetAll() {
 
   return (
     <div>
-      <button onClick={handleClick} />
+      <button onClick={handleClick} >
         Set All
       </button>
     </div>
