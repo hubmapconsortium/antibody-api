@@ -137,14 +137,22 @@ def value_present_in_row(value_key: str, row: dict) -> bool:
 
 def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     """
-    These are fields in the data that cannot be empty as described in
-    https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
+    This routine tests for adherence to a number of rules:
+
+    0) items in the 'required_item_keys' must always be present (e.g., not the empty string).
+    1) 'concentration_value' or 'dilution_factor' but not both (e.g, xor).
+    2) 'cell_line' or 'organ' but not both (e.g, xor).
+    3) if 'cell_line' is present then 'cell_line_ontology_id' must be present.
+    4) 'clone_id' will be non-blank when 'clonality' contains 'monoclonal', if 'clonality' contains 'polyclonal' then 'clone_id' will/should be blank.
+    5) if 'organ' is present then 'organ_uberon_id' must be present.
+    6) if both 'organ' and 'organ_uberon_id' are present (see #5), then neither 'cell_line' nor 'cell_line_ontoloty_id' should be present.
     """
+    # Ellen Quardokus Aug 1, 2023
+    # Remove: 'cycle_number' and 'isotype' as 'fields that should always be present' and make them both optional.
     required_item_keys: list[str] = [
-        'uniprot_accession_number', 'hgnc_id', 'target_symbol', 'isotype', 'host',
-        'clonality', 'vendor', 'catalog_number', 'recombinant',
-        'rrid', 'method', 'tissue_preservation', 'protocol_doi','author_orcids',
-        'organ_uberon_id', 'avr_pdf_filename', 'cycle_number'
+        'author_orcids', 'avr_pdf_filename', 'catalog_number', 'clonality', 'hgnc_id', 'host',
+        'method', 'protocol_doi', 'recombinant', 'rrid', 'target_symbol',
+        'tissue_preservation', 'uniprot_accession_number', 'vendor'
     ]
     logger.debug(f'validate_row_data_required_fields: row: {row}')
     for item_key in required_item_keys:
@@ -158,27 +166,39 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
         abort(json_error(f"CSV file row# {row_i}: 'concentration_value' or 'dilution_factor'"
                          " but not both, and one must be present", 406))
 
-    # 'cell_line' or 'organ' must be present but not both (e.g, xor). Ellen in Slack on Jul 20, 2023
-    cell_line_value_present: bool = value_present_in_row('cell_line', row)
+    # 'cell_line' or 'organ' but not both (e.g, xor). Ellen in Slack on Jul 20, 2023
+    cell_line_present: bool = value_present_in_row('cell_line', row)
     organ_present: bool = value_present_in_row('organ', row)
-    if not (cell_line_value_present ^ organ_present):
+    if not (cell_line_present ^ organ_present):
         abort(json_error(f"CSV file row# {row_i}: 'cell_line' or 'organ'"
                          " but not both, and one must be present", 406))
 
     # if 'cell_line' is present then 'cell_line_ontology_id' must be present. Ellen in Slack on Jul 20, 2023
-    cell_line_ontology_id_value_present: bool = value_present_in_row('cell_line_ontology_id', row)
-    if cell_line_value_present ^ cell_line_ontology_id_value_present:
+    cell_line_ontology_id_present: bool = value_present_in_row('cell_line_ontology_id', row)
+    if cell_line_present ^ cell_line_ontology_id_present:
         abort(json_error(f"CSV file row# {row_i}: Both 'cell_line' and 'cell_line_ontology_id'"
                          " must be present if any one of them are present", 406))
 
-    # clone_id will be non-blank when 'clonality' contains 'monoclonal', if clonality contains polyclonal then clone_id
-    # will/should be blank. Ellen in Slack on Jul 20, 2023
+    # 'clone_id' will be non-blank when 'clonality' contains 'monoclonal',
+    # if 'clonality' contains 'polyclonal' then 'clone_id' will/should be blank. Ellen in Slack on Jul 20, 2023
     clonality: str = row['clonality'].lower()
     clone_id: str = row['clone_id']
     if (clonality == 'monoclonal' and len(clone_id) == 0) or\
             (clonality != 'monoclonal' and len(clone_id) > 0):
         abort(json_error(f"CSV file row# {row_i}: When clonality is 'monoclonal' then 'clone_id'"
                          " must be specified otherwise 'clone_id' should not be specified", 406))
+
+    # if 'organ' is present then 'organ_uberon_id' must be present.
+    organ_uberon_id_present: bool = value_present_in_row('organ_uberon_id', row)
+    if organ_present ^ organ_uberon_id_present:
+        abort(json_error(f"CSV file row# {row_i}: Both 'organ' and 'organ_uberon_id'"
+                         " must be present if any one of them are present", 406))
+
+    # if both 'organ' and 'organ_uberon_id' are present, then neither 'cell_line' nor 'cell_line_ontoloty_id' should be present.
+    # NOTE: Since we've already checked for the and conditions (rule above) we only have to check for one....
+    if not (organ_present ^ cell_line_present):
+        abort(json_error(f"CSV file row# {row_i}: 'organ' & 'organ_uberon_id' or 'cell_line' & 'cell_line_ontoloty_id'"
+                         " but not both groups, and one group must be present", 406))
 
     # 'cycle_number' and 'fluorescent_reporter' are required fields if 'omap_id' is present.
     # cycle_number_present: bool = value_present_in_row('cycle_number', row)
