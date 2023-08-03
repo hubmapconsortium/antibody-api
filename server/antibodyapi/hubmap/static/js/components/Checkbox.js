@@ -7,7 +7,7 @@ function Checkbox(props) {
   const elt = props.element;
   const checked = props.checked.elt;
   const setChecked = props.setChecked;
-  const setCookies = props.setCookies;
+  const setCookie = props.setCookie;
 
   const id_col = elt + '_col';
   const id_header = id_col + "_head";
@@ -88,11 +88,11 @@ function AdditionalColumns() {
         <div className="content div-border">
             {checkbox_props.map(prop =>
              <Checkbox
-               label={this.prop.label}
-               element={this.prop.element}
-               checked={this.checked}
-               setChecked={this.setChecked}
-               setCookies={this.setCookies}
+               label={prop.label}
+               element={prop.element}
+               checked={checked}
+               setChecked={setChecked}
+               setCookie={setCookie}
                />
              )}
         </div>
