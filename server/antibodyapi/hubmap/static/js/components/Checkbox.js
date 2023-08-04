@@ -77,11 +77,11 @@ function AdditionalColumns() {
     {element:"created_by_user_email", label:"Submitter Email"}
   ];
 
-  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-
-  const [checked, setChecked] = useState(state_values);
   const [cookies, setCookie] = useCookies([]);
+  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]})));
+  const [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns cookies: ', cookies);
+  console.info('AdditionalColumns state_values: ', state_values);
 
   return (
      <div>
