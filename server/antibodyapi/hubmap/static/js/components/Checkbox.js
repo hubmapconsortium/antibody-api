@@ -81,6 +81,7 @@ function AdditionalColumns() {
 
   const [checked, setChecked] = useState(state_values);
   const [cookies, setCookie] = useCookies([]);
+  console.info('AdditionalColumns cookies: ', cookies);
 
   return (
      <div>
