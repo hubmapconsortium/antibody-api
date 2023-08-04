@@ -5,6 +5,7 @@ function Checkbox(props) {
 
   const label = props.label;
   const elt = props.element;
+  const checked = props.checked.elt
   const setChecked = props.setChecked;
   const setCookie = props.setCookie;
 
@@ -19,11 +20,10 @@ function Checkbox(props) {
 
   const handleChange = () => {
     console.info(elt, "Checkbox handler: checked on entry:", props.checked);
-    props.checked.elt = props.checked.elt==='false'?'true':'false'
-    setChecked(props.checked);
+    setChecked({...props.checked, ...{elt: checked==='false'?'true':'false'}});
     console.info('Checkbox handler: chected after reversing: ', props.checked);
-    setCookie(elt, props.checked.elt==='false'?'true':'false', { path: "/", sameSite: 'strict' });
-    display[elt] = props.checked.elt==="false"?'table-cell':'none';
+    setCookie(elt, checked==='false'?'true':'false', { path: "/", sameSite: 'strict' });
+    display[elt] = checked==="false"?'table-cell':'none';
     const all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
