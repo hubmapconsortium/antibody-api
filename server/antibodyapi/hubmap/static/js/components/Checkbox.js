@@ -78,7 +78,7 @@ function AdditionalColumns() {
   ];
 
   const [cookies, setCookie] = useCookies([]);
-  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]})));
+  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]==="true"?true:false})));
   const [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns cookies: ', cookies);
   console.info('AdditionalColumns state_values: ', state_values);
