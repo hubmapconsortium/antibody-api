@@ -2,48 +2,16 @@ import React, {useState} from 'react';
 import { useCookies } from 'react-cookie';
 
 function Checkbox(props) {
-
   const label = props.label;
   const elt = props.element;
-  const checked = props.checked.elt;
-  const setChecked = props.setChecked;
-  const setCookie = props.setCookie;
-
-  const id_col = elt + '_col';
-  const id_header = id_col + "_head";
-
-  //const [cookies, setCookie] = useCookies([]);
-  //const [checked, setChecked] = useState(cookies[elt]==='true');
-
-  console.info('Checkbox elt: ', elt, ' id_col: ', id_col, ' id_header: ', id_header, ' label: ', label);
-  console.info('Checkbox display: ', display);
-
-  const handleChange = () => {
-    console.info(elt, "Checkbox handler: checked on entry:", props.checked);
-    setChecked({...props.checked, ...{elt: checked==='false'?'true':'false'}});
-    console.info('Checkbox handler: chected after reversing: ', props.checked);
-    setCookie(elt, checked==='false'?'true':'false', { path: "/", sameSite: 'strict' });
-    display[elt] = checked==="false"?'table-cell':'none';
-    const all_col=document.getElementsByClassName(id_col);
-    console.info('Checkbox handler: all_col: ', all_col);
-    console.info('Checkbox handler: display before: ', display);
-    for (var i=0;i<all_col.length;i++) {
-       all_col[i].style.display=display[elt];
-    }
-    console.info('Checkbox handler: display after: ', display);
-    // Uncaught TypeError: document.getElementById(...) is null
-    // will only happen if no data has been loaded
-    const table_header_elt=document.getElementById(id_header);
-    if (table_header_elt !== null) {
-      table_header_elt.style.display=display[elt];
-    }
-  };
+  const handleChange = props.handleChange;
+  const isChecked = props.isChecked;
 
   return (
     <div>
       <input type="checkbox"
-             onChange={handleChange}
-             checked={checked==='false'?true:false}
+             onChange={handleChange(elt)}
+             checked={isChecked(elt)}
       />
       {label}
     </div>
@@ -80,11 +48,33 @@ function AdditionalColumns() {
     {element:"created_by_user_email", label:"Submitter Email"}
   ];
 
-  const [cookies, setCookie] = useCookies([]);
-  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]})));
-  const [checked, setChecked] = useState(state_values);
-  console.info('AdditionalColumns cookies: ', cookies);
+  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
+  [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns state_values: ', state_values);
+
+  const handleChange = (elt) => {
+    console.info(elt, "Checkbox handler: checked before:", checked, ' elt: ', elt);
+    setChecked({...checked, ...{elt: !checked.elt}})
+    console.info('Checkbox handler: chected after reversing: ', checked);
+    display[elt] = checked.elt?'table-cell':'none';
+    const id_col = elt + '_col';
+    const all_col=document.getElementsByClassName(id_col);
+    for (var i=0;i<all_col.length;i++) {
+       all_col[i].style.display=display[elt];
+    }
+    console.info('Checkbox handler: display after: ', display);
+    // Uncaught TypeError: document.getElementById(...) is null
+    // will only happen if no data has been loaded
+    const id_header = id_col + "_head";
+    const table_header_elt=document.getElementById(id_header);
+    if (table_header_elt !== null) {
+      table_header_elt.style.display=display[elt];
+    }
+  };
+
+  const isChecked = (elt) => {
+    return checked.elt;
+  };
 
   return (
      <div>
@@ -94,9 +84,8 @@ function AdditionalColumns() {
              <Checkbox
                label={prop.label}
                element={prop.element}
-               checked={checked}
-               setChecked={setChecked}
-               setCookie={setCookie}
+               handleChange={hangleChange}
+               isChecked={isChecked}
                />
              )}
         </div>
