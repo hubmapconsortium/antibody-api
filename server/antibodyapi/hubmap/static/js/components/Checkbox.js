@@ -25,12 +25,12 @@ function Checkbox(props) {
     setCookie(elt, checked==='false'?'true':'false', { path: "/", sameSite: 'strict' });
     display[elt] = checked==="false"?'table-cell':'none';
     const all_col=document.getElementsByClassName(id_col);
-    console.info('Checkbox handler: all_col: ', all_col)
-    console.info('Checkbox handler: display before: ', display)
+    console.info('Checkbox handler: all_col: ', all_col);
+    console.info('Checkbox handler: display before: ', display);
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
     }
-    console.info('Checkbox handler: display after: ', display)
+    console.info('Checkbox handler: display after: ', display);
     // Uncaught TypeError: document.getElementById(...) is null
     // will only happen if no data has been loaded
     const table_header_elt=document.getElementById(id_header);
