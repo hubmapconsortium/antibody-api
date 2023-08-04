@@ -5,7 +5,6 @@ function Checkbox(props) {
 
   const label = props.label;
   const elt = props.element;
-  const checked = props.checked.elt;
   const setChecked = props.setChecked;
   const setCookie = props.setCookie;
 
@@ -19,12 +18,12 @@ function Checkbox(props) {
   console.info('Checkbox display: ', display);
 
   const handleChange = () => {
-    console.info(elt, "Checkbox handler: checked on entry:", checked, 'elt: ', elt);
-    props.checked.elt = !checked
-    setChecked(props.checked.elt);
-    console.info('Checkbox handler: chected after reversing: ', checked, 'elt: ', elt);
-    setCookie(elt, !checked?'true':'false', { path: "/", sameSite: 'strict' });
-    display[elt]=!checked?'table-cell':'none';
+    console.info(elt, "Checkbox handler: checked on entry:", props.checked);
+    props.checked.elt = props.checked.elt==='false'?'true':'false'
+    setChecked(props.checked);
+    console.info('Checkbox handler: chected after reversing: ', props.checked);
+    setCookie(elt, props.checked.elt==='false'?'true':'false', { path: "/", sameSite: 'strict' });
+    display[elt]=props.checked.elt==="false"?'table-cell':'none';
     const all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
@@ -79,7 +78,7 @@ function AdditionalColumns() {
   ];
 
   const [cookies, setCookie] = useCookies([]);
-  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]==="true"?true:false})));
+  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: cookies[x.element]})));
   const [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns cookies: ', cookies);
   console.info('AdditionalColumns state_values: ', state_values);
