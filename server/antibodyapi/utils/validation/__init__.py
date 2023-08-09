@@ -505,7 +505,7 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
                 max_ingest_file_upload_size_mb: float = 10.0
                 if pdf_file_size_mb >= max_ingest_file_upload_size_mb:
                     abort(json_error(f"CSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}'"
-                                     f" PDF file size limit is {max_ingest_file_upload_size_mb}MB", 406))
+                                     f" is over maximum file size of {max_ingest_file_upload_size_mb}MB", 406))
                 avr_pdf_file.stream.seek(0)
                 logger.debug("validate_antibodycsv_row: avr_pdf_file.filename:"
                              f" {row['avr_pdf_filename']}; size: {pdf_file_size_mb}MB")
