@@ -501,6 +501,11 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
                 content: bytes = avr_pdf_file.stream.read()
                 # Since this is a stream, we need to go back to the beginning or the next time that it is read
                 # it will be read from the end where there are no characters providing an empty file.
+                pdf_file_size_mb: float = len(bytes)/(1024.0*1000.0)
+                max_ingest_file_upload_size_mb: float = 10.0
+                if pdf_file_size_mb >= max_ingest_file_upload_size_mb:
+                    abort(json_error(f"CSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}'"
+                                     f" PDF file size limit is {max_ingest_file_upload_size_mb}MB", 406))
                 avr_pdf_file.stream.seek(0)
                 logger.debug("validate_antibodycsv_row: avr_pdf_file.filename:"
                              f" {row['avr_pdf_filename']}; size: {len(content)}")
@@ -563,6 +568,7 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
             # Remove any non-ascii characters from the stream both here and when processing it.
             lines: [str] = [x.decode("ascii", "ignore") for x in file.stream.read().splitlines()]
             logger.debug(f'Lines: {lines}')
+            # TODO: Limit the number of lines to 16 (header plus 15 lines of data)
             validate_header_keys(lines[0])
             # Since this is a stream, we need to go back to the beginning or the next time that it is read
             # it will be read from the end where there are no characters providing an empty file.
@@ -587,6 +593,7 @@ def validate_antibodycsv(request_files: dict, ubkg_api_url: str):
     return pdf_files_processed, target_datas
 
 
+# TODO: Apparently a POST has a 100MB limit which we cannot check here.
 if __name__ == '__main__':
     import argparse
 
