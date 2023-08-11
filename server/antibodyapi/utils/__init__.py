@@ -28,7 +28,7 @@ class SI(IntEnum):
     ANTIBODY_UUID = 0
     AVR_PDF_FILENAME = 1
     AVR_PDF_UUID = 2
-    PROTOCOLS_DOI = 3
+    PROTOCOL_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
     TARGET_SYMBOL = 5
     RRID = 6
@@ -40,18 +40,18 @@ class SI(IntEnum):
     RECOMBINANT = 12
     ORGAN = 13
     METHOD = 14
-    AUTHOR_ORCID = 15
+    AUTHOR_ORCIDS = 15
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
-    DILUTION = 19
+    DILUTION_FACTOR = 19
     CONJUGATE = 20
     TISSUE_PRESERVATION = 21
     CYCLE_NUMBER = 22
     FLUORESCENT_REPORTER = 23
     MANUSCRIPT_DOI = 24
     VENDOR_AFFILIATION = 25
-    ORGAN_UBERON = 26
+    ORGAN_UBERON_ID = 26
     ANTIGEN_RETRIEVAL = 27
     OMAP_ID = 28
     CREATED_TIMESTAMP = 29
@@ -59,19 +59,23 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
+    CELL_LINE = 34
+    CELL_LINE_ONTOLOGY_ID = 35
+    CLONE_ID = 36
 
 
 QUERY = '''
 SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
-    a.protocols_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.protocol_doi, a.uniprot_accession_number,
+    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.clonality, a.clone_id, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
-    a.method, a.author_orcid, a.hgnc_id, a.isotype,
-    a.concentration_value, a.dilution, a.conjugate,
+    a.method, a.author_orcids, a.hgnc_id, a.isotype,
+    a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
-    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon_id,
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
@@ -88,30 +92,33 @@ def base_antibody_query():
 def base_antibody_query_result_to_json(antibody) -> dict:
     ant = {
         'antibody_uuid': antibody[SI.ANTIBODY_UUID].replace('-', ''),
-        'protocols_doi': antibody[SI.PROTOCOLS_DOI],
+        'protocol_doi': antibody[SI.PROTOCOL_DOI],
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
         'target_symbol': antibody[SI.TARGET_SYMBOL],
         'rrid': antibody[SI.RRID],
+        'cell_line': antibody[SI.CELL_LINE],
+        'cell_line_ontology_id': antibody[SI.CELL_LINE_ONTOLOGY_ID],
         'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
+        'clone_id': antibody[SI.CLONE_ID],
         'vendor_name': antibody[SI.VENDOR_NAME],
         'catalog_number': antibody[SI.CATALOG_NUMBER],
         'lot_number': antibody[SI.LOT_NUMBER],
         'recombinant': antibody[SI.RECOMBINANT],
         'organ': antibody[SI.ORGAN],
         'method': antibody[SI.METHOD],
-        'author_orcid': antibody[SI.AUTHOR_ORCID],
+        'author_orcids': antibody[SI.AUTHOR_ORCIDS],
         'hgnc_id': antibody[SI.HGNC_ID],
         'isotype': antibody[SI.ISOTYPE],
         'concentration_value': antibody[SI.CONCENTRATION_VALUE],
-        'dilution': antibody[SI.DILUTION],
+        'dilution_factor': antibody[SI.DILUTION_FACTOR],
         'conjugate': antibody[SI.CONJUGATE],
         'tissue_preservation': antibody[SI.TISSUE_PRESERVATION],
         'cycle_number': antibody[SI.CYCLE_NUMBER],
         'fluorescent_reporter': antibody[SI.FLUORESCENT_REPORTER],
         'manuscript_doi': antibody[SI.MANUSCRIPT_DOI],
         'vendor_affiliation': antibody[SI.VENDOR_AFFILIATION],
-        'organ_uberon': antibody[SI.ORGAN_UBERON],
+        'organ_uberon_id': antibody[SI.ORGAN_UBERON_ID],
         'antigen_retrieval': antibody[SI.ANTIGEN_RETRIEVAL],
         'omap_id': antibody[SI.OMAP_ID],
         # 'created_timestamp': antibody[SI.CREATED_TIMESTAMP]
@@ -272,13 +279,14 @@ def insert_query():
     return '''
 INSERT INTO antibodies (
     antibody_uuid,
-    protocols_doi, uniprot_accession_number,
-    target_symbol, rrid, host, clonality, vendor_id,
+    protocol_doi, uniprot_accession_number,
+    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
-    method, author_orcid, hgnc_id, isotype,
-    concentration_value, dilution, conjugate,
+    method, author_orcids, hgnc_id, isotype,
+    concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
-    manuscript_doi, vendor_affiliation, organ_uberon,
+    manuscript_doi, vendor_affiliation, organ_uberon_id,
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
@@ -286,13 +294,14 @@ INSERT INTO antibodies (
 ) 
 VALUES (
     %(antibody_uuid)s,
-    %(protocols_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(protocol_doi)s, %(uniprot_accession_number)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
-    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
-    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
+    %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
-    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon_id)s,
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
@@ -306,13 +315,14 @@ def insert_query_with_avr_file_and_uuid():
 INSERT INTO antibodies (
     antibody_uuid,
     avr_pdf_uuid, avr_pdf_filename,
-    protocols_doi, uniprot_accession_number,
-    target_symbol, rrid, host, clonality, vendor_id,
+    protocol_doi, uniprot_accession_number,
+    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
-    method, author_orcid, hgnc_id, isotype,
-    concentration_value, dilution, conjugate,
+    method, author_orcids, hgnc_id, isotype,
+    concentration_value, dilution_factor, conjugate,
     tissue_preservation, cycle_number, fluorescent_reporter,
-    manuscript_doi, vendor_affiliation, organ_uberon,
+    manuscript_doi, vendor_affiliation, organ_uberon_id,
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
@@ -321,13 +331,14 @@ INSERT INTO antibodies (
 VALUES (
     %(antibody_uuid)s,
     %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
-    %(protocols_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(clonality)s, %(vendor_id)s,
+    %(protocol_doi)s, %(uniprot_accession_number)s,
+    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
-    %(method)s, %(author_orcid)s, %(hgnc_id)s, %(isotype)s,
-    %(concentration_value)s, %(dilution)s, %(conjugate)s,
+    %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
+    %(concentration_value)s, %(dilution_factor)s, %(conjugate)s,
     %(tissue_preservation)s, %(cycle_number)s, %(fluorescent_reporter)s,
-    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon)s,
+    %(manuscript_doi)s, %(vendor_affiliation)s, %(organ_uberon_id)s,
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,

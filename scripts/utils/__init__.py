@@ -48,7 +48,7 @@ class SI(IntEnum):
     ANTIBODY_UUID = 0
     AVR_PDF_FILENAME = 1
     AVR_PDF_UUID = 2
-    PROTOCOLS_DOI = 3
+    PROTOCOL_DOI = 3
     UNIPROT_ACCESSION_NUMBER = 4
     TARGET_SYMBOL = 5
     RRID = 6
@@ -60,18 +60,18 @@ class SI(IntEnum):
     RECOMBINANT = 12
     ORGAN = 13
     METHOD = 14
-    AUTHOR_ORCID = 15
+    AUTHOR_ORCIDS = 15
     HGNC_ID = 16
     ISOTYPE = 17
     CONCENTRATION_VALUE = 18
-    DILUTION = 19
+    DILUTION_FACTOR = 19
     CONJUGATE = 20
     TISSUE_PRESERVATION = 21
     CYCLE_NUMBER = 22
     FLUORESCENT_REPORTER = 23
     MANUSCRIPT_DOI = 24
     VENDOR_AFFILIATION = 25
-    ORGAN_UBERON = 26
+    ORGAN_UBERON_id = 26
     ANTIGEN_RETRIEVAL = 27
     OMAP_ID = 28
     CREATED_TIMESTAMP = 29
@@ -79,19 +79,22 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
+    CELL_LINE = 34
+    CELL_LINE_ONTOLOGY_ID = 35
 
 
 QUERY = '''
 SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
-    a.protocols_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.clonality, v.vendor_name,
+    a.protocol_doi, a.uniprot_accession_number,
+    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
-    a.method, a.author_orcid, a.hgnc_id, a.isotype,
-    a.concentration_value, a.dilution, a.conjugate,
+    a.method, a.author_orcids, a.hgnc_id, a.isotype,
+    a.concentration_value, a.dilution_factor, a.conjugate,
     a.tissue_preservation, a.cycle_number, a.fluorescent_reporter,
-    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon,
+    a.manuscript_doi, a.vendor_affiliation, a.organ_uberon_id,
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
@@ -108,11 +111,11 @@ def where_condition(csv_row: dict, column: str, condition: str = 'AND') -> str:
 
 
 def base_antibody_query(csv_row: dict):
-    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocols_doi', '') + \
+    return QUERY + 'WHERE' + where_condition(csv_row, 'a.protocol_doi', '') + \
             where_condition(csv_row, 'a.uniprot_accession_number') + \
             where_condition(csv_row, 'a.target_symbol') + where_condition(csv_row, 'a.rrid') + \
             where_condition(csv_row, 'a.catalog_number') + where_condition(csv_row, 'a.lot_number') + \
-            where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcid')
+            where_condition(csv_row, 'a.organ') + where_condition(csv_row, 'a.author_orcids')
 
 
 def map_string_to_bool(value: str):
@@ -174,10 +177,12 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     if 'avr_pdf_uuid' in source:
         check_hit(source, 'avr_pdf_filename', db_row, SI.AVR_PDF_FILENAME, antibody_uuid)
         check_hit(source, 'avr_pdf_uuid', db_row, SI.AVR_PDF_UUID, antibody_uuid)
-    check_hit(source, 'protocols_doi', db_row, SI.PROTOCOLS_IO_DOI, antibody_uuid)
+    check_hit(source, 'protocol_doi', db_row, SI.PROTOCOL_DOI, antibody_uuid)
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_symbol', db_row, SI.TARGET_SYMBOL, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
+    check_hit(source, 'cell_line', db_row, SI.CELL_LINE, antibody_uuid)
+    check_hit(source, 'cell_line_ontology_id', db_row, SI.CELL_LINE_ONTOLOGY_ID, antibody_uuid)
     check_hit(source, 'host', db_row, SI.HOST, antibody_uuid)
     check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)
     check_hit(source, 'vendor_name', db_row, SI.VENDOR_NAME, antibody_uuid)
@@ -187,17 +192,17 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'organ', db_row, SI.ORGAN, antibody_uuid)
 
     check_hit(source, 'method', db_row, SI.METHOD, antibody_uuid)
-    check_hit(source, 'author_orcid', db_row, SI.AUTHOR_ORCID, antibody_uuid)
+    check_hit(source, 'author_orcids', db_row, SI.AUTHOR_ORCIDS, antibody_uuid)
     check_hit(source, 'hgnc_id', db_row, SI.HGNC_ID, antibody_uuid)
     check_hit(source, 'concentration_value', db_row, SI.CONCENTRATION_VALUE, antibody_uuid)
-    check_hit(source, 'dilution', db_row, SI.DILUTION, antibody_uuid)
+    check_hit(source, 'dilution_factor', db_row, SI.DILUTION_FACTOR, antibody_uuid)
     check_hit(source, 'conjugate', db_row, SI.CONJUGATE, antibody_uuid)
     check_hit(source, 'tissue_preservation', db_row, SI.TISSUE_PRESERVATION, antibody_uuid)
     check_hit(source, 'cycle_number', db_row, SI.CYCLE_NUMBER, antibody_uuid)
     check_hit(source, 'fluorescent_reporter', db_row, SI.FLUORESCENT_REPORTER, antibody_uuid)
     check_hit(source, 'manuscript_doi', db_row, SI.MANUSCRIPT_DOI, antibody_uuid)
     check_hit(source, 'vendor_affiliation', db_row, SI.VENDOR_AFFILIATION, antibody_uuid)
-    check_hit(source, 'organ_uberon', db_row, SI.ORGAN_UBERON, antibody_uuid)
+    check_hit(source, 'organ_uberon_id', db_row, SI.ORGAN_UBERON_ID, antibody_uuid)
     check_hit(source, 'antigen_retrieval', db_row, SI.ANTIGEN_RETRIEVAL, antibody_uuid)
     check_hit(source, 'omap_id', db_row, SI.OMAP_ID, antibody_uuid)
     check_hit(source, 'created_timestamp', db_row, SI.CREATED_TIMESTAMP, antibody_uuid)

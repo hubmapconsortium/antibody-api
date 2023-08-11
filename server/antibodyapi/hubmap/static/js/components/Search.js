@@ -5,7 +5,7 @@ import {
   ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
-import { Checkbox } from './Checkbox';
+import { Checkbox, ButtonSetAll } from './Checkbox';
 import DownloadFile from './DownloadFile';
 import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
@@ -55,18 +55,16 @@ function Search(props) {
         queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
         queryFields={[
-            "antibody_uuid","protocols_doi","manuscript_doi","uniprot_accession_number",
-            "target_symbol","target_aliases","rrid","host","clonality","vendor","catalog_number","lot_number",
-            "recombinant","organ","organ_uberon","omap_id","antigen_retrieval","hgnc_id","isotype",
-            "concentration_value","dilution","conjugate","method","tissue_preservation","cycle_number",
-            "fluorescent_reporter","author_orcid","vendor_affiliation","created_by_user_displayname",
+            "antibody_uuid","protocol_doi","manuscript_doi","uniprot_accession_number",
+            "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
+            "clonality","clone_id","vendor","catalog_number","lot_number",
+            "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
+            "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
+            "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
             "created_by_user_email","avr_pdf_filename"
         ]}
         />
-      <a href="/upload"
-         style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
-         Add AVRs
-      </a>
+
     </TopBar>
 
     <LayoutBody>
@@ -74,8 +72,17 @@ function Search(props) {
       <SideBar>
         <h3>Filters</h3>
 
-        <button onClick={collapseAllFilters}>Collapse All Filters</button>
+        <button onClick={collapseAllFilters}>Collapse all filters</button>
         <ResetFilters />
+        <RefinementListFilter
+          id="cell_line"
+          title="Cell Line"
+          field="cell_line.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
         <RefinementListFilter
           id="clonality"
           title="Clonality"
@@ -185,6 +192,9 @@ function Search(props) {
                 <div className="header"><h3>Additional Columns</h3></div>
                 <div className="content div-border">
 
+                  <Checkbox element="clone_id" label="Clone ID"/>
+                  <Checkbox element="cell_line" label="Cell Line"/>
+                  <Checkbox element="cell_line_ontology_id" label="Cell Line Ontology ID"/>
                   <Checkbox element="host" label="Host"/>
                   <Checkbox element="rrid" label="RRID"/>
                   <Checkbox element="catalog_number" label="Catalog#"/>
@@ -192,18 +202,18 @@ function Search(props) {
                   <Checkbox element="vendor_name" label="Vendor"/>
                   <Checkbox element="recombinant" label="Recombinant"/>
                   <Checkbox element="organ" label="Organ"/>
-                  <Checkbox element="author_orcid" label="Author ORCiD iD"/>
+                  <Checkbox element="author_orcids" label="Author ORCiDs"/>
                   <Checkbox element="hgnc_id" label="HGNC ID"/>
                   <Checkbox element="isotype" label="Isotype"/>
                   <Checkbox element="concentration_value" label="Concentration"/>
-                  <Checkbox element="dilution" label="Dilution"/>
+                  <Checkbox element="dilution_factor" label="Dilution Factor"/>
                   <Checkbox element="conjugate" label="Conjugate"/>
                   <Checkbox element="cycle_number" label="Cycle#"/>
                   <Checkbox element="fluorescent_reporter" label="Fluorescent Reporter"/>
                   <Checkbox element="manuscript_doi" label="Manuscript DOI"/>
-                  <Checkbox element="protocols_doi" label="Protocols DOI"/>
+                  <Checkbox element="protocol_doi" label="Protocol DOI"/>
                   <Checkbox element="vendor_affiliation" label="Vendor Affiliation"/>
-                  <Checkbox element="organ_uberon" label="Organ UBERON"/>
+                  <Checkbox element="organ_uberon_id" label="Organ UBERON ID"/>
                   <Checkbox element="antigen_retrieval" label="Antigen Retrieval"/>
                   <Checkbox element="omap_id" label="OMAP ID"/>
                   <Checkbox element="created_by_user_email" label="Submitter Email"/>

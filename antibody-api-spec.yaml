@@ -20,7 +20,7 @@ components:
     Antibody:
       type: object
       properties:
-        protocols_io_doi:
+        protocol_doi:
           type: string
           description: "The protocols.io digital object identifier for the protocol under which the sample was obtained and/or prepared."
         uniprot_accession_number:
@@ -32,7 +32,13 @@ components:
         rrid:
           type: string
           description: "The associated Research Resource IDentifier (https://scicrunch.org/resources)."
-        host_organism:
+        cell_line:
+          type: string
+          description: "Name of the cell line."
+        cell_line_ontology_id:
+          type: string
+          description: "The Cell Line Ontology (e.g., CLO:0007606 from https://www.ebi.ac.uk/ols4/ontologies/clo)."
+        host:
           type: string
           description: "The antibody's host organism."
         clonality:
@@ -42,6 +48,9 @@ components:
             - polyclonal
             - oligoclonal
           description: "One of the values: monoclonal (one), oligoclonal (few), and polyclonal (many)."
+        clone_id:
+          type: string
+          description: "The id of the clone when clonality is monoclonal."
         vendor:
           type: string
           description: "The antibody's vendor."

@@ -12,7 +12,7 @@ from antibodyapi.utils import (
     insert_query, insert_query_with_avr_file_and_uuid,
     json_error
 )
-from antibodyapi.utils.validation import validate_antibodycsv
+from antibodyapi.utils.validation import validate_antibodycsv, CanonicalizeYNResponse, CanonicalizeDOI
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
 import string
@@ -26,11 +26,11 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d
 logger = logging.getLogger(__name__)
 
 
-def only_printable(s: str) -> str:
+def only_printable_and_strip(s: str) -> str:
     # This does not work because (apparently) the TM symbol is a unicode character.
     # s.encode('utf-8', errors='ignore').decode('utf-8')
     # So, we use the more restrictive string.printable which does not contain unicode characters.
-    return ''.join(c for c in s if c in string.printable)
+    return ''.join(c for c in s if c in string.printable).strip()
 
 
 @import_antibodies_blueprint.route('/antibodies/import', methods=['POST'])
@@ -65,12 +65,12 @@ def import_antibodies(): # pylint: disable=too-many-branches
             filename = secure_filename(file.filename)
             logger.info(f"import_antibodies: processing filename: {filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as csvfile:
+            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), encoding="ascii", errors="ignore") as csvfile:
                 row_i = 1
                 for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
                     # and make all the keys lowercase so comparison is easy...
-                    row = {k.lower(): only_printable(v) for (k, v) in row_dr.items()}
+                    row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
                     row_i = row_i + 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
@@ -91,9 +91,20 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
                     row['group_uuid'] = group_id
-                    # do an auto lower case on anything is 'true' or 'false' as Excel likes
-                    # all uppercase and people seem to use Excel to make the .csv files
-                    row['recombinant'] = row['recombinant'].lower()
+
+                    # Canonicalize entries that we can so that they are always saved under the same string...
+                    row['clonality'] = row['clonality'].lower()
+                    row['host'] = row['host'].capitalize()
+                    row['organ'] = row['organ'].lower()
+                    # NOTE: The validation step will try to canonicalize and if it can't throw an error.
+                    # So, by the time that we get here canonicalize will return a string.
+                    canonicalize_yn_response = CanonicalizeYNResponse()
+                    row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
+                    canonicalize_doi = CanonicalizeDOI()
+                    row['protocol_doi'] = canonicalize_doi.canonicalize_multiple(row['protocol_doi'])
+                    if row['manuscript_doi'] != '':
+                        row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
+
                     query = insert_query()
                     if 'avr_pdf_filename' in row.keys():
                         if 'pdf' in request.files:
