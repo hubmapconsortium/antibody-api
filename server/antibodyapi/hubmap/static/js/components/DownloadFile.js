@@ -46,18 +46,22 @@ class DownloadFile extends SearchkitComponent {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(query)
-        })
+            })
             .then(response => response.json())
             .then(data => {
                 var lines = [];
+                console.info('_source ', _source);
+                console.info('.csv file data: ', data);
 
                 // header for .csv file...
                 lines.push(_source.join(','));
+                console.info('current lines (initial): ', lines);
 
                 data.hits.hits.forEach(item => {
                     var line = [];
                     _source.forEach((key) => {
                         let item_source = item._source[key];
+                        console.info('_source.forEach((key) item_source[', key, ']=', item_source);
                         if (this.avr_file_as_url && key == 'avr_pdf_filename') {
                             item_source = assets_url + '/' + item._source['avr_pdf_uuid'] + '/' + item_source;
                             item_source = item_source.replace(/,/g, '%2C');
@@ -68,6 +72,7 @@ class DownloadFile extends SearchkitComponent {
                         }
                         line.push(item_source);
                     })
+                    console.info('current lines (data loop): ', lines);
                     // data line for .csv file...
                     lines.push(line.join(','));
                 })
