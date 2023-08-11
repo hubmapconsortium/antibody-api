@@ -68,7 +68,6 @@ class DownloadFile extends SearchkitComponent {
                         }
                         line.push(item_source);
                     })
-                    console.info('current lines (data loop): ', lines);
                     // data line for .csv file...
                     lines.push(line.join(','));
                 })
