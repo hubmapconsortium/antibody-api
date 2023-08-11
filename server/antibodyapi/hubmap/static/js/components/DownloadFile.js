@@ -60,7 +60,7 @@ class DownloadFile extends SearchkitComponent {
                 data.hits.hits.forEach(item => {
                     var line = [];
                     _source.forEach((key) => {
-                        let item_source = item._source[key];
+                        let item_source = item._source[key] || '';
                         console.info('_source.forEach((key) item_source[', key, ']=', item_source);
                         if (this.avr_file_as_url && key == 'avr_pdf_filename') {
                             item_source = assets_url + '/' + item._source['avr_pdf_uuid'] + '/' + item_source;
