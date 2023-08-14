@@ -31,7 +31,7 @@ def index_antibody(antibody: dict):
         'host': antibody['host'],
         'clonality': antibody['clonality'],
         'clone_id': antibody['clone_id'],
-        'vendor_name': antibody['vendor'],
+        'vendor_name': antibody['vendor_name'],
         'catalog_number': antibody['catalog_number'],
         'lot_number': antibody['lot_number'],
         'recombinant': antibody['recombinant'],
