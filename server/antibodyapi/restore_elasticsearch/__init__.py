@@ -30,16 +30,15 @@ def restore_elasticsearch():
     print(f'Rows retrieved: {cur.rowcount}')
     results = []
     for antibody_array in cur:
-        target_symbol: str = antibody_array['target_symbol']
+        antibody: dict = base_antibody_query_result_to_json(antibody_array)
+        target_symbol: str = antibody['target_symbol']
         ubkg_rest_url: str = f"{ubkg_api_url}/relationships/gene/{target_symbol}"
         response = requests.get(ubkg_rest_url, headers={"Accept": "application/json"}, verify=False)
         if response.status_code == 200:
             response_json: dict = response.json()
-            antibody_array['target_aliases'] = response_json["symbol-alias"]
+            antibody['target_aliases'] = response_json["symbol-alias"]
         else:
             # This really should never happen...
-            antibody_array['target_aliases'] =[target_symbol]
-        antibody: dict = base_antibody_query_result_to_json(antibody_array)
-        antibody['target_aliases'] = antibody_array['target_aliases']
+            antibody['target_aliases'] =[target_symbol]
         index_antibody(antibody)
     return make_response(jsonify(antibodies=results), 200)
