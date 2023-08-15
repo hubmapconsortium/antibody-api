@@ -56,6 +56,7 @@ def index_antibody(antibody: dict):
     if 'avr_pdf_uuid' in antibody and 'avr_pdf_filename' in antibody and antibody['avr_pdf_filename'] != '':
         doc['avr_pdf_uuid'] = antibody['avr_pdf_uuid']
         doc['avr_pdf_filename'] = antibody['avr_pdf_filename']
+    logger.info(f"antibody: {antibody}")
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     es_conn.index(index=antibody_elasticsearch_index, body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 

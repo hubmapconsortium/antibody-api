@@ -20,9 +20,11 @@ def restore_elasticsearch():
     server: str = current_app.config['ELASTICSEARCH_SERVER']
     ubkg_api_url: str = current_app.config['UBKG_API_URL']
     es_conn = elasticsearch.Elasticsearch([server])
+
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
-    print(f'Deleting Elastic Search index {antibody_elasticsearch_index} on server {server}')
+    print(f'Zeroing Elastic Search index {antibody_elasticsearch_index} on server {server}')
     es_conn.indices.delete(index=antibody_elasticsearch_index, ignore=[400, 404])
+    es_conn.indices.create(index=antibody_elasticsearch_index)
 
     print(f'Restoring Elastic Search index {antibody_elasticsearch_index} on server {server}')
     cur = get_cursor(current_app)
