@@ -24,7 +24,6 @@ class AntibodyHitsTable extends React.Component {
     var organ_uberon_id_url_encode = '';
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
-      console.info('hit: ', hit)
       antibodies += `<tr key=${hit._id}>`;
       antibodies += '<td class="target_symbol_col">';
       antibodies += a_hrefs('https://www.uniprot.org/uniprotkb?query=(protein_name:%22', '%22)', hit._source.target_symbol);
