@@ -64,13 +64,14 @@ class SI(IntEnum):
     CLONE_ID = 36
 
 
+# THESE MUST MATCH THE ORDER IN THE ""SI"" CLASS!!!
 QUERY = '''
 SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
-    a.clonality, a.clone_id, v.vendor_name,
+    a.target_symbol, a.rrid, a.host,
+    a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
@@ -79,7 +80,8 @@ SELECT
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
-    a.created_by_user_sub, a.group_uuid
+    a.created_by_user_sub, a.group_uuid,
+    a.cell_line, a.cell_line_ontology_id, a.clone_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
