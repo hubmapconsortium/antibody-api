@@ -36,11 +36,10 @@ def restore_elasticsearch():
         target_symbol: str = antibody['target_symbol']
         ubkg_rest_url: str = f"{ubkg_api_url}/relationships/gene/{target_symbol}"
         response = requests.get(ubkg_rest_url, headers={"Accept": "application/json"}, verify=False)
+        target_aliases: list = [target_symbol]
         if response.status_code == 200:
             response_json: dict = response.json()
-            antibody['target_aliases'] = response_json["symbol-alias"]
-        else:
-            # This really should never happen...
-            antibody['target_aliases'] =[target_symbol]
+            target_aliases += response_json["symbol-alias"] + response_json["symbol-previous"]
+        antibody['target_aliases'] = target_aliases
         index_antibody(antibody)
     return make_response(jsonify(antibodies=results), 200)
