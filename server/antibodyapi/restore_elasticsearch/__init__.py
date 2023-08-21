@@ -20,9 +20,11 @@ def restore_elasticsearch():
     server: str = current_app.config['ELASTICSEARCH_SERVER']
     ubkg_api_url: str = current_app.config['UBKG_API_URL']
     es_conn = elasticsearch.Elasticsearch([server])
+
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
-    print(f'Deleting Elastic Search index {antibody_elasticsearch_index} on server {server}')
+    print(f'Zeroing Elastic Search index {antibody_elasticsearch_index} on server {server}')
     es_conn.indices.delete(index=antibody_elasticsearch_index, ignore=[400, 404])
+    es_conn.indices.create(index=antibody_elasticsearch_index)
 
     print(f'Restoring Elastic Search index {antibody_elasticsearch_index} on server {server}')
     cur = get_cursor(current_app)
@@ -30,16 +32,14 @@ def restore_elasticsearch():
     print(f'Rows retrieved: {cur.rowcount}')
     results = []
     for antibody_array in cur:
-        target_symbol: str = antibody_array['target_symbol']
+        antibody: dict = base_antibody_query_result_to_json(antibody_array)
+        target_symbol: str = antibody['target_symbol']
         ubkg_rest_url: str = f"{ubkg_api_url}/relationships/gene/{target_symbol}"
         response = requests.get(ubkg_rest_url, headers={"Accept": "application/json"}, verify=False)
+        target_aliases: list = [target_symbol]
         if response.status_code == 200:
             response_json: dict = response.json()
-            antibody_array['target_aliases'] = response_json["symbol-alias"]
-        else:
-            # This really should never happen...
-            antibody_array['target_aliases'] =[target_symbol]
-        antibody: dict = base_antibody_query_result_to_json(antibody_array)
-        antibody['target_aliases'] = antibody_array['target_aliases']
+            target_aliases += response_json["symbol-alias"] + response_json["symbol-previous"]
+        antibody['target_aliases'] = target_aliases
         index_antibody(antibody)
     return make_response(jsonify(antibodies=results), 200)

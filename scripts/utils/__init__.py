@@ -71,7 +71,7 @@ class SI(IntEnum):
     FLUORESCENT_REPORTER = 23
     MANUSCRIPT_DOI = 24
     VENDOR_AFFILIATION = 25
-    ORGAN_UBERON_id = 26
+    ORGAN_UBERON_ID = 26
     ANTIGEN_RETRIEVAL = 27
     OMAP_ID = 28
     CREATED_TIMESTAMP = 29
@@ -81,14 +81,14 @@ class SI(IntEnum):
     GROUP_UUID = 33
     CELL_LINE = 34
     CELL_LINE_ONTOLOGY_ID = 35
-
+    CLONE_ID = 36
 
 QUERY = '''
 SELECT
     a.antibody_uuid,
     a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_symbol, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.target_symbol, a.rrid, a.host,
     a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
@@ -98,7 +98,8 @@ SELECT
     a.antigen_retrieval, a.omap_id,
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
-    a.created_by_user_sub, a.group_uuid
+    a.created_by_user_sub, a.group_uuid,
+    a.cell_line, a.cell_line_ontology_id, a.clone_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''

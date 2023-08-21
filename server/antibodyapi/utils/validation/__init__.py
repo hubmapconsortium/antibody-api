@@ -498,19 +498,19 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     if 'pdf' in request_files:
         for avr_pdf_file in request_files.getlist('pdf'):
             if avr_pdf_file.filename == row['avr_pdf_filename']:
-                content: bytes = avr_pdf_file.stream.read()
+                pdf_file_content: bytes = avr_pdf_file.stream.read()
                 # Since this is a stream, we need to go back to the beginning or the next time that it is read
                 # it will be read from the end where there are no characters providing an empty file.
-                pdf_file_size_mb: float = len(bytes)/(1024.0*1000.0)
+                pdf_file_size_mb: float = len(pdf_file_content)/(1024.0*1000.0)
                 max_ingest_file_upload_size_mb: float = 10.0
                 if pdf_file_size_mb >= max_ingest_file_upload_size_mb:
                     abort(json_error(f"CSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}'"
-                                     f" PDF file size limit is {max_ingest_file_upload_size_mb}MB", 406))
+                                     f" is over maximum file size of {max_ingest_file_upload_size_mb}MB", 406))
                 avr_pdf_file.stream.seek(0)
                 logger.debug("validate_antibodycsv_row: avr_pdf_file.filename:"
-                             f" {row['avr_pdf_filename']}; size: {len(content)}")
+                             f" {row['avr_pdf_filename']}; size: {pdf_file_size_mb}MB")
                 try:
-                    PyPDF2.PdfFileReader(stream=io.BytesIO(content))
+                    PyPDF2.PdfFileReader(stream=io.BytesIO(pdf_file_content))
                     logger.debug("validate_antibodycsv_row: Processing"
                                  f" avr_pdf_filename: {avr_pdf_file.filename}; is a valid PDF file")
                     found_pdf = avr_pdf_file.filename
