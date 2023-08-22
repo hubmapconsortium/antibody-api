@@ -9,7 +9,6 @@ function AdditionalColumns() {
   ];
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-  console.info('AdditionalColumns state_values: ', state_values);
   const [checked, setChecked] = useState(state_values);
   console.info('Set useState for state_values; checked:', checked)
 
@@ -34,6 +33,7 @@ function AdditionalColumns() {
   };
 
   const isChecked = (elt) => {
+    console.info('isChecked: elt: ', elt, ' checked: ', checked.elt)
     return checked.elt;
   };
 
@@ -41,7 +41,7 @@ function AdditionalColumns() {
      <div>
         <div className="header"><h3>Additional Columns</h3></div>
         <div className="content div-border">
-            {checkbox_props.map(prop =>
+            {checkbox_props.forEach(prop =>
              <Checkbox
                label={prop.label}
                element={prop.element}
