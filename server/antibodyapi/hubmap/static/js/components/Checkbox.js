@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 function AdditionalColumns() {
@@ -33,7 +33,8 @@ function AdditionalColumns() {
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
   console.info('AdditionalColumns state_values: ', state_values);
-  [checked, setChecked] = useState(state_values);
+  const [checked, setChecked] = useState(state_values);
+  console.info('Set useState for state_values; checked:', checked)
 
   const handleChange = (elt) => {
     console.info(elt, "Checkbox handler: checked before:", checked, ' elt: ', elt);
