@@ -15,9 +15,9 @@ function AdditionalColumns() {
 
   const handleChange = (elt) => {
     console.info(elt, "Checkbox handler: checked before:", checked, ' elt: ', elt);
-    setChecked({...checked, ...{elt: !checked.elt}});
+    setChecked({...checked, ...{elt: !checked[elt]}});
     console.info('Checkbox handler: checked after: ', checked, ' elt: ', elt);
-    display[elt] = checked.elt?'table-cell':'none';
+    display[elt] = checked[elt]?'table-cell':'none';
     const id_col = elt + '_col';
     const all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
@@ -34,7 +34,7 @@ function AdditionalColumns() {
   };
 
   const isChecked = (elt) => {
-    console.info('isChecked: elt: ', elt, ' checked: ', checked, ' checked.elt: ', checked.elt);
+    console.info('isChecked: elt: ', elt, ' checked: ', checked, ' checked[elt]: ', checked[elt]);
     return checked.elt;
   };
 
