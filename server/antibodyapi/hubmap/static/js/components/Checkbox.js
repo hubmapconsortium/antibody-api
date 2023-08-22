@@ -1,23 +1,6 @@
 import React, {useState} from 'react';
 import { useCookies } from 'react-cookie';
 
-function Checkbox(props) {
-  const label = props.label;
-  const elt = props.element;
-  const handleChange = props.handleChange;
-  const isChecked = props.isChecked;
-
-  return (
-    <div>
-      <input type="checkbox"
-             onChange={handleChange(elt)}
-             checked={isChecked(elt)}
-      />
-      {label}
-    </div>
-  );
-};
-
 function AdditionalColumns() {
 
   const checkbox_props = [
@@ -49,8 +32,8 @@ function AdditionalColumns() {
   ];
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-  [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns state_values: ', state_values);
+  [checked, setChecked] = useState(state_values);
 
   const handleChange = (elt) => {
     console.info(elt, "Checkbox handler: checked before:", checked, ' elt: ', elt);
@@ -89,6 +72,24 @@ function AdditionalColumns() {
                />
              )}
         </div>
+    </div>
+  );
+};
+
+function Checkbox(props) {
+  const label = props.label;
+  const elt = props.element;
+  const handleChange = props.handleChange;
+  const isChecked = props.isChecked;
+  console.info('Checkbox props: ', props);
+
+  return (
+    <div>
+      <input type="checkbox"
+             onChange={handleChange(elt)}
+             checked={isChecked(elt)}
+      />
+      {label}
     </div>
   );
 };
