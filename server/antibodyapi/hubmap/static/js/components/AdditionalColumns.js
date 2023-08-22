@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { Checkbox } from Checkbox
+import { Checkbox } from './Checkbox';
 
 function AdditionalColumns() {
 
