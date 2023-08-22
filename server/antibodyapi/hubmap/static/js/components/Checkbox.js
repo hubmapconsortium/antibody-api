@@ -55,7 +55,7 @@ function AdditionalColumns() {
   const handleChange = (elt) => {
     console.info(elt, "Checkbox handler: checked before:", checked, ' elt: ', elt);
     setChecked({...checked, ...{elt: !checked.elt}})
-    console.info('Checkbox handler: chected after reversing: ', checked);
+    console.info('Checkbox handler: chected after: ', checked, ' elt: ', elt);
     display[elt] = checked.elt?'table-cell':'none';
     const id_col = elt + '_col';
     const all_col=document.getElementsByClassName(id_col);
@@ -84,7 +84,7 @@ function AdditionalColumns() {
              <Checkbox
                label={prop.label}
                element={prop.element}
-               handleChange={hangleChange}
+               handleChange={handleChange}
                isChecked={isChecked}
                />
              )}
