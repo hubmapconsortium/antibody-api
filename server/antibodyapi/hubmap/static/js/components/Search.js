@@ -184,14 +184,7 @@ function Search(props) {
         <Popup trigger={<button className="button-placement">Configure Columns</button>}
                contentStyle={{width: "280px"}}
                modal>
-          {close => (
-              <div className="modal form-border">
-                <button className="close" onClick={close}>
-                  &times;
-                </button>
-                <AdditionalColumns/>
-              </div>
-          )}
+            <AdditionalColumns/>
         </Popup>
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
