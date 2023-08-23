@@ -34,7 +34,7 @@ function AdditionalColumns() {
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
   const [checked, setChecked] = useState(state_values);
-  console.info('AdditionalColumns' after set useState for state_values; checked:', checked);
+  console.info('AdditionalColumns: after set useState for state_values; checked:', checked);
 
   const handleChange = (elt) => {
     console.info(elt, "Checkbox handleChange: checked before:", checked, ' elt: ', elt, ' !checked[elt]: ', !checked[elt]);
