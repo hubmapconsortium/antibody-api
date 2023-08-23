@@ -13,6 +13,7 @@ function Checkbox(props) {
       <input type="checkbox"
              onChange={() => handleChange(elt)}
              checked={() => isChecked(elt)}
+             defaultChecked={() => isChecked(elt)}
       />
       {label}
     </div>

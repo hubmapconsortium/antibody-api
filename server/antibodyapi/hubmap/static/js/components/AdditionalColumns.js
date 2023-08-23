@@ -41,7 +41,6 @@ function AdditionalColumns() {
     const newChecked = Object.assign({}, checked);
     newChecked[elt] = !checked[elt];
     setChecked(newChecked);
-    console.info('Checkbox handleChange: checked after: ', checked, ' elt: ', elt);
     display[elt] = newChecked[elt]?'table-cell':'none';
     const id_col = elt + '_col';
     const all_col=document.getElementsByClassName(id_col);
