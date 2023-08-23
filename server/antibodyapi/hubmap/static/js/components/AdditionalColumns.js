@@ -42,12 +42,14 @@ function AdditionalColumns() {
      <div>
         <div className="header"><h3>Additional Columns</h3></div>
         <div className="content div-border">
-            {const elts = [];
-             checkbox_props.forEach(function(prop) {
-                elts.push(<Checkbox label={prop.label} element={prop.element} handleChange={handleChange} isChecked={isChecked}/>);
-                });
-             return elts;
-            }
+            {checkbox_props.map(prop =>
+             <Checkbox
+               label={prop.label}
+               element={prop.element}
+               handleChange={handleChange}
+               isChecked={isChecked}
+               />
+            )}
         </div>
     </div>
   );
