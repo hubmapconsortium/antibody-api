@@ -38,12 +38,14 @@ function AdditionalColumns() {
 
   const handleChange = (elt, to_state) => {
     console.info(elt, "Checkbox handleChange: checked before:", checked, ' elt: ', elt, ' !checked[elt]: ', !checked[elt]);
-    const newChecked = Object.assign({}, checked);
+    var newChecked = Object.assign({}, checked);
     newChecked[elt] = to_state===null?!checked[elt]:to_state;
     setChecked(newChecked);
     display[elt] = newChecked[elt]?'table-cell':'none';
-    const id_col = elt + '_col';
-    const all_col=document.getElementsByClassName(id_col);
+    var chkBox = document.getElementById(elt);
+    chkBox.checked = newChecked[elt];
+    var id_col = elt + '_col';
+    var all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
     }
@@ -63,11 +65,11 @@ function AdditionalColumns() {
   };
 
   const clearAll = () => {
-    checkbox_props.forEach(x => handleChange(x.element, false))
+    checkbox_props.forEach(x => handleChange(x.element, false));
   };
 
   const setAll = () => {
-    checkbox_props.forEach(x => handleChange(x.element, true))
+    checkbox_props.forEach(x => handleChange(x.element, true));
   };
 
   return (
