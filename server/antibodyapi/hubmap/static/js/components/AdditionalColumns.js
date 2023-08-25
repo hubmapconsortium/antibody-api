@@ -42,7 +42,7 @@ function AdditionalColumns() {
     newChecked[elt] = to_state===null?!checked[elt]:to_state;
     setChecked(newChecked);
     display[elt] = newChecked[elt]?'table-cell':'none';
-    var chkBox = document.getElementById(elt);
+    var chkBox = document.getElementById(elt + '_checkbox_id');
     chkBox.checked = newChecked[elt];
     var id_col = elt + '_col';
     var all_col=document.getElementsByClassName(id_col);
