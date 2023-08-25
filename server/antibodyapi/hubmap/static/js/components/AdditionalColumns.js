@@ -62,9 +62,23 @@ function AdditionalColumns() {
     return checked.elt;
   };
 
+  const clearAll = () => {
+    const new_state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
+    setChecked(new_state_values);
+  };
+
+  const setAll = () => {
+    const new_state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
+    setChecked(new_state_values);
+  };
+
   return (
      <div>
         <div className="header"><h3>Additional Columns</h3></div>
+        <div>
+            <button onClick={clearAll}>Clear All</button>
+            <button onClick={setAll}>Set All</button>
+        </div>
         <div className="content div-border">
             {checkbox_props.map(prop =>
              <Checkbox
