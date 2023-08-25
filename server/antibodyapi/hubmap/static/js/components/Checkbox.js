@@ -17,7 +17,7 @@ function Checkbox(props) {
     <div>
       <input type="checkbox"
              id={`${elt}_checkbox_id`}
-             onChange={this.handleToggle}
+             onChange={handleToggle}
       />
       {label}
     </div>
