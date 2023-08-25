@@ -36,10 +36,10 @@ function AdditionalColumns() {
   const [checked, setChecked] = useState(state_values);
   console.info('AdditionalColumns: after set useState for state_values; checked:', checked);
 
-  const handleChange = (elt) => {
+  const handleChange = (elt, to_state) => {
     console.info(elt, "Checkbox handleChange: checked before:", checked, ' elt: ', elt, ' !checked[elt]: ', !checked[elt]);
     const newChecked = Object.assign({}, checked);
-    newChecked[elt] = !checked[elt];
+    newChecked[elt] = to_state===null?!checked[elt]:to_state;
     setChecked(newChecked);
     display[elt] = newChecked[elt]?'table-cell':'none';
     const id_col = elt + '_col';
@@ -63,13 +63,11 @@ function AdditionalColumns() {
   };
 
   const clearAll = () => {
-    const new_state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-    setChecked(new_state_values);
+    checkbox_props.forEach(x => handleChange(x.element, false))
   };
 
   const setAll = () => {
-    const new_state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
-    setChecked(new_state_values);
+    checkbox_props.forEach(x => handleChange(x.element, true))
   };
 
   return (
