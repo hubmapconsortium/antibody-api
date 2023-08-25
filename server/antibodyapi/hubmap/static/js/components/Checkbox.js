@@ -9,8 +9,8 @@ function Checkbox(props) {
   console.info('Checkbox props: ', props);
 
   const handleToggle = (event) => {
-    console.info('handleToggle; e=', event, '; !event.target.checked=', !event.target.checked);
-    props.handleChange(elt, !event.target.checked);
+    console.info('handleToggle; e=', event, '; event.target.checked=', event.target.checked);
+    handleChange(elt, event.target.checked);
   }
 
   return (
