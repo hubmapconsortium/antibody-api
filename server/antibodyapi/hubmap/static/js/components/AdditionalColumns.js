@@ -74,8 +74,8 @@ function AdditionalColumns() {
      <div>
         <div className="header"><h3>Additional Columns</h3></div>
         <div>
-            <button className="button-placement" onClick={clearAll}>Clear All</button>
-            <button className="button-placement" onClick={setAll}>Set All</button>
+            <button class="btn-continue" onClick={setAll}>Set All</button>
+            <button class="btn-cancel" onClick={clearAll}>Clear All</button>
         </div>
         <div className="content div-border">
             {checkbox_props.map(prop =>
