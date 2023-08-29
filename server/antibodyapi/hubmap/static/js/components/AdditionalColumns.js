@@ -35,9 +35,14 @@ function AdditionalColumns() {
   const state_values = Object.assign({}, ...checkbox_props.map((x) =>
     ({[x.element]: document.getElementById(x.element + '_col_head').style.display==='table-cell'?true:false})
     ));
-//  const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-  console.info('state_values: ', state_values)
   const [checked, setChecked] = useState(state_values);
+
+  Object.keys(state_values).forEach(function(key) {
+    if (state_values[key] === true) {
+        var elt_checkbox_id = document.getElementById(key + '_checkbox_id');
+        elt_checkbox_id.click();
+        //handleChange(elt_checkbox_id, true));
+    });
 
   const handleChange = (elt, to_state) => {
     var newChecked = Object.assign({}, checked);
