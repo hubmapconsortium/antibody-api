@@ -40,8 +40,7 @@ function AdditionalColumns() {
   Object.keys(state_values).forEach(function(key) {
     if (state_values[key] === true) {
         var elt_checkbox_id = document.getElementById(key + '_checkbox_id');
-        elt_checkbox_id.click();
-        //handleChange(elt_checkbox_id, true));
+        handleChange(elt_checkbox_id, true));
     }});
 
   const handleChange = (elt, to_state) => {
