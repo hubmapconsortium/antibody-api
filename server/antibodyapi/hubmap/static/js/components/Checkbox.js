@@ -11,7 +11,8 @@ function Checkbox(props) {
   }
 
   const isCheckedCheck = () => {
-    isChecked(elt);
+    console.info('isCheckedCheck = ', isChecked(elt));
+    return isChecked(elt);
   }
 
   return (
@@ -19,7 +20,7 @@ function Checkbox(props) {
       <input type="checkbox"
              id={`${elt}_checkbox_id`}
              onChange={handleToggle}
-             checked={isCheckedCheck}
+             checked={isCheckedCheck()}
       />
       {label}
     </div>
