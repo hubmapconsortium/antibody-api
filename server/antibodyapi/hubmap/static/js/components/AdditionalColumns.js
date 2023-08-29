@@ -32,10 +32,10 @@ function AdditionalColumns() {
     {element:"created_by_user_email", label:"Submitter Email"},
   ];
 
-  const state_values_0 = Object.assign({}, ...checkbox_props.map((x) =>
-    ({[x.element]: document.getElementsByClassName(x.element + '_col').style.display==='table-cell'?true:false})
-    ));
-  console.info('state_values from class name: ', state_values_0)
+//  const state_values_0 = Object.assign({}, ...checkbox_props.map((x) =>
+//    ({[x.element]: document.getElementsByClassName(x.element + '_col').style.display==='table-cell'?true:false})
+//    ));
+//  console.info('state_values from class name: ', state_values_0)
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
   console.info('state_values from checkbox props: ', state_values)
