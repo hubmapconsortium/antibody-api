@@ -36,6 +36,7 @@ function AdditionalColumns() {
     ({[x.element]: document.getElementById(x.element + '_col_head').style.display==='table-cell'?true:false})
     ));
   const [checked, setChecked] = useState(state_values);
+  console.info('checked: ', checked);
 
   const handleChange = (elt, to_state) => {
     var newChecked = Object.assign({}, checked);
@@ -61,7 +62,8 @@ function AdditionalColumns() {
   };
 
   const isChecked = (elt) => {
-    return checked.elt;
+    console.info('isChecked(', elt, ')=', checked[elt])
+    return checked[elt];
   };
 
   const clearAll = () => {
