@@ -44,9 +44,10 @@ function AdditionalColumns() {
     setChecked(newChecked);
     display[elt] = newChecked[elt]?'table-cell':'none';
     var elt_checkbox_id = document.getElementById(elt + '_checkbox_id');
-    if (newChecked[elt] != elt_checkbox_id.checked) {
-        elt_checkbox_id.click();
-    }
+    elt_checkbox_id.checked=newChecked[elt];
+//    if (newChecked[elt] != elt_checkbox_id.checked) {
+//        elt_checkbox_id.click();
+//    }
     var id_col = elt + '_col';
     var all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
