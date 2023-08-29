@@ -42,7 +42,7 @@ function AdditionalColumns() {
         var elt_checkbox_id = document.getElementById(key + '_checkbox_id');
         elt_checkbox_id.click();
         //handleChange(elt_checkbox_id, true));
-    });
+    }});
 
   const handleChange = (elt, to_state) => {
     var newChecked = Object.assign({}, checked);
