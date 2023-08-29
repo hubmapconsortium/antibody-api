@@ -37,12 +37,6 @@ function AdditionalColumns() {
     ));
   const [checked, setChecked] = useState(state_values);
 
-  Object.keys(state_values).forEach(function(key) {
-    if (state_values[key] === true) {
-        var elt_checkbox_id = document.getElementById(key + '_checkbox_id');
-        handleChange(elt_checkbox_id, true);
-    }});
-
   const handleChange = (elt, to_state) => {
     var newChecked = Object.assign({}, checked);
     newChecked[elt] = to_state===null?!checked[elt]:to_state;

@@ -15,6 +15,7 @@ function Checkbox(props) {
       <input type="checkbox"
              id={`${elt}_checkbox_id`}
              onChange={handleToggle}
+             {isChecked(elt)===true?"checked":""}
       />
       {label}
     </div>
