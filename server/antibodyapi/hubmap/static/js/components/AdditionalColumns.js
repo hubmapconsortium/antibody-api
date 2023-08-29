@@ -34,15 +34,12 @@ function AdditionalColumns() {
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
   const [checked, setChecked] = useState(state_values);
-  console.info('AdditionalColumns: after set useState for state_values; checked:', checked);
 
   const handleChange = (elt, to_state) => {
-    console.info(elt, "Checkbox handleChange: checked before:", checked, ' elt: ', elt, ' !checked[elt]: ', !checked[elt]);
     var newChecked = Object.assign({}, checked);
     newChecked[elt] = to_state===null?!checked[elt]:to_state;
     setChecked(newChecked);
     display[elt] = newChecked[elt]?'table-cell':'none';
-    //document.getElementById(elt + '_checkbox_id').checked = newChecked[elt];
     var elt_checkbox_id = document.getElementById(elt + '_checkbox_id');
     if (newChecked[elt] != elt_checkbox_id.checked) {
         elt_checkbox_id.click();
@@ -52,7 +49,6 @@ function AdditionalColumns() {
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
     }
-    console.info('Checkbox handleChange: display after: ', display);
     // Uncaught TypeError: document.getElementById(...) is null
     // will only happen if no data has been loaded
     const id_header = id_col + "_head";
@@ -63,7 +59,6 @@ function AdditionalColumns() {
   };
 
   const isChecked = (elt) => {
-    console.info('isChecked: elt: ', elt, ' checked: ', checked, ' checked[elt]: ', checked[elt]);
     return checked.elt;
   };
 
@@ -79,8 +74,8 @@ function AdditionalColumns() {
      <div>
         <div className="header"><h3>Additional Columns</h3></div>
         <div>
-            <button onClick={clearAll}>Clear All</button>
-            <button onClick={setAll}>Set All</button>
+            <button className="button-placement" onClick={clearAll}>Clear All</button>
+            <button className="button-placement" onClick={setAll}>Set All</button>
         </div>
         <div className="content div-border">
             {checkbox_props.map(prop =>

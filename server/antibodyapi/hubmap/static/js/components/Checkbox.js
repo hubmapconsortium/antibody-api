@@ -1,5 +1,4 @@
 import React from 'react';
-import { useCookies } from 'react-cookie';
 
 function Checkbox(props) {
   const label = props.label;
@@ -9,7 +8,6 @@ function Checkbox(props) {
   console.info('Checkbox props: ', props);
 
   const handleToggle = (event) => {
-    console.info('handleToggle; e=', event, '; event.target.checked=', event.target.checked);
     handleChange(elt, event.target.checked);
   }
 
