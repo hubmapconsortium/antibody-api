@@ -81,7 +81,9 @@ function AdditionalColumns() {
 
   return (
      <div>
-        <div className="header"><h3>Additional Columns</h3></div>
+        <div className="header">
+            <h3>Additional Columns</h3>
+        </div>
         <div>
             <button onClick={setAll}>Set All</button>
             &nbsp;
@@ -90,6 +92,7 @@ function AdditionalColumns() {
         <div className="content div-border">
             {checkbox_props.map(prop =>
              <Checkbox
+               key={prop.element}
                label={prop.label}
                element={prop.element}
                handleChange={handleChange}
