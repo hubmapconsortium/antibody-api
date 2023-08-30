@@ -84,6 +84,7 @@ function AdditionalColumns() {
         <div className="header"><h3>Additional Columns</h3></div>
         <div>
             <button onClick={setAll}>Set All</button>
+            &nbsp;
             <button onClick={clearAll}>Clear All</button>
         </div>
         <div className="content div-border">
