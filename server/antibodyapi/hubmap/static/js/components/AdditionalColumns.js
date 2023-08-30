@@ -68,15 +68,15 @@ function AdditionalColumns() {
   };
 
   const clearAll = () => {
-    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-    setChecked(state_values);
-    //checkbox_props.forEach(x => handleChange(x.element, false));
+//    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
+//    setChecked(state_values);
+    checkbox_props.forEach(x => handleChange(x.element, false));
   };
 
   const setAll = () => {
-    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
-    setChecked(state_values);
-    //checkbox_props.forEach(x => handleChange(x.element, true));
+//    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
+//    setChecked(state_values);
+    checkbox_props.forEach(x => handleChange(x.element, true));
   };
 
   return (
