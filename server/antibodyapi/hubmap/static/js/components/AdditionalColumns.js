@@ -36,23 +36,24 @@ function AdditionalColumns() {
     ({[x.element]: document.getElementById(x.element + '_col_head').style.display==='table-cell'?true:false})
     ));
   const [checked, setChecked] = useState(state_values);
-  console.info('checked: ', checked);
 
   const handleChange = (elt, to_state) => {
     var newChecked = Object.assign({}, checked);
-    newChecked[elt] = to_state===null?!checked[elt]:to_state;
+    newChecked[elt] = to_state;
     setChecked(newChecked);
-    display[elt] = newChecked[elt]?'table-cell':'none';
-    var elt_checkbox_id = document.getElementById(elt + '_checkbox_id');
-    elt_checkbox_id.checked=newChecked[elt];
-//    if (newChecked[elt] != elt_checkbox_id.checked) {
-//        elt_checkbox_id.click();
-//    }
-    var id_col = elt + '_col';
-    var all_col=document.getElementsByClassName(id_col);
+    changeEltDisplayState(elt, to_state);
+  };
+
+
+  const changeEltDisplayState = (elt, to_state) => {
+    display[elt] = to_state?'table-cell':'none';
+
+    const id_col = elt + '_col';
+    const all_col=document.getElementsByClassName(id_col);
     for (var i=0;i<all_col.length;i++) {
        all_col[i].style.display=display[elt];
     }
+
     // Uncaught TypeError: document.getElementById(...) is null
     // will only happen if no data has been loaded
     const id_header = id_col + "_head";
@@ -63,20 +64,19 @@ function AdditionalColumns() {
   };
 
   const isChecked = (elt) => {
-    console.info('isChecked(', elt, ')=', checked[elt])
     return checked[elt];
   };
 
   const clearAll = () => {
-//    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
-//    setChecked(state_values);
-    checkbox_props.forEach(x => handleChange(x.element, false));
+    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: false})));
+    setChecked(state_values);
+    checkbox_props.forEach(x => changeEltDisplayState(x.element, false));
   };
 
   const setAll = () => {
-//    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
-//    setChecked(state_values);
-    checkbox_props.forEach(x => handleChange(x.element, true));
+    const state_values = Object.assign({}, ...checkbox_props.map((x) => ({[x.element]: true})));
+    setChecked(state_values);
+    checkbox_props.forEach(x => changeEltDisplayState(x.element, true));
   };
 
   return (

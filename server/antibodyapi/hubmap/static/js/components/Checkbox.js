@@ -11,7 +11,6 @@ function Checkbox(props) {
   }
 
   const isCheckedCheck = () => {
-    console.info('isCheckedCheck = ', isChecked(elt));
     return isChecked(elt);
   }
 
