@@ -40,6 +40,55 @@ function Search(props) {
   }
   //console.info('Search display after cookie set: ', display);
 
+  const add_avrs = () => {
+    let url = new URL(window.location.href);
+    let url_info = url.searchParams.get("info");
+    if (url_info !== null) {
+      // Grabs the ?info= bit
+      localStorage.setItem("info", url_info);
+      localStorage.setItem("isAuthenticated", true);
+    }
+    const info_json = localStorage.getItem("info");
+    if (info_json == null) {
+        const login_url =`${ingest_url}/login`;
+        return (
+         <a href={login_url}
+           style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
+           Add AVRs
+         </a>
+        );
+    }
+    console.log('info_json: ', info_json);
+    const token = JSON.parse(info_json).groups_token;
+    console.log('token: ', token);
+    fetch('antibodies-isauth', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.info('is_authorized data: ', data);
+        console.info('data.authorized:', data.authorized)
+        console.info('data.authorized === true:', data.authorized === true)
+        if (data.authorized === true) {
+            console.info('return a href to upload');
+            return (
+                <div>
+                <div> This is a happy message </div>
+                <a href="/upload"
+                    style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
+                    Add AVRs
+                </a>
+                </div>
+            );
+        }
+    });
+  }
+
   return(
   <SearchkitProvider searchkit={searchkit}>
     <CookieConsent>This website uses cookies to enhance the user experience.</CookieConsent>
@@ -64,7 +113,7 @@ function Search(props) {
             "created_by_user_email","avr_pdf_filename"
         ]}
         />
-
+        {add_avrs()}
     </TopBar>
 
     <LayoutBody>
