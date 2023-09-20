@@ -64,7 +64,10 @@ function Search(props) {
             "created_by_user_email","avr_pdf_filename"
         ]}
         />
-
+      <a href="/upload"
+         style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
+         Add AVRs
+      </a>
     </TopBar>
 
     <LayoutBody>

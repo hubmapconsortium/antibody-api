@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unauthorized</title>
+</head>
+<body>
+    <script type="text/javascript">
+      var hubmap_avr_uploaders_group_id={{ hubmap_avr_uploaders_group_id | tojson }};
+    </script>
+    <div>
+        <p>
+            You are not authorized to access the AVR Upload page.
+        </p>
+        <p>
+            You must be in the HuBMAP group:
+            <script> document.write(hubmap_avr_uploaders_group_id) </script>
+        </p>
+    </div>
+</body>
+</html>
