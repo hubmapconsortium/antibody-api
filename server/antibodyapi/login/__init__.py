@@ -30,16 +30,25 @@ def login():
         return redirect(auth_uri)
     else:
         code = request.args.get('code')
-        tokens = globus_auth_client.oauth2_exchange_code_for_tokens(code)
-        user_info = get_user_info(tokens)
-        logger.info(f"login user_info: {user_info}")
-        groups_access_token = tokens.by_resource_server['groups.api.globus.org']['access_token']
+        try:
+            tokens = globus_auth_client.oauth2_exchange_code_for_tokens(code)
+            user_info = get_user_info(tokens)
+            logger.info(f"login user_info: {user_info}")
+            groups_access_token = tokens.by_resource_server['groups.api.globus.org']['access_token']
 
-        # https://globus-sdk-python.readthedocs.io/en/stable/examples/group_listing.html
-        globus_groups_client = globus_sdk.GroupsClient(
-            authorizer=globus_sdk.AccessTokenAuthorizer(groups_access_token)
-        )
-        my_groups = globus_groups_client.get_my_groups()
+            # https://globus-sdk-python.readthedocs.io/en/stable/examples/group_listing.html
+            globus_groups_client = globus_sdk.GroupsClient(
+                authorizer=globus_sdk.AccessTokenAuthorizer(groups_access_token)
+            )
+            my_groups = globus_groups_client.get_my_groups()
+        except globus_sdk.services.auth.errors.AuthAPIError as ae:
+            logger.info(f"login(): AuthAPIError: {ae}")
+            # Possibly related to an invalid/expired/revoked token?!
+            # Usually occurs when user hits reload after some time, so we send the user to the login screen.
+            auth_uri = globus_auth_client.oauth2_get_authorize_url(query_params={
+                "scope": "openid profile email urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:auth.globus.org:view_identities urn:globus:auth:scope:nexus.api.globus.org:groups urn:globus:auth:scope:groups.api.globus.org:all"
+            }) # pylint: disable=line-too-long
+            return redirect(auth_uri)
         #logger.info(f"login(): my_groups: {my_groups}")
         my_group_ids = [g['id'] for g in my_groups]
         is_authorized = False

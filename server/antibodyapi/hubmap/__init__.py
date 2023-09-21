@@ -1,4 +1,7 @@
-from flask import abort, Blueprint, redirect, render_template, session, request, current_app, send_from_directory
+from flask import (
+    abort, Blueprint, redirect, render_template, session,
+    request, current_app, send_from_directory
+)
 import os
 from antibodyapi.utils.elasticsearch import execute_query
 import logging
