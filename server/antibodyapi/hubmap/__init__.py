@@ -1,8 +1,13 @@
-from flask import abort, Blueprint, redirect, render_template, session, request, current_app, send_from_directory
+from flask import (
+    abort, Blueprint, redirect, render_template, session,
+    request, current_app, send_from_directory
+)
 import os
 from antibodyapi.utils.elasticsearch import execute_query
+import logging
 
 hubmap_blueprint = Blueprint('hubmap', __name__, template_folder='templates')
+logger = logging.getLogger(__name__)
 
 
 def bad_request_error(err_msg):
@@ -12,11 +17,19 @@ def bad_request_error(err_msg):
 @hubmap_blueprint.route('/upload')
 def hubmap():
     #replace by the correct way to check token validity.
-    authenticated = session.get('is_authenticated')
-    if not authenticated:
+    if not session.get('is_authenticated'):
         #return redirect(url_for('login.login'))
         redirect_url = current_app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/login'
         return redirect(redirect_url)
+
+    if not session.get('is_authorized'):
+        logger.info("User is not authorized.")
+        hubmap_avr_uploaders_group_id: str = current_app.config['HUBMAP_AVR_UPLOADERS_GROUP_ID']
+        return render_template(
+            'unauthorized.html',
+            hubmap_avr_uploaders_group_id=hubmap_avr_uploaders_group_id
+        )
+
     data_provider_groups = session.get('data_provider_groups')
     if data_provider_groups is not None and len(data_provider_groups) == 1:
         data_provider_groups = None
