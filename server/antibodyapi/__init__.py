@@ -10,8 +10,6 @@ from antibodyapi.save_antibody import save_antibody_blueprint
 from antibodyapi.status import status_blueprint
 from antibodyapi import default_config
 
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
-                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 

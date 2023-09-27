@@ -2,7 +2,7 @@ import csv
 import os
 from flask import (
     abort, Blueprint, current_app, jsonify, make_response,
-    redirect, request, session, url_for
+    redirect, request, session, url_for, render_template
 )
 from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
 from werkzeug.utils import secure_filename
@@ -18,11 +18,7 @@ from typing import List
 import string
 import logging
 
-
 import_antibodies_blueprint = Blueprint('import_antibodies', __name__)
-
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
-                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
@@ -41,9 +37,16 @@ def import_antibodies(): # pylint: disable=too-many-branches
 
     NOTE: The maximum .pdf size is currently 10Mb.
     """
-    authenticated = session.get('is_authenticated')
-    if not authenticated:
+    if not session.get('is_authenticated'):
         return redirect(url_for('login'))
+
+    if not session.get('is_authorized'):
+        logger.info("User is not authorized.")
+        hubmap_avr_uploaders_group_id: str = current_app.config['HUBMAP_AVR_UPLOADERS_GROUP_ID']
+        return render_template(
+            'unauthorized.html',
+            hubmap_avr_uploaders_group_id=hubmap_avr_uploaders_group_id
+        )
 
     if 'file' not in request.files:
         abort(json_error('CSV file missing', 406))
