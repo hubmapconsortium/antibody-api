@@ -34,6 +34,7 @@ def hubmap_search():
     # if not authenticated:
     #     return redirect(url_for('login.login'))
     assets_url: str = current_app.config['ASSETS_URL']
+    ingest_url: str = current_app.config['INGEST_API_URL']
     display: dict = {
         "target_symbol": "table-cell",
         "uniprot_accession_number": "table-cell",
@@ -83,7 +84,8 @@ def hubmap_search():
         'search.html',
         assets_url=assets_url,
         display=display,
-        csv_column_order=csv_column_order
+        csv_column_order=csv_column_order,
+        ingest_url=ingest_url
     )
 
 
