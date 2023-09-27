@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from 'react';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
@@ -27,7 +27,6 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const [unauthorizedModal, setUnauthorizedModal] = useState(false);
   const searchkit = new SearchkitManager("/");
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
@@ -40,66 +39,6 @@ function Search(props) {
     }
   }
   //console.info('Search display after cookie set: ', display);
-
-  const toggleUnauthorizedModal = () => {
-    setUnauthorizedModal(!unauthorizedModal);
-  };
-
-
-  const add_avrs = () => {
-    let url = new URL(window.location.href);
-    let url_info = url.searchParams.get("info");
-    if (url_info !== null) {
-      // Grabs the ?info= bit
-      localStorage.setItem("info", url_info);
-      localStorage.setItem("isAuthenticated", true);
-    }
-    const info_json = localStorage.getItem("info");
-    const login_url =`${ingest_url}/login`;
-
-    if (info_json == null) {
-        fetch(login_url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json',
-            }
-        });
-        return ;
-    }
-    console.log('info_json: ', info_json);
-    const token = JSON.parse(info_json).groups_token;
-    console.log('token: ', token);
-    fetch('antibodies-isauth', {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token,
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.info('is_authorized data: ', data);
-        console.info('data.authorized:', data.authorized)
-        console.info('data.authorized ===', data.authorized, ':', data.authorized === true)
-        if (data.authorized !== true) {
-            toggleUnauthorizedModal();
-        }
-        if (data.authorized === true) {
-            console.info('return a href to upload');
-            return (
-                <div>
-                <div> This is a happy message </div>
-                <a href="/upload"
-                    style={{display: "flex", color: "white", alignItems: "center", margin: "20px"}}>
-                    Add AVRs
-                </a>
-                </div>
-            );
-        }
-    });
-  }
 
   return(
   <SearchkitProvider searchkit={searchkit}>
@@ -125,11 +64,7 @@ function Search(props) {
             "created_by_user_email","avr_pdf_filename"
         ]}
         />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-           <button id='addAvrButton' onClick={add_avrs} >
-                Add AVRs
-           </button>
-        </div>
+
     </TopBar>
 
     <LayoutBody>
@@ -258,29 +193,6 @@ function Search(props) {
               </div>
           )}
         </Popup>
-
-        <Popup open={unauthorizedModal} onClose={() => {toggleUnauthorizedModal();}}
-               contentStyle={{width: "280px"}}
-               modal>
-          {close => (
-              <div className="modal form-border">
-                <button className="close" onClick={close}>
-                  &times;
-                </button>
-                <div className="header"><h3>Not Authorized</h3></div>
-                <div className="content div-border">
-                 <p>
-                    Sorry, but you are not authorized to upload AVRs.
-                 </p>
-                 <p>
-                    This could be because you do not have an account with the proper authorization,
-                    or your login has expired.
-                 </p>
-                </div>
-              </div>
-          )}
-        </Popup>
-
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
