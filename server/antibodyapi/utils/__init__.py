@@ -233,14 +233,10 @@ def get_group_id(ingest_api_url: str, group_id=None):
 
 
 def get_data_provider_groups(ingest_api_url: str):
-    return get_data_provider_groups_provide_token(ingest_api_url, session['groups_access_token'])
-
-
-def get_data_provider_groups_provide_token(ingest_api_url: str, token: str):
     req = requests.get(
         '%s/metadata/usergroups' % (ingest_api_url,),
         headers={
-            'authorization': 'Bearer %s' % token
+            'authorization': 'Bearer %s' % session['groups_access_token']
         },
         verify=False
     )
