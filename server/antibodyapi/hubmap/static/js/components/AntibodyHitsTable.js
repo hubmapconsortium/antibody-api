@@ -99,7 +99,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="method_col_head">Method</th>
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
               <th id="avr_pdf_filename_col_head">Validation Report</th>
-              <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP ID</th>
+              <th id="omap_id_col_head">OMAP ID</th>
 
               <th id="cell_line_col_head" style={{"display": display.cell_line}}>Cell Line</th>
               <th id="cell_line_ontology_id_col_head" style={{"display": display.cell_line_ontology_id}}>Cell Line Ontology ID</th>
