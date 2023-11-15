@@ -18,6 +18,14 @@ class AntibodyHitsTable extends React.Component {
       return cs;
     }
 
+    function a_href_omap_id(omap_id) {
+      if (omap_id in omap_id_linkage) {
+        return `<a href="${omap_id_linkage[omap_id]}" target="_blank">${omap_id}</a>`;
+      } else {
+        return omap_id;
+      }
+    }
+
     //console.info('display: ', display);
     //console.info('assets_url: ', assets_url);
     var antibodies = '';
@@ -35,10 +43,13 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="clone_id_col" style="display:'+display.clone_id+`;">${hit._source.clone_id}</td>`;
       antibodies += `<td class="method_col">${hit._source.method}</td>`;
       antibodies += `<td class="tissue_preservation_col">${hit._source.tissue_preservation}</td>`;
-      antibodies += `<td class="avr_pdf_filename_col">`;
+      antibodies += '<td class="avr_pdf_filename_col">';
       if (hit._source.avr_pdf_filename != undefined) {
         antibodies += `<a href="${assets_url}/${hit._source.avr_pdf_uuid}/${hit._source.avr_pdf_filename}" target="_blank">${hit._source.avr_pdf_filename}</a>`;
       }
+      antibodies += '</td>';
+      antibodies += '<td class="omap_id_col">';
+      antibodies += a_href_omap_id(hit._source.omap_id);
       antibodies += '</td>';
       antibodies += '<td class="cell_line_col" style="display:'+display.cell_line+`;">${hit._source.cell_line}</td>`;
       antibodies += '<td class="cell_line_ontology_id_col" style="display:'+display.cell_line_ontology_id+`;"><a href="https://www.ebi.ac.uk/ols4/search?q=${hit._source.cell_line_ontology_id}" target="_blank">${hit._source.cell_line_ontology_id}</a></td>`;
@@ -73,7 +84,6 @@ class AntibodyHitsTable extends React.Component {
       organ_uberon_id_url_encode = hit._source.organ_uberon_id.replace(':','%3A');
       antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
       antibodies += '<td class="antigen_retrieval_col" style="display:'+display.antigen_retrieval+`;">${hit._source.antigen_retrieval}</td>`;
-      antibodies += '<td class="omap_id_col" style="display:'+display.omap_id+`;">${hit._source.omap_id}</td>`;
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
       antibodies += `</tr>`;
     }
@@ -89,6 +99,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="method_col_head">Method</th>
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
               <th id="avr_pdf_filename_col_head">Validation Report</th>
+              <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP ID</th>
 
               <th id="cell_line_col_head" style={{"display": display.cell_line}}>Cell Line</th>
               <th id="cell_line_ontology_id_col_head" style={{"display": display.cell_line_ontology_id}}>Cell Line Ontology ID</th>
@@ -112,7 +123,6 @@ class AntibodyHitsTable extends React.Component {
               <th id="vendor_affiliation_col_head" style={{"display": display.vendor_affiliation}}>Vendor Affiliation</th>
               <th id="organ_uberon_id_col_head" style={{"display": display.organ_uberon_id}}>Organ UBERON ID</th>
               <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
-              <th id="omap_id_col_head" style={{"display": display.omap_id}}>OMAP ID</th>
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>
             </tr>
           </thead>
