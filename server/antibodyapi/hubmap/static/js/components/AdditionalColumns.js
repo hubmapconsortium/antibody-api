@@ -28,7 +28,6 @@ function AdditionalColumns() {
     {element:"vendor_affiliation", label:"Vendor Affiliation"},
     {element:"organ_uberon_id", label:"Organ UBERON ID"},
     {element:"antigen_retrieval", label:"Antigen Retrieval"},
-    {element:"omap_id", label:"OMAP ID"},
     {element:"created_by_user_email", label:"Submitter Email"},
   ];
 

@@ -54,6 +54,7 @@ def hubmap_search():
         "method": "table-cell",
         "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
+        "omap_id": "table-cell",
 
         "clone_id": "none",
         "host": "none",
@@ -78,7 +79,6 @@ def hubmap_search():
         "vendor_affiliation": "none",
         "organ_uberon_id": "none",
         "antigen_retrieval": "none",
-        "omap_id": "none",
         "created_by_user_email": "none"
     }
     csv_column_order: list = [
@@ -92,11 +92,29 @@ def hubmap_search():
         "vendor_affiliation", "organ_uberon_id", "antigen_retrieval", "omap_id",
         "created_by_user_email"
     ]
+    # Link the individual OMAP entries to the (P)URLs defined mapped in
+    # https://github.com/hubmapconsortium/antibody-api/files/13229463/HRA7threleasetoUBKG-June2024PurlsOMAPs.xlsx
+    omap_id_linkage: dict = {
+        "OMAP-1": "https://purl.humanatlas.io/omap/1-human-lymph-node-ibex",
+        "OMAP-2": "https://purl.humanatlas.io/omap/2-intestine-codex",
+        "OMAP-3": "https://purl.humanatlas.io/omap/3-kidney-codex",
+        "OMAP-4": "https://purl.humanatlas.io/omap/4-skin-cell-dive",
+        "OMAP-5": "https://purl.humanatlas.io/omap/5-liver-sims",
+        "OMAP-6": "https://purl.humanatlas.io/omap/6-pancreas-codex",
+        "OMAP-7": "https://purl.humanatlas.io/omap/7-lung-cell-dive",
+        "OMAP-8": "https://purl.humanatlas.io/omap/8-placenta-full-term-imc",
+        "OMAP-9": "https://purl.humanatlas.io/omap/9-kidney-codex",
+        "OMAP-10": "https://purl.humanatlas.io/omap/10-palatine-tonsil-macsima",
+        "OMAP-11": "https://purl.humanatlas.io/omap/11-spleen-ibex",
+        "OMAP-12": "https://purl.humanatlas.io/omap/12-eye-retina-ibex",
+        "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex"
+    }
     return render_template(
         'search.html',
         assets_url=assets_url,
         display=display,
-        csv_column_order=csv_column_order
+        csv_column_order=csv_column_order,
+        omap_id_linkage=omap_id_linkage
     )
 
 

@@ -79,7 +79,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
                         abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
-                    vendor = row['vendor']
+                    # Save this for index_antibody() Elasticsearch, but remove from for DB store...
+                    vendor_name = row['vendor']
                     del row['vendor']
                     # The .csv file contains a 'target_symbol' field that is (possibly) resolved into a different
                     # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
@@ -128,7 +129,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         uuids_and_names.append({
                             'antibody_uuid': row['antibody_uuid']
                         })
-                        index_antibody(row | {'vendor': vendor, 'target_aliases': target_aliases})
+                        index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
                     except KeyError as ke:
                         abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:
