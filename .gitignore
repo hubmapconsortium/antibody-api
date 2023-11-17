@@ -57,6 +57,9 @@ instance/
 
 **/venv/
 
+# Ignore docker env file
+.env
+
 server/BUILD
 server/VERSION
 BUILD
