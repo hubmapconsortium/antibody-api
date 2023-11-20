@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "created_by_user_displayname" text NOT NULL,
     "created_by_user_email" text NOT NULL,
     "created_by_user_sub" text NOT NULL,
+
+    "antibody_hubmap_id" text NOT NULL,
     PRIMARY KEY ("id")
 );
 

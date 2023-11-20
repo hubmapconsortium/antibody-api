@@ -20,6 +20,7 @@ def index_antibody(antibody: dict):
     logger.info(f"*** Indexing: {antibody}")
     doc = {
         'antibody_uuid': antibody['antibody_uuid'],
+        'antibody_hubmap_id': antibody['antibody_hubmap_id'],
         'protocol_doi': antibody['protocol_doi'],
         'manuscript_doi': antibody['manuscript_doi'],
         'uniprot_accession_number': antibody['uniprot_accession_number'],

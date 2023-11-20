@@ -25,7 +25,7 @@ def allowed_file(filename):
 # TODO: This is duplicated in 'scripts/utils/__init__.py'
 @unique
 class SI(IntEnum):
-    ANTIBODY_UUID = 0
+    ANTIBODY_UUID = 0,
     AVR_PDF_FILENAME = 1
     AVR_PDF_UUID = 2
     PROTOCOL_DOI = 3
@@ -62,6 +62,7 @@ class SI(IntEnum):
     CELL_LINE = 34
     CELL_LINE_ONTOLOGY_ID = 35
     CLONE_ID = 36
+    ANTIBODY_HUBMAP_ID = 37
 
 
 # THESE MUST MATCH THE ORDER IN THE ""SI"" CLASS!!!
@@ -81,7 +82,8 @@ SELECT
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid,
-    a.cell_line, a.cell_line_ontology_id, a.clone_id
+    a.cell_line, a.cell_line_ontology_id, a.clone_id,
+    a.antibody_hubmap_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
@@ -94,6 +96,7 @@ def base_antibody_query():
 def base_antibody_query_result_to_json(antibody) -> dict:
     ant = {
         'antibody_uuid': antibody[SI.ANTIBODY_UUID].replace('-', ''),
+        'antibody_hubmap_id': antibody[SI.ANTIBODY_HUBMAP_ID],
         'protocol_doi': antibody[SI.PROTOCOL_DOI],
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
         'target_symbol': antibody[SI.TARGET_SYMBOL],
@@ -254,9 +257,10 @@ def get_data_provider_groups(ingest_api_url: str):
     return data_provider_groups
 
 
-def get_hubmap_uuid(uuid_api_url: str):
+def get_hubmap_uuid(uuid_api_url: str) -> dict:
+    url: str = f'{uuid_api_url}/hmuuid'
     req = requests.post(
-        '%s/hmuuid' % (uuid_api_url,),
+        url,
         headers={
             'Content-Type': 'application/json',
             'authorization': 'Bearer %s' % session['groups_access_token']
@@ -268,7 +272,8 @@ def get_hubmap_uuid(uuid_api_url: str):
         logger.debug(f"utils/get_hubmap_uuid: response.status_code {req.status_code}")
         abort(json_error(f"Internal error caused when trying to accessing server '{uuid_api_url}'; status: {req.status_code}", 406))
 
-    return req.json()[0]['uuid']
+    logger.debug(f"get_hubmap_uuid(); url={url}; req.json={req.json()}")
+    return req.json()[0]
 
 
 def get_user_info(token):
@@ -292,7 +297,8 @@ INSERT INTO antibodies (
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
-    created_by_user_sub, group_uuid
+    created_by_user_sub, group_uuid,
+    antibody_hubmap_id
 ) 
 VALUES (
     %(antibody_uuid)s,
@@ -307,7 +313,8 @@ VALUES (
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
-    %(created_by_user_sub)s, %(group_uuid)s
+    %(created_by_user_sub)s, %(group_uuid)s,
+    %(antibody_hubmap_id)s
 ) RETURNING id
 '''
 
@@ -328,7 +335,8 @@ INSERT INTO antibodies (
     antigen_retrieval, omap_id,
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
-    created_by_user_sub, group_uuid
+    created_by_user_sub, group_uuid,
+    antibody_hubmap_id
 ) 
 VALUES (
     %(antibody_uuid)s,
@@ -344,7 +352,8 @@ VALUES (
     %(antigen_retrieval)s, %(omap_id)s,
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
-    %(created_by_user_sub)s, %(group_uuid)s
+    %(created_by_user_sub)s, %(group_uuid)s,
+    %(antibody_hubmap_id)s
 ) RETURNING id
 '''
 

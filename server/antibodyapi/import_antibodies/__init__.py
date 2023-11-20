@@ -65,21 +65,22 @@ def import_antibodies(): # pylint: disable=too-many-branches
 
     for file in request.files.getlist('file'):
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+            filename: str = secure_filename(file.filename)
             logger.info(f"import_antibodies: processing filename: {filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), encoding="ascii", errors="ignore") as csvfile:
-                row_i = 1
+            file_path: bytes = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            with open(file_path, encoding="ascii", errors="ignore") as csvfile:
+                row_i: int = 1
                 for row_dr in csv.DictReader(csvfile, delimiter=','):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
                     # and make all the keys lowercase so comparison is easy...
                     row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
-                    row_i = row_i + 1
+                    row_i += 1
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
                         abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
-                    vendor = row['vendor']
+                    vendor_name: str = row['vendor']
                     del row['vendor']
                     # The .csv file contains a 'target_symbol' field that is (possibly) resolved into a different
                     # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
@@ -89,7 +90,9 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     # The target_aliases is a list of the other symbols that are associated with the target_symbol,
                     # and it gets saved to ElasticSearch, but not the database.
                     target_aliases: List[str] = target_datas[target_symbol_from_csv]['target_aliases']
-                    row['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+                    hubmap_uuid_dict: dict = get_hubmap_uuid(app.config['UUID_API_URL'])
+                    row['antibody_uuid'] = hubmap_uuid_dict.get('uuid')
+                    row['antibody_hubmap_id'] = hubmap_uuid_dict.get('hubmap_id')
                     row['created_by_user_displayname'] = session['name']
                     row['created_by_user_email'] = session['email']
                     row['created_by_user_sub'] = session['sub']
@@ -128,7 +131,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         uuids_and_names.append({
                             'antibody_uuid': row['antibody_uuid']
                         })
-                        index_antibody(row | {'vendor': vendor, 'target_aliases': target_aliases})
+                        index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
                     except KeyError as ke:
                         abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:
