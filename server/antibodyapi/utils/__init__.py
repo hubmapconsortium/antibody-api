@@ -25,7 +25,7 @@ def allowed_file(filename):
 # TODO: This is duplicated in 'scripts/utils/__init__.py'
 @unique
 class SI(IntEnum):
-    ANTIBODY_UUID = 0,
+    ANTIBODY_UUID = 0
     AVR_PDF_FILENAME = 1
     AVR_PDF_UUID = 2
     PROTOCOL_DOI = 3
