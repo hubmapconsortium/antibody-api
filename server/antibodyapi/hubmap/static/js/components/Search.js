@@ -55,7 +55,7 @@ function Search(props) {
         queryOptions={{analyzer:"standard"}}
         searchOnChange={true}
         queryFields={[
-            "antibody_uuid","protocol_doi","manuscript_doi","uniprot_accession_number",
+            "antibody_uuid","antibody_hubmap_id","protocol_doi","manuscript_doi","uniprot_accession_number",
             "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
             "clonality","clone_id","vendor","catalog_number","lot_number",
             "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
