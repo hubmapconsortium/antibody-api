@@ -54,6 +54,7 @@ def hubmap_search():
         "method": "table-cell",
         "tissue_preservation": "table-cell",
         "avr_pdf_filename": "table-cell",
+        "antibody_hubmap_id": "table-cell",
 
         "clone_id": "none",
         "host": "none",
@@ -82,7 +83,8 @@ def hubmap_search():
         "created_by_user_email": "none"
     }
     csv_column_order: list = [
-        "target_symbol", "uniprot_accession_number", "clonality", "clone_id", "method", "tissue_preservation", "avr_pdf_filename",
+        "target_symbol", "uniprot_accession_number", "clonality", "clone_id", "method",
+        "tissue_preservation", "avr_pdf_filename", "antibody_hubmap_id",
 
         "host", "cell_line", "cell_line_ontoloty_id",
         "rrid", "catalog_number", "lot_number", "vendor_name",

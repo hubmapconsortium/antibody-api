@@ -32,16 +32,18 @@ def save_antibody():
     app = current_app
     cur = get_cursor(app)
     antibody['vendor_id'] = find_or_create_vendor(cur, antibody['vendor'])
-    vendor = antibody['vendor']
+    vendor_name = antibody['vendor']
     del antibody['vendor']
-    antibody['antibody_uuid'] = get_hubmap_uuid(app.config['UUID_API_URL'])
+    hubmap_uuid_dict: dict = get_hubmap_uuid(app.config['UUID_API_URL'])
+    antibody['antibody_uuid'] = hubmap_uuid_dict.get('uuid')
+    antibody['antibody_hubmap_id'] = hubmap_uuid_dict.get('hubmap_id')
     antibody['created_by_user_displayname'] = session['name']
     antibody['created_by_user_email'] = session['email']
     antibody['created_by_user_sub'] = session['sub']
     antibody['group_uuid'] = '7e5d3aec-8a99-4902-ab45-f2e3335de8b4'
     try:
         cur.execute(insert_query(), antibody)
-        index_antibody(antibody | {'vendor': vendor})
+        index_antibody(antibody | {'vendor_name': vendor_name})
     except UniqueViolation:
         abort(json_error('Antibody not unique', 400))
     return make_response(jsonify(id=cur.fetchone()[0], uuid=antibody['antibody_uuid']), 201)
