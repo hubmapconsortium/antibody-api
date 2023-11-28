@@ -51,6 +51,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="omap_id_col">';
       antibodies += a_href_omap_id(hit._source.omap_id);
       antibodies += '</td>';
+      antibodies += `<td class="antibody_hubmap_id_col">${hit._source.antibody_hubmap_id}</td>`;
+
       antibodies += '<td class="cell_line_col" style="display:'+display.cell_line+`;">${hit._source.cell_line}</td>`;
       antibodies += '<td class="cell_line_ontology_id_col" style="display:'+display.cell_line_ontology_id+`;"><a href="https://www.ebi.ac.uk/ols4/search?q=${hit._source.cell_line_ontology_id}" target="_blank">${hit._source.cell_line_ontology_id}</a></td>`;
       antibodies += '<td class="host_col" style="display:'+display.host+`;">${hit._source.host}</td>`;
@@ -100,6 +102,7 @@ class AntibodyHitsTable extends React.Component {
               <th id="tissue_preservation_col_head">Tissue Preservation</th>
               <th id="avr_pdf_filename_col_head">Validation Report</th>
               <th id="omap_id_col_head">OMAP ID</th>
+              <th id="antibody_hubmap_id_col_head">HuBMAP ID</th>
 
               <th id="cell_line_col_head" style={{"display": display.cell_line}}>Cell Line</th>
               <th id="cell_line_ontology_id_col_head" style={{"display": display.cell_line_ontology_id}}>Cell Line Ontology ID</th>
