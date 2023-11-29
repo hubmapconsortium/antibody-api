@@ -48,7 +48,9 @@ class AntibodyHitsTable extends React.Component {
         antibodies += `<a href="${assets_url}/${hit._source.avr_pdf_uuid}/${hit._source.avr_pdf_filename}" target="_blank">${hit._source.avr_pdf_filename}</a>`;
       }
       antibodies += '</td>';
-      antibodies += `<td class="omap_id_col">${hit._source.omap_id}</td>`;
+      antibodies += '<td class="omap_id_col">';
+      antibodies += a_href_omap_id(hit._source.omap_id);
+      antibodies += '</td>';
       antibodies += `<td class="antibody_hubmap_id_col">${hit._source.antibody_hubmap_id}</td>`;
 
       antibodies += '<td class="cell_line_col" style="display:'+display.cell_line+`;">${hit._source.cell_line}</td>`;
