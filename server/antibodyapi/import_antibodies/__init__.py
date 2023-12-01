@@ -80,6 +80,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
                         abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
+                    # Save this for index_antibody() Elasticsearch, but remove from for DB store...
                     vendor_name: str = row['vendor']
                     del row['vendor']
                     # The .csv file contains a 'target_symbol' field that is (possibly) resolved into a different

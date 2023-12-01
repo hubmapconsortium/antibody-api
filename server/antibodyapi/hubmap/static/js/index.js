@@ -13,4 +13,3 @@ ReactDOM.render(
     </CookiesProvider>,
     document.getElementById("render-react-here")
 );
-
