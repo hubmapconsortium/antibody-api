@@ -63,3 +63,6 @@ instance/
 server/BUILD
 server/VERSION
 BUILD
+
+# Mounted data
+postgres/data

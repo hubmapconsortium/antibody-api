@@ -16,7 +16,6 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "id" serial,
-
     "antibody_uuid" uuid NOT NULL,
     "avr_pdf_filename" text,
     "avr_pdf_uuid" uuid,
@@ -49,13 +48,11 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "organ_uberon_id" text NOT NULL,
     "antigen_retrieval" text NOT NULL,
     "omap_id" text,
-
     "group_uuid" uuid NOT NULL,
     "created_timestamp" integer NOT NULL,
     "created_by_user_displayname" text NOT NULL,
     "created_by_user_email" text NOT NULL,
     "created_by_user_sub" text NOT NULL,
-
     "antibody_hubmap_id" text NOT NULL,
     PRIMARY KEY ("id")
 );

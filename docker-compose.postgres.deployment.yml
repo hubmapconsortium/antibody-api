@@ -1,5 +1,4 @@
 version: '3.7'
-# https://docs.docker.com/compose/compose-file/compose-file-v3/
 
 services:
   avr-postgres:
@@ -10,11 +9,13 @@ services:
       dockerfile: Dockerfile-Postgres
     restart: always
     environment:
-      POSTGRES_USER: avr
-      POSTGRES_PASSWORD: test4now
-      POSTGRES_DB: avr
+      POSTGRES_USER: ${AVR_POSTGRES_USER:-demo}
+      POSTGRES_PASSWORD: ${AVR_POSTGRES_PASSWORD:-123}
+      POSTGRES_DB: ${AVR_POSTGRES_DB:-test}
     ports:
       - "5433:5432"
     volumes:
       # The official postgres docker image will run .sql scripts found in the /docker-entrypoint-initdb.d/ folder.
-      - ./db/initdb.d:/docker-entrypoint-initdb.d/
+      - "./postgres/initdb.d:/docker-entrypoint-initdb.d/"
+      # Data persistence
+      - "./postgres/data:/var/lib/postgresql/data"
