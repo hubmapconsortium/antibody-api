@@ -1,6 +1,23 @@
 <!DOCTYPE html>
   <html>
   <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-329LZM826B"></script>
+    <script>
+        let track_host = 'avr.hubmapconsortium.org';
+        if (window.location.hostname == track_host) {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-329LZM826B', {
+                'cookie_domain': track_host,
+                'cookie_flags': 'max-age=7200;secure;samesite=none'
+            });
+            console.log("Google Analytics ON");
+        } else {
+            console.log("Google Analytics OFF");
+        }
+    </script>
     <title>HuBMAP AVR Upload (v2)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
