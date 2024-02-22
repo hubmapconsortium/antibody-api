@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-329LZM826B"></script>
+        <script>
+            let track_host = 'avr.hubmapconsortium.org';
+            if (window.location.hostname == track_host) {
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'G-329LZM826B', {
+                    'cookie_domain': track_host,
+                    'cookie_flags': 'max-age=7200;secure;samesite=none'
+                });
+                console.log("Google Analytics ON");
+            } else {
+                console.log("Google Analytics OFF");
+            }
+        </script>
         <title>HuBMAP AVR Search</title>
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/searchkit/2.0.0/theme.css">
         <link rel="stylesheet" type="text/css" href="/css/app.css">
