@@ -14,14 +14,15 @@ import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
 class BannerMessage extends React.Component {
     render () {
-        var banner_elt = '<div></div>';
-        if (banner_message) {
-            banner_elt = banner_message;
+        if (!banner_message) {
+            return(
+              <div></div>
+            );
         }
 
         return(
           <div className="banner">
-            <div dangerouslySetInnerHTML={{ __html: banner_elt }} />
+            <div dangerouslySetInnerHTML={{ __html: banner_message }} />
           </div>
         );
     }
