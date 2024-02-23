@@ -459,3 +459,17 @@ body{
   float: right;
   margin-right: 8px;
 }
+
+.banner {
+  display: flex;
+  width: 100%;
+  background-color: red;
+  margin: 1px 1px 1px 1px;
+  padding:1px 1px 1px 1px;
+}
+
+.render-react {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

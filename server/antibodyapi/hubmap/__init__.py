@@ -5,6 +5,7 @@ from flask import (
 import os
 from antibodyapi.utils.elasticsearch import execute_query
 import logging
+import html5lib
 
 hubmap_blueprint = Blueprint('hubmap', __name__, template_folder='templates')
 logger = logging.getLogger(__name__)
@@ -111,12 +112,21 @@ def hubmap_search():
         "OMAP-12": "https://purl.humanatlas.io/omap/12-eye-retina-ibex",
         "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex"
     }
+
+    banner_message: str = current_app.config['BANNER_MESSAGE']
+    try:
+        html5lib.parseFragment(banner_message)
+    except html5lib.html5parser.ParseError as pe:
+        logger.error(f"ParseError found in app.conf:BANNER_MESSAGE: {pe}")
+        exit(1)
+
     return render_template(
         'search.html',
         assets_url=assets_url,
         display=display,
         csv_column_order=csv_column_order,
-        omap_id_linkage=omap_id_linkage
+        omap_id_linkage=omap_id_linkage,
+        banner_message=banner_message
     )
 
 

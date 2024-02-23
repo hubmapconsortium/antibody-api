@@ -12,6 +12,22 @@ import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 import { useSearchkitQueryValue, useSearchkit } from '@searchkit/client'
 
+class BannerMessage extends React.Component {
+    render () {
+        var banner_elt = '<div></div>';
+        if (banner_message) {
+            banner_elt = banner_message;
+        }
+
+        return(
+          <div className="banner">
+            <div dangerouslySetInnerHTML={{ __html: banner_elt }} />
+          </div>
+        );
+    }
+}
+
+
 function collapseAllFilters() {
   const filters_dev = document.querySelectorAll(".sk-layout__filters");
   const header = filters_dev[0].querySelectorAll(".sk-panel__header.is-collapsable:not(.is-collapsed)")
@@ -196,6 +212,7 @@ function Search(props) {
               </div>
           )}
         </Popup>
+        <BannerMessage />
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
