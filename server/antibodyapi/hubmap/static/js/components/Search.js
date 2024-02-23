@@ -86,6 +86,8 @@ function Search(props) {
       </a>
     </TopBar>
 
+    <BannerMessage />
+
     <LayoutBody>
 
       <SideBar>
@@ -212,7 +214,7 @@ function Search(props) {
               </div>
           )}
         </Popup>
-        <BannerMessage />
+
         <Hits mod="sk-hits-list"
           hitsPerPage={20}
           listComponent={AntibodyHitsTable}
