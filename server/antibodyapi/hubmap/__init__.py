@@ -113,12 +113,15 @@ def hubmap_search():
         "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex"
     }
 
-    banner_message: str = current_app.config['BANNER_MESSAGE']
     try:
-        html5lib.parseFragment(banner_message)
-    except html5lib.html5parser.ParseError as pe:
-        logger.error(f"ParseError found in app.conf:BANNER_MESSAGE: {pe}")
-        exit(1)
+        banner_message: str = current_app.config['BANNER_MESSAGE']
+        try:
+            html5lib.parseFragment(banner_message)
+        except html5lib.html5parser.ParseError as pe:
+            logger.error(f"ParseError found in app.conf:BANNER_MESSAGE: {pe}")
+            exit(1)
+    except KeyError:
+        banner_message: str = ''
 
     return render_template(
         'search.html',

@@ -308,7 +308,7 @@ caption {
 
 /* Antibody  */
 html{
-  background-color:rgb(250, 250, 250);
+  background-color: #f4f4f4;
 }
 body{
   font-family: Inter, Helvetica, Arial, sans-serif;
@@ -462,8 +462,9 @@ body{
 
 .banner {
   display: absolute;
-  margin: 65px 0px 1px 0px;
-  width: 100%;
-  padding:10px;
-  background-color: #d32f2f;
+  margin: 75px 15px -65px;
+  padding: 10px;
+  border: 1px solid rgb(255, 230, 156);
+  background-color: rgb(255, 243, 205);
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
 }
