@@ -576,6 +576,9 @@ div.sk-search-box{
 .sk-item-list-option__count{
   color:#666;
 }
+.sk-item-list-option.is-active .sk-item-list-option__count{
+  font-weight:700!important;
+}
 .sk-layout__results{
   background:none!important;
   box-shadow: none!important;
