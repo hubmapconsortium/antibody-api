@@ -93,7 +93,7 @@ function Search(props) {
         />
       <div className='searchView'>
         <SideBar>
-          <button onClick={collapseAllFilters}>Collapse all</button>
+          <button className='collapseButton' onClick={collapseAllFilters}>Collapse all</button>
           <ResetFilters />
           <RefinementListFilter
             id="cell_line"
@@ -191,15 +191,12 @@ function Search(props) {
         <LayoutResults>
 
           <ActionBar>
-
             <ActionBarRow>
               <HitsStats />
             </ActionBarRow>
-
             <ActionBarRow>
               <SelectedFilters />
             </ActionBarRow>
-
           </ActionBar>
 
           <Popup trigger={<button className="button-placement">Configure Columns</button>}
