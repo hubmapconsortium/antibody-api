@@ -510,13 +510,20 @@ body{
   border-color: rgba(0,0,0,.175);
   border-radius: 0.375rem;
   font-size: 1.6rem;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
-.collapseButton{
-  background:none!important;
-  color: #08c!important;
-  border: none!important;
+.sk-layout__body .sk-layout__filters a.collapseButton{
+  line-height: 1;
+  font-size: 14px;
+  color: #08c;
+  border: none;
+  margin-bottom:0px;
+  cursor: pointer;
 }
+.sk-layout__body .sk-layout__filters a.collapseButton:visited{
+  color: #08c;
+}
+
 .sk-action-bar{
   display:inline-block;
   margin: 0 auto 0 10px;

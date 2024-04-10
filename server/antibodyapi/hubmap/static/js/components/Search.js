@@ -76,7 +76,7 @@ function Search(props) {
     <BannerMessage />
     
     <LayoutBody>
-      <h1 class="">Antibody Search</h1>
+      <h1 class="">Antibody Validation Report Search</h1>
       <SearchBox
         autofocus={true}
         queryOptions={{analyzer:"standard"}}
@@ -93,7 +93,8 @@ function Search(props) {
         />
       <div className='searchView'>
         <SideBar>
-          <button className='collapseButton' onClick={collapseAllFilters}>Collapse all</button>
+          <h3>Filters</h3>
+          <a className='collapseButton' onClick={collapseAllFilters}>Collapse all</a>
           <ResetFilters />
           <RefinementListFilter
             id="cell_line"
