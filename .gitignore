@@ -63,3 +63,5 @@ instance/app.conf
 server/BUILD
 server/VERSION
 BUILD
+antibody-api.code-workspace
+app.conf

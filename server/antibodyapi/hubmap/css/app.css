@@ -311,7 +311,7 @@ html{
   background-color: #f4f4f4;
 }
 body{
-  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-family: Inter Variable, Helvetica, Arial, sans-serif;
 }
 .toptitle{
   font-size:1.5rem;
@@ -364,7 +364,7 @@ body{
 }
 .uploadCol h3{
   font-size: 2rem;
-  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-family: Inter Variable, Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.167;
   margin-bottom: 16px;
@@ -376,7 +376,7 @@ body{
   text-align:left;
   display:inline-block;
   font-size: 1rem;
-  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-family: Inter Variable, Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.6;
   margin-bottom:16px;
@@ -392,7 +392,7 @@ body{
 }
 .uploadInnerWrap label{
   font-size: 1.6rem;
-  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-family: Inter Variable, Helvetica, Arial, sans-serif;
   font-weight: 300;
   line-height: 1.235;
 }
@@ -467,4 +467,168 @@ body{
   border: 1px solid rgb(255, 230, 156);
   background-color: rgb(255, 243, 205);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+}
+
+.sk-top-bar__content{
+  display:inline-block;
+  max-width: 1280px;
+}
+.topmenuRight{
+  float:inline-end;
+  display: inline-block;
+  text-decoration: none;
+}
+.sk-layout__body{
+  width: 100%!important;
+  max-width: 1280px;
+  display: flex;
+  flex-direction: column;
+}
+.sk-layout__body h1{
+  color:rgb(68, 74, 101);
+  font-weight: 200;
+  font-size: 2.3rem;
+  font-family: Inter Variable, Helvetica, Arial, sans-serif;
+  font-variation-settings: "slnt" 0, "wght" 200;
+  line-height: 1.2;
+  margin: 30px 20px 0 20px;
+}
+.sk-layout__body h1 svg{
+  color:rgb(68, 74, 101);
+  width:45px;
+}
+.sk-layout__body a{
+  color: rgb(42, 111, 184);
+}
+.sk-layout__body button{
+  background-color: rgb(68, 74, 101);
+  box-sizing: border-box;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: inline-block;
+  line-height: 1.5;
+  border-color: rgba(0,0,0,.175);
+  border-radius: 0.375rem;
+  font-size: 1.6rem;
+  /* margin-bottom: 20px; */
+}
+.sk-layout__body .sk-layout__filters a.collapseButton{
+  line-height: 1;
+  font-size: 14px;
+  color: #08c;
+  border: none;
+  margin-bottom:0px;
+  cursor: pointer;
+}
+.sk-layout__body .sk-layout__filters a.collapseButton:visited{
+  color: #08c;
+}
+
+.sk-action-bar{
+  display:inline-block;
+  margin: 0 auto 0 10px;
+}
+.searchView{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 20px auto;
+  width: 100%;
+}
+div.sk-search-box{
+  display:inline-block;
+  /* margin-top:60px; */
+  background-color: #fff;
+  border: 1px solid #636363;
+  border-radius: 8px;
+  text-align: center;
+  /* width: 100%; */
+  margin: 20px 20px 0 20px;
+}
+.sk-search-box input.sk-search-box__text{
+  box-shadow: none;
+  background-color: #fff!important;
+  color: #000;
+  font-size: 16px;
+  padding: 5px;
+}
+.sk-panel__header{
+  font-weight: normal;
+}
+.sk-panel_filter{
+  background: none!important;
+  margin: 15px 0 15px 15px;
+  flex: 0 0 246px;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+}
+.sk-panel_filter button{ 
+  background: none!important;
+  margin: 15px 0 15px 15px;
+  flex: 0 0 246px;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+}
+.sk-panel_filter_{
+  background: #fff;
+  padding: 15px;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+}
+.sk-panel__header.is-collapsable::after{
+  /* content: url('data:image/svg+xml; utf8, <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ExpandMoreIcon"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>') */
+}
+
+
+.sk-item-list{
+  margin-left: 20px;
+}
+.sk-item-list-option__count{
+  color:#666;
+}
+.sk-item-list-option.is-active .sk-item-list-option__count{
+  font-weight:700!important;
+}
+.sk-layout__results{
+  background:none!important;
+  box-shadow: none!important;
+}
+
+.sk-table-striped tr:nth-child(2n-1) td{
+  background-color: white!important;
+}
+#antibody-results-table{
+  background-color: white!important;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
+}
+#antibody-results-table thead{
+  display: table-header-group;
+  background-color: white!important;
+}
+#antibody-results-table th{
+  font-weight: 800!important;
+  font-size: 0.8rem;
+  font-family: Inter, Helvetica, Arial, sans-serif;
+  line-height: 1.5rem;
+  display: table-cell;
+  vertical-align: inherit;
+  border-bottom: 1px solid rgb(224, 224, 224);
+  border-top: none!important;
+  border-left: none!important;
+  border-right: none!important;
+  text-align: left;
+  padding: 16px;
+  color: rgba(0, 0, 0, 0.87);
+}
+#antibody-results-table td{
+  font-weight: 300;
+  font-size: 0.8rem;
+  font-family: Inter, Helvetica, Arial, sans-serif;
+  line-height: 1.43;
+  display: table-cell;
+  vertical-align: inherit;
+  border-bottom: 1px solid rgb(224, 224, 224);
+  border-top: none!important;
+  border-left: none!important;
+  border-right: none!important;
+  text-align: left;
+  padding: 16px;
+  color: rgba(0, 0, 0, 0.87);
 }
