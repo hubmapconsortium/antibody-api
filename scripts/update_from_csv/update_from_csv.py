@@ -66,23 +66,17 @@ def make_db_connection(user: str, password: str, host: str, dbname: str) -> conn
     return db_conn
 
 
-def get_id_for_vendor(conn, vendor_name: str) -> int:
+def find_or_create_vendor(cursor, vendor_name) -> int:
     """
     Look for the vendor_name in the VENDOR_TABLE, if found return the vendor_id,
     if not found create an entry for it returning the vendor_id.
     """
-    select_stmt: str = f"SELECT id FROM {VENDORS_TABLE} WHERE vendor_name = %s;"
-    cur = conn.cursor()
-    cur.execute(select_stmt, (vendor_name,))
-    id = cur.fetchone()
-    if id is None:
-        insert_stmt: str = f"INSERT INTO {VENDORS_TABLE}(vendor_name) VALUES(%s) RETURNING id;"
-        cur.execute(insert_stmt, (vendor_name,))
-        conn.commit()
-        id = cur.fetchone()
-        logger.info(f"Added vendor_name '{vendor_name}' to table {VENDORS_TABLE}")
-    cur.close()
-    return id[0]
+    cursor.execute('SELECT id FROM vendors WHERE UPPER(vendor_name) = %s', (vendor_name.upper(),))
+    try:
+        return cursor.fetchone()[0]
+    except TypeError:
+        cursor.execute('INSERT INTO vendors (vendor_name) VALUES (%s) RETURNING id', (vendor_name,))
+        return cursor.fetchone()[0]
 
 
 def confirm_existance_of_antibody_hubmap_id(conn, antibody_hubmap_id: str) -> bool:
@@ -113,7 +107,9 @@ def make_update(conn, csv_header: list, line_items: list) -> None:
         else:
             if header_item == 'vendor_affiliation':
                 try:
-                    line_item = get_id_for_vendor(conn, line_item)
+                    cur = conn.cursor()
+                    line_item = find_or_create_vendor(cur, line_item)
+                    cur.close()
                 except psycopg2.Error as pe:
                     logger.error(f"Fatal error while executing get_id_for_vendor: {pe}")
                     exit(1)
