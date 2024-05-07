@@ -6,6 +6,10 @@ import datetime
 import requests
 import psycopg2
 from psycopg2._psycopg import connection
+# import sys
+# sys.path.insert(0, "../../server/antibodyapi/utils/validate_items")
+# from validation_exception import ValidationError
+# from validation_utils import CanonicalizeYNResponse, CanonicalizeDOI
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
                     filename='./updates_from_csv.log',
@@ -44,9 +48,10 @@ ANTIBODIES_TABLE: str = 'public.antibodies'
 
 
 def only_printable_and_strip(s: str) -> str:
-    # This does not work because (apparently) the TM symbol is a unicode character.
-    # s.encode('utf-8', errors='ignore').decode('utf-8')
-    # So, we use the more restrictive string.printable which does not contain unicode characters.
+    """
+    Return a string that contains only printable characters found in 's'.
+    """
+    # We use the more restrictive string.printable which does not contain unicode characters.
     return ''.join(c for c in s if c in string.printable).strip()
 
 
@@ -81,7 +86,7 @@ def find_or_create_vendor(cursor, vendor_name) -> int:
 
 def confirm_existance_of_antibody_hubmap_id(conn, antibody_hubmap_id: str) -> bool:
     """
-    Return True if it exists, False if it does not.
+    Return True if the 'antibody_humbmap_id' exists exists in the database, False if it does not.
     """
     stmt: str = f"SELECT count(*) from {ANTIBODIES_TABLE} where antibody_hubmap_id = %s"
     cur = conn.cursor()
@@ -93,6 +98,7 @@ def confirm_existance_of_antibody_hubmap_id(conn, antibody_hubmap_id: str) -> bo
 def make_update(conn, csv_header: list, line_items: list) -> None:
     """
     Update the database record changing the values of the fields in 'csv_header' to that in 'line_items'.
+    The record changed is that which has the 'antibody_hubmap_id'.
     """
     antibody_hubmap_id = None
     stmt: str = f'UPDATE {ANTIBODIES_TABLE} SET'
@@ -145,7 +151,7 @@ class MyParser(argparse.ArgumentParser):
 
 parser = MyParser(
     description='''
-    This is a script to change entries in the database using the 'csv_file' and then restore ElasticSearch.
+    This is a script to change entries in the database using the 'csv_file' provided, and then restore ElasticSearch.
     
     For the 'token' parameter, login through the UI to get the credentials for the environment that you are using.
     https://ingest.dev.hubmapconsortium.org/ (DEV)
