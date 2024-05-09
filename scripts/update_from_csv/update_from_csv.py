@@ -61,7 +61,7 @@ def make_db_connection(user: str, password: str, host: str, dbname: str) -> conn
     try:
         db_conn: connection = psycopg2.connect(user=user, password=password, host=host, port=port, dbname=dbname)
     except psycopg2.Error as e:
-        logger.error(f"Unable to connect to PosgreSQL database at host: {host} and port: {port}")
+        logger.error(f"Unable to connect to PosgreSQL database at host: {host} and port: {port}; error: {e}")
         exit(1)
     if db_conn.closed == 0:
         logger.info(f"make_db_connection successfully connected")
