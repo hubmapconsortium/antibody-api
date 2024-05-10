@@ -72,11 +72,12 @@ def execute_query_elasticsearch_directly(query):
 
 def execute_query_through_search_api(query):
     # SEARCHAPI_BASE_URL, and ANTIBODY_ELASTICSEARCH_INDEX should be defined in the Flask app.cfg file.
+    # TODO: The reference to SEARCH_API_BASE in the config file seems to be breaking things?!
     searchapi_base_url: str = current_app.config['SEARCH_API_BASE'].rstrip("/")
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     # https://smart-api.info/ui/7aaf02b838022d564da776b03f357158#/search_by_index/search-post-by-index
     url: str = f"{searchapi_base_url}/{antibody_elasticsearch_index}/search"
-    logger.debug(f'execute_query_through_search_api() URL: {url}')
+    logger.info(f'execute_query_through_search_api() URL: {url}')
     response = requests.post(url, headers={"Content-Type": "application/json"}, json=query)
 
     if response.status_code != 200:
