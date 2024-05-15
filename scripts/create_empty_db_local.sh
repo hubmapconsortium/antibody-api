@@ -5,7 +5,11 @@ DATABASE_NAME='antibodydb'
 DATABASE_USER='postgres'
 DATABASE_PASSWORD='password'
 
-ANTIBODY_URL='localhost:5000'
+ANTIBODY_URL_LOCAL='http://localhost:5000'
+ANTIBODY_URL_DEV='https://avr.dev.hubmapconsortium.org'
+ANTIBODY_URL_TEST='https://avr.test.hubmapconsortium.org'
+ANTIBODY_URL_PROD='https://avr.hubmapconsortium.org'
+export ANTIBODY_URL=$ANTIBODY_URL_LOCAL
 
 if [[ `which psql > /dev/null 2>&1 ; echo $?` -ne 0 ]] ; then
   brew install postgresql
@@ -16,4 +20,5 @@ psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -c "DROP TABLE IF EXI
 psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -f development/postgresql_init_scripts/create_tables.sql
 
 # Rebuild the index
-curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
+# curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
+scripts/rebuild_elasticsearch_index.sh $ANTIBODY_URL

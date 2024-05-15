@@ -35,7 +35,7 @@ def create_app(testing=False):
 
     @app.teardown_appcontext
     def close_db(error): # pylint: disable=unused-argument
-        if 'connection' in g:
+        if 'connection' in g and g.connection is not None:
             logger.info(f"Closing Database Connection")
             g.connection.close()
 
