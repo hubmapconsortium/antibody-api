@@ -20,5 +20,4 @@ psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -c "DROP TABLE IF EXI
 psql -h $DATABASE_HOST -U $DATABASE_USER -d $DATABASE_NAME -f development/postgresql_init_scripts/create_tables.sql
 
 # Rebuild the index
-# curl -X PUT --header 'Content-Type: application/json' "${ANTIBODY_URL}/restore_elasticsearch"
 scripts/rebuild_elasticsearch_index.sh $ANTIBODY_URL
