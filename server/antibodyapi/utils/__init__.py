@@ -5,6 +5,7 @@ from flask import abort, g, jsonify, make_response,  session
 from enum import IntEnum, unique
 from werkzeug.utils import secure_filename
 import psycopg2
+from psycopg2._psycopg import connection
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import logging
 from requests.packages.urllib3.exceptions import InsecureRequestWarning # pylint: disable=import-error
@@ -148,14 +149,36 @@ def find_or_create_vendor(cursor, vendor_name):
 
 
 def get_cursor(app):
-    if 'connection' not in g:
-        conn = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
-        )
-        g.connection = conn # pylint: disable=assigning-non-slot
+    """
+    Reuse an existing connection after testing to see that it still works.
+    If the connection is no longer valid, or was never established, then make one.
+
+    Return an error message and a status_code == 502 if there is a problem creating a connection,
+    otherwise return a cursor.
+    """
+    host: str = app.config['DATABASE_HOST']
+    user: str = app.config['DATABASE_USER']
+    dbname: str = app.config['DATABASE_NAME']
+    password: str = app.config['DATABASE_PASSWORD']
+    if 'connection' in g:
+        # Test to see if the connection still works...
+        try:
+            # NOTE: connection.isolation_level no longer actually calls the database
+            cur = g.connection.cursor()
+            cur.execute('SELECT 1')
+            cur.close()
+        except psycopg2.OperationalError:
+            logger.error("Connectionn to PosgreSQL database is no longer valid")
+            g.connection = None
+    if 'connection' not in g or g.connection is None or g.connection.closed != 0:
+        # Have not connected or the connection is now broken or closed...
+        logger.info(f"Connecting to PosgreSQL database; host: {host}, user: {user}, dbname: {dbname}")
+        try:
+            conn: connection = psycopg2.connect(host=host, user=user, dbname=dbname, password=password)
+        except psycopg2.Error as e:
+            abort(json_error(f"Unable to connect to PosgreSQL database; error: {e}", 502))
+        logger.info("Successfully connected to PosgreSQL database")
+        g.connection = conn
         g.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     return g.connection.cursor()
 
@@ -269,8 +292,7 @@ def get_hubmap_uuid(uuid_api_url: str) -> dict:
         verify=False
     )
     if req.status_code != 200:
-        logger.debug(f"utils/get_hubmap_uuid: response.status_code {req.status_code}")
-        abort(json_error(f"Internal error caused when trying to accessing server '{uuid_api_url}'; status: {req.status_code}", 406))
+        abort(json_error(f"Error accessing '{url}'; status: {req.status_code}", 406))
 
     logger.debug(f"get_hubmap_uuid(); url={url}; req.json={req.json()}")
     return req.json()[0]

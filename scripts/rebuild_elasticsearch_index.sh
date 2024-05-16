@@ -12,15 +12,18 @@
 # Take the 'groups_token' as the TOKEN below...
 #
 # When calling specify the TOKEN, e,g.:
-#export TOKEN="tokenString" ; ./scripts/rebuild_elasticsearch_index.sh
+#export TOKEN="tokenString" ; ./scripts/rebuild_elasticsearch_index.sh ANTIBODY_URL
 #
 # if it works you will get: {"antibodies":[]}
+
+echo "Rebuild the ElasticSearch index..."
 
 ANTIBODY_URL_LOCAL='https://localhost:5000'
 ANTIBODY_URL_DEV='https://avr.dev.hubmapconsortium.org'
 ANTIBODY_URL_TEST='https://avr.test.hubmapconsortium.org'
 ANTIBODY_URL_PROD='https://avr.hubmapconsortium.org'
-ANTIBODY_URL=$ANTIBODY_URL_PROD
+ANTIBODY_URL=$1
+echo "ANTIBODY_URL==$ANTIBODY_URL"
 
 curl --request PUT \
  --url "${ANTIBODY_URL}/restore_elasticsearch" \

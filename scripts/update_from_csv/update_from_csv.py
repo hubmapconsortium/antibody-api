@@ -56,12 +56,11 @@ def only_printable_and_strip(s: str) -> str:
 
 
 def make_db_connection(user: str, password: str, host: str, dbname: str) -> connection:
-    port: int = 5432
-    logger.info(f"make_db_connection host:{host}, port:{port}, user:{user}, dbname:{dbname}")
+    logger.info(f"make_db_connection host:{host}, user:{user}, dbname:{dbname}")
     try:
-        db_conn: connection = psycopg2.connect(user=user, password=password, host=host, port=port, dbname=dbname)
+        db_conn: connection = psycopg2.connect(user=user, password=password, host=host, dbname=dbname)
     except psycopg2.Error as e:
-        logger.error(f"Unable to connect to PosgreSQL database at host: {host} and port: {port}; error: {e}")
+        logger.error(f"Unable to connect to PosgreSQL database: {dbname} on host: {host}; error: {e}")
         exit(1)
     if db_conn.closed == 0:
         logger.info(f"make_db_connection successfully connected")
@@ -156,6 +155,7 @@ parser = MyParser(
     For the 'token' parameter, login through the UI to get the credentials for the environment that you are using.
     https://ingest.dev.hubmapconsortium.org/ (DEV)
     https://ingest.test.hubmapconsortium.org/ (TEST)
+    https://ingest.hubmapconsortium.org/ (PROD)
     In Firefox (Tools > Browser Tools > Web Developer Tools).
     Click on "Storage" then the dropdown for "Local Storage" and then the url,
     Take the 'groups_token' as the 'token' parameter.
