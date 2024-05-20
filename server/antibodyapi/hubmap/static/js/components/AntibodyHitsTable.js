@@ -32,6 +32,7 @@ class AntibodyHitsTable extends React.Component {
     var organ_uberon_id_url_encode = '';
     for (var i = 0; i < hits.length; i++) {
       var hit = hits[i];
+      Object.keys(hit._source).forEach((i) => {if (hit._source[i] == null) hit._source[i] = '';})
       antibodies += `<tr key=${hit._id}>`;
       antibodies += '<td class="target_symbol_col">';
       antibodies += a_hrefs('https://www.uniprot.org/uniprotkb?query=(protein_name:%22', '%22)', hit._source.target_symbol);
@@ -84,7 +85,7 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '</td>';
       antibodies += '<td class="vendor_affiliation_col" style="display:'+display.vendor_affiliation+`;">${hit._source.vendor_affiliation}</td>`;
       organ_uberon_id_url_encode = hit._source.organ_uberon_id.replace(':','%3A');
-      antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}&groupField=iri&exact=on&start=0" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
+      antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
       antibodies += '<td class="antigen_retrieval_col" style="display:'+display.antigen_retrieval+`;">${hit._source.antigen_retrieval}</td>`;
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
       antibodies += `</tr>`;
