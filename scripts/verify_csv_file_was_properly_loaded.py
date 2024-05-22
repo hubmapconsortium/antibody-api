@@ -2,9 +2,9 @@
 
 # Directions:
 # Upload the .csv and correcponding .pdf file through the UI at localhost:500
+# deactivate; rm -rf ./venv
 # python3 -m pip install --upgrade pip
-# python3 -m venv venv
-# source venv/bin/activate
+# python3 -m venv ./venv; source venv/bin/activate
 # pip install -r ../requirements.txt
 # ./verify_csv_file_was_properly_loaded.py ../server/manual_test_files/upload_mulriple_with_pdf/antibodies.csv
 
