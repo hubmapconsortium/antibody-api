@@ -25,4 +25,18 @@ You will need to change the '*_ENDPOINT' and '*_API_BASE' urls as needed.
 
 Look at './scripts/README.md'.
 
+## package.json dependencies
 
+To check for new dependencies in package.json use:
+```commandline
+$ (cd server; npx npm-check-updates)
+Checking .../antibody-api/server/package.json
+[====================] 20/20 100%
+
+All dependencies match the latest package versions :)
+```
+
+to update them to the latest versions use:
+```commandline
+$ (cd server; npx npm-check-updates -u)
+```
