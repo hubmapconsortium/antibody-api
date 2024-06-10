@@ -2,7 +2,7 @@ elasticsearch==8.13.1
 Flask==3.0.3
 globus-sdk==3.41.0
 html5lib==1.1
-psycopg2-binary==2.9.9
+psycopg2==2.9.9
 pylint==3.2.2
 PyPDF2==3.0.1
 pytest==8.2.1
