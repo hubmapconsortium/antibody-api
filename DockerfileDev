@@ -1,4 +1,4 @@
-FROM python:3.9.5-alpine
+FROM python:3.12-alpine
 
 RUN apk add --no-cache --update build-base libffi-dev postgresql-dev postgresql-libs
 

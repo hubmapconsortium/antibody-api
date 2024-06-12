@@ -1,6 +1,7 @@
 import csv
 import io
-import PyPDF2
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 import requests
 import re
 from flask import abort, make_response, jsonify
@@ -510,12 +511,13 @@ def validate_antibodycsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
                 logger.debug("validate_antibodycsv_row: avr_pdf_file.filename:"
                              f" {row['avr_pdf_filename']}; size: {pdf_file_size_mb}MB")
                 try:
-                    PyPDF2.PdfFileReader(stream=io.BytesIO(pdf_file_content))
+                    # https://pypdf.readthedocs.io/en/stable/modules/PdfReader.html
+                    PdfReader(io.BytesIO(pdf_file_content))
                     logger.debug("validate_antibodycsv_row: Processing"
                                  f" avr_pdf_filename: {avr_pdf_file.filename}; is a valid PDF file")
                     found_pdf = avr_pdf_file.filename
                     break
-                except PyPDF2.utils.PdfReadError:
+                except PdfReadError:
                     abort(json_error(f"CSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}'"
                                      " found, but not a valid PDF file", 406))
         if found_pdf is None:
