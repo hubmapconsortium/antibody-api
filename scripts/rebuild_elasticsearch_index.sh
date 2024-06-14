@@ -18,7 +18,7 @@
 
 echo "Rebuild the ElasticSearch index..."
 
-ANTIBODY_URL_LOCAL='https://localhost:5000'
+ANTIBODY_URL_LOCAL='http://localhost:5000'
 ANTIBODY_URL_DEV='https://avr.dev.hubmapconsortium.org'
 ANTIBODY_URL_TEST='https://avr.test.hubmapconsortium.org'
 ANTIBODY_URL_PROD='https://avr.hubmapconsortium.org'
