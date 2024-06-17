@@ -106,7 +106,7 @@ def validate_header_keys(header: str):
 def validate_row_keys(row_i: int, row: dict) -> None:
     """
     For a list and definitions of these fields please see:
-    https://software.docs.hubmapconsortium.org/avr/csv-format-v2.html
+    https://docs.hubmapconsortium.org/avr/csv-format-v2.html
     """
 
     if len(row) != len(csv_header_keys):
