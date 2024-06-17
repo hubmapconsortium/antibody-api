@@ -1,4 +1,4 @@
-FROM python:3.9.5-alpine
+FROM python:3.12-alpine
 
 RUN apk add --no-cache --update build-base gcc libc-dev libffi-dev linux-headers pcre-dev postgresql-dev postgresql-libs su-exec curl
 

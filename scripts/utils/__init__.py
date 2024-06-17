@@ -5,7 +5,8 @@ import os
 import sys
 import json
 import requests
-import PyPDF2
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 import io
 import elasticsearch
 from urllib.parse import urlparse, unquote
@@ -227,8 +228,8 @@ def check_pdf_file_upload(assets_url: str, avr_pdf_uuid: str, avr_pdf_filename: 
         return
     content: bytes = response.content
     try:
-        PyPDF2.PdfFileReader(stream=io.BytesIO(content))
-    except PyPDF2.utils.PdfReadError:
+        PdfReader(stream=io.BytesIO(content))
+    except PdfReadError:
         vprint(f" INVALID .pdf file")
         eprint(f"ERROR: avr_file {avr_pdf_filename} found, but not a valid .pdf file")
         return

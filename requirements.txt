@@ -1,10 +1,13 @@
-elasticsearch==8.13.1
+# You need to use the same major version here as is used by the elesticsearch server.
+# Why this version of elasticsearch is the highest that we can go before the server is upgraded --\/
+# https://stackoverflow.com/questions/68992402/elasticsearch-error-the-client-noticed-that-the-server-is-not-a-supported-dist
+elasticsearch==7.13.4
 Flask==3.0.3
 globus-sdk==3.41.0
 html5lib==1.1
-psycopg2-binary==2.9.9
+psycopg2==2.9.9
 pylint==3.2.2
-PyPDF2==3.0.1
+pypdf==4.2.0
 pytest==8.2.1
 requests==2.32.0
 Werkzeug==3.0.3

@@ -13,12 +13,12 @@ services:
   elasticsearch:
     environment:
       - discovery.type=single-node
-    image: elasticsearch:7.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     ports:
       - '9200:9200'
       - '9300:9300'
   kibana:
-    image: kibana:7.4.2
+    image: docker.elastic.co/kibana/kibana:7.10.2
     ports:
       - '5601:5601'
   mockserver:
