@@ -632,3 +632,14 @@ div.sk-search-box{
   padding: 16px;
   color: rgba(0, 0, 0, 0.87);
 }
+
+div.panel{
+  background: #fff;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+  padding: 5px 15px 5px 15px;
+  margin: 25px 15px 5px 15px;
+  flex: 0 0 246px;
+  font-size: 0.8em;
+  /* border:1px solid #a3a3a3; */
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+}
