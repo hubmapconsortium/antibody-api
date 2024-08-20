@@ -461,7 +461,6 @@ body{
 }
 
 .banner {
-  display: absolute;
   margin: 75px 15px -65px;
   padding: 10px;
   border: 1px solid rgb(255, 230, 156);
