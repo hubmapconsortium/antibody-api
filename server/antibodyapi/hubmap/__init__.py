@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 def bad_request_error(err_msg):
-    abort(400, description = err_msg)
+    abort(400, description=err_msg)
 
 
 @hubmap_blueprint.route('/upload')
 def hubmap():
-    #replace by the correct way to check token validity.
+    # replace by the correct way to check token validity.
     if not session.get('is_authenticated'):
-        #return redirect(url_for('login.login'))
+        # return redirect(url_for('login.login'))
         redirect_url = current_app.config['FLASK_APP_BASE_URI'].rstrip('/') + '/login'
         return redirect(redirect_url)
 
@@ -43,7 +43,7 @@ def hubmap():
 
 @hubmap_blueprint.route('/')
 def hubmap_search():
-    #replace by the correct way to check token validity.
+    # replace by the correct way to check token validity.
     # authenticated = session.get('is_authenticated')
     # if not authenticated:
     #     return redirect(url_for('login.login'))
@@ -107,7 +107,7 @@ def hubmap_search():
         "OMAP-7": "https://purl.humanatlas.io/omap/7-lung-cell-dive",
         "OMAP-8": "https://purl.humanatlas.io/omap/8-placenta-full-term-imc",
         "OMAP-9": "https://purl.humanatlas.io/omap/9-kidney-codex",
-        "OMAP-10": "https://purl.humanatlas.io/omap/10-palatine-tonsil-macsima",
+        "OMAP-10": "https://purl.humanatlas.io/omap/10-palatine-tonsil-mics",
         "OMAP-11": "https://purl.humanatlas.io/omap/11-spleen-ibex",
         "OMAP-12": "https://purl.humanatlas.io/omap/12-eye-retina-ibex",
         "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex"
@@ -146,9 +146,9 @@ def css():
                                mimetype='text/css')
 
 
-@hubmap_blueprint.route('/_search', methods = ['GET', 'POST'])
+@hubmap_blueprint.route('/_search', methods=['GET', 'POST'])
 def search():
-    #replace by the correct way to check token validity.
+    # replace by the correct way to check token validity.
     # authenticated = session.get('is_authenticated')
     # if not authenticated:
     #     return redirect(url_for('login.login'))
@@ -157,11 +157,9 @@ def search():
     # if not request.is_json:
     #     bad_request_error("A JSON body and appropriate Content-Type header are required")
 
-
     # Determine the target real index in Elasticsearch to be searched against
     # Use the app.config['DEFAULT_INDEX_WITHOUT_PREFIX'] since /search doesn't take any index
     # target_index = get_target_index(request, app.config['DEFAULT_INDEX_WITHOUT_PREFIX'])
-
 
     # Return the elasticsearch resulting json data as json string
     return execute_query(request.get_json())
