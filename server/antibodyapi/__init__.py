@@ -18,6 +18,9 @@ def create_app(testing=False):
     app.config.from_object(default_config.DefaultConfig)
     app.config['UPLOAD_FOLDER'] = '/tmp'
     if testing:
+        # https://stackoverflow.com/questions/26080872/secret-key-not-set-in-flask-session-using-the-flask-session-extension/26080974#26080974
+        # Need the following line for the tests to pass...
+        app.secret_key = 'super secret key'
         app.config['TESTING'] = True
     else:
         # We should not load the gitignored app.conf during tests.

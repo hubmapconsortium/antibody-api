@@ -27,8 +27,7 @@ $ cd server
 $ python3 -m pip install --upgrade pip
 $ rm -rf venv
 $ python3 -m venv venv
-$ pip install -r ../requirements.txt
-$ pip install fpdf
+$ pip install -r ../requirements-dev.txt
 $ source venv/bin/activate
 $ PYTHONPATH=. pytest -v
 ```

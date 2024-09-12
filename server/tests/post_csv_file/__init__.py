@@ -462,7 +462,6 @@ class TestPostCSVFile(AntibodyTesting):
         self, create_group_expectations, response
     ):
         """Sending a CSV file should return 201 CREATED if all goes well"""
-        print(response.status)
         assert response.status == '201 CREATED'
 
     def test_post_csv_file_should_return_uuids_and_antibody_names(
@@ -474,8 +473,6 @@ class TestPostCSVFile(AntibodyTesting):
                 'antibody_name': antibody['antibody_name'],
                 'antibody_uuid': antibody['_antibody_uuid']
             })
-        print({ 'antibodies': uuid_and_name })
-        print(json.loads(response.data))
         assert(
             { 'antibodies': uuid_and_name } == json.loads(response.data)
         )

@@ -1,10 +1,11 @@
 def base_antibody_query():
     return '''
-SELECT 
+SELECT
     a.antibody_uuid,
+    a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
-    a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.cell_line, a.cell_line_ontology_id,
+    a.host, a.clonality, a.clone_id, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
@@ -13,17 +14,19 @@ SELECT
     a.antigen_retrieval, a.omap_id,
     a.group_uuid,
     a.created_by_user_displayname, a.created_by_user_email,
-    a.created_by_user_sub
+    a.created_by_user_sub,
+    a.antibody_hubmap_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
 
 def base_antibody_query_without_antibody_uuid():
     return '''
-SELECT 
+SELECT
+    a.avr_pdf_filename, a.avr_pdf_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
-    a.clonality, v.vendor_name,
+    a.target_symbol, a.rrid, a.cell_line, a.cell_line_ontology_id,
+    a.host, a.clonality, a.clone_id, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
     a.concentration_value, a.dilution_factor, a.conjugate,
@@ -32,7 +35,8 @@ SELECT
     a.antigen_retrieval, a.omap_id,
     a.group_uuid,
     a.created_by_user_displayname, a.created_by_user_email,
-    a.created_by_user_sub
+    a.created_by_user_sub,
+    a.antibody_hubmap_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''

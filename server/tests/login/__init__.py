@@ -25,7 +25,7 @@ class TestLogin:
         mock = mocker.patch.object(MockClient,'oauth2_start_flow')
         mocker.patch('globus_sdk.ConfidentialAppAuthClient', new=MockClient)
         client.get('/login')
-        mock.assert_called_once_with(url_for('login.login', _external=True))
+        mock.assert_called_once_with(url_for('login.login', _external=True), refresh_tokens=True)
 
     @classmethod
     def create_group_id_expectation(cls, flask_app, group_id):

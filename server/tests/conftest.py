@@ -16,23 +16,51 @@ def pytest_runtest_makereport(item, call): # pylint: disable=unused-argument
     if docstring:
         report.nodeid = docstring
 
+
 def raw_antibody_data():
     faker = Faker()
+    # base_antibody_query_result_to_json()
     return {
         '_antibody_uuid': str(uuid4()),
-        'protocols_io_doi': faker.uri(),
+        'antibody_hubmap_id': str(uuid4()),
+        'protocol_doi': faker.uri(),
         'uniprot_accession_number': faker.uuid4(),
-        'target_name': faker.first_name(),
+        'target_symbol': faker.last_name(),
+        'symbol-alias': faker.last_name(),
+        'target_aliases': faker.last_name(),
         'rrid': 'AB_%s' % ('%s%s' % (faker.pyint(3333), faker.pyint(2222))),
-        'host_organism': faker.first_name(),
-        'clonality': random.choice(('monoclonal','polyclonal','oligoclonal')),
+        'cell_line': faker.first_name(),
+        'cell_line_ontology_id': faker.uuid4(),
+        'host': faker.last_name(),
+        'clonality': random.choice(('monoclonal', 'polyclonal', 'oligoclonal')),
+        'clone_id': faker.uuid4(),
         'vendor': faker.first_name(),
+        'vendor_name': faker.first_name(),
         'catalog_number': faker.uuid4(),
         'lot_number': faker.uuid4(),
         'recombinant': faker.pybool(),
-        'organ_or_tissue': faker.first_name(),
-        'hubmap_platform': faker.first_name(),
-        'submitter_orcid': faker.uuid4()
+        'organ': faker.first_name(),
+        'method': faker.first_name(),
+        'author_orcids': faker.uuid4(),
+        'hgnc_id': faker.uuid4(),
+        'isotype': faker.first_name(),
+        'concentration_value': faker.random_int(),
+        'dilution_factor': faker.first_name(),
+        'conjugate': faker.first_name(),
+        'tissue_preservation': faker.first_name(),
+        'cycle_number': faker.random_int(),
+        'fluorescent_reporter': faker.first_name(),
+        'manuscript_doi': faker.first_name(),
+        'vendor_affiliation': faker.first_name(),
+        'organ_uberon_id': faker.uuid4(),
+        'antigen_retrieval': faker.first_name(),
+        'omap_id': f'OMAP-{faker.random_int()}',
+        'created_by_user_displayname': faker.first_name(),
+        'created_by_user_email': f'{faker.first_name()}@{faker.last_name()}.com',
+        'created_by_user_sub': faker.first_name(),
+        'group_uuid': str(uuid4()),
+        'avr_pdf_filename': faker.first_name(),
+        'avr_pdf_uuid': str(uuid4())
     }
 
 @pytest.fixture(scope='class')

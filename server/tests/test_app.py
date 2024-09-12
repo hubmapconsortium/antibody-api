@@ -8,6 +8,11 @@ from post_incomplete_json_body import TestPostIncompleteJSONBody
 from post_complete_json_body import TestPostWithCompleteJSONBody
 from index_elasticsearch import TestElasticsearchIndexing
 
+#
+# $ development/postgresql_init_scripts/create_test_database.sh
+# $ scripts/run_tests.sh
+
+
 def test_post_with_no_body_should_return_400(client, headers):
     """POST /antibodies with no body should return 400 BAD REQUEST"""
     response = client.post('/antibodies', headers=headers)

@@ -2,12 +2,13 @@ import json
 import pytest
 import requests
 from base_antibody_query import base_antibody_query_without_antibody_uuid
+import post_incomplete_json_body
 
 class AntibodyTesting:
     # pylint: disable=no-self-use,unused-argument
     @pytest.fixture
     def ant_query(self):
-        return base_antibody_query_without_antibody_uuid() + 'WHERE a.id = %s'
+        return base_antibody_query_without_antibody_uuid() + ' WHERE a.id = %s'
 
     @pytest.fixture
     def last_antibody_data(self, ant_query, cursor, last_antibody_id):
@@ -32,7 +33,7 @@ class AntibodyTesting:
 
     @pytest.fixture
     def last_vendor_data(self, cursor):
-        cursor.execute('SELECT name FROM vendors ORDER BY id DESC LIMIT 1')
+        cursor.execute('SELECT vendor_name FROM vendors ORDER BY id DESC LIMIT 1')
         try:
             return cursor.fetchone()[0]
         except TypeError:

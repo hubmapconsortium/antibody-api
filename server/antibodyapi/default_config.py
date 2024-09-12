@@ -35,3 +35,6 @@ class DefaultConfig:
     DATABASE_NAME = 'antibodydb_test'
     DATABASE_USER = 'postgres'
     DATABASE_PASSWORD = 'password'
+
+    FLASK_APP_BASE_URI = 'http://localhost'
+    HUBMAP_AVR_UPLOADERS_GROUP_ID = 'should-be-overridden'

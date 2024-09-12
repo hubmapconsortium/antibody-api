@@ -7,15 +7,15 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
     @pytest.fixture
     def add_vendor(self, cursor, antibody_data):
         cursor.execute(
-            'INSERT INTO vendors (name) VALUES (%s)',
-            (antibody_data['antibody']['vendor'],)
+            'INSERT INTO vendors (vendor_name) VALUES (%s)',
+            (antibody_data['antibody']['vendor_name'],)
         )
 
     @pytest.fixture
     def add_vendor_uppercase(self, cursor, antibody_data):
         cursor.execute(
-            'INSERT INTO vendors (name) VALUES (%s)',
-            (antibody_data['antibody']['vendor'].upper(),)
+            'INSERT INTO vendors (vendor_name) VALUES (%s)',
+            (antibody_data['antibody']['vendor_name'].upper(),)
         )
 
     @pytest.fixture
@@ -24,8 +24,7 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
 
     @pytest.fixture
     def response(
-        self, client, antibody_data, headers,
-        initial_antibodies_count, create_uuid_expectation, mocker
+        self, client, antibody_data, headers, create_uuid_expectation, mocker
     ):
         with client.session_transaction() as sess:
             sess['is_authenticated'] = True
@@ -85,7 +84,7 @@ class TestPostWithCompleteJSONBody(AntibodyTesting):
         self, response, antibody_data, last_vendor_data
     ):
         """POST /antibodies should save a new vendor correctly"""
-        assert antibody_data['antibody']['vendor'] == last_vendor_data
+        assert antibody_data['antibody']['vendor_name'] == last_vendor_data
 
     def test_api_should_not_create_vendor_if_it_exists_already(
         self, add_vendor, initial_vendor_count, response, final_vendor_count
