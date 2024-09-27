@@ -79,160 +79,160 @@ function Search(props) {
     <BannerMessage />
     
     <LayoutBody>
-    <div className='panel'>
-      <h2 >What is AVR? </h2>
+      {/* <div className='panel'>
+        <h2 >What is AVR? </h2>
         <p>Antibody Validation Reports (AVRs) provide information on the characterization of individual antibodies for multiplexed antibody-based imaging assays. AVRs additionally report details not included by antibody vendors such as the best performing conjugate for a particular clone and/or the impact of cycle order on immunogenicity. The current AVR database, on the Human Biomolecular Atlas Program (HuBMAP) AVR Search website, allows validated antibodies to be queried by clone, Research Resource Identifiers (RRIDs), catalog number, organ/tissue, and HuBMAP platform. This AVR metadata is included in a .CSV file uploaded to the portal by the contributing author for all AVRs submitted at one time. The AVR is completed as a text file and saved as a PDF for submission to the HuBMAP AVR upload site; it contains additional characterization data. Results from queries of the database may be downloaded as a .CSV and individual AVRs may be downloaded and viewed as a PDF.</p>
         <p>AVRs were piloted to provide individual antibody validation information for the diverse antibody-based methods employed by HuBMAP members. Importantly, AVRs have become tightly integrated with Organ Mapping Antibody Panels (OMAPs)(<a href="https://humanatlas.io/omap">https://humanatlas.io/omap</a>), a comprehensive panel of curated antibodies that identifies the major anatomical structures and cell types present in a specific organ. The selected antibodies are optimized for a tissue preservation method and multiplexed imaging modality. Both efforts share standardized metadata fields that will facilitate construction of a searchable antibody database. Beginning in 2023, we are excited to open AVR contributions to the larger community, beyond HuBMAP members.</p>
-      </div>
+      </div> */}
    
       <h1 class="">Antibody Validation Report Search</h1>
       <SearchBox
-        autofocus={true}
-        queryOptions={{analyzer:"standard"}}
-        searchOnChange={true}
-        queryFields={[
-            "antibody_uuid","antibody_hubmap_id","protocol_doi","manuscript_doi","uniprot_accession_number",
-            "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
-            "clonality","clone_id","vendor","catalog_number","lot_number",
-            "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
-            "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
-            "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
-            "created_by_user_email","avr_pdf_filename"
-        ]}
-        />
+      autofocus={true}
+      queryOptions={{analyzer:"standard"}}
+      searchOnChange={true}
+      queryFields={[
+          "antibody_uuid","antibody_hubmap_id","protocol_doi","manuscript_doi","uniprot_accession_number",
+          "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
+          "clonality","clone_id","vendor","catalog_number","lot_number",
+          "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
+          "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
+          "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
+          "created_by_user_email","avr_pdf_filename"
+      ]}
+      />
       <div className='searchView'>
-        <SideBar>
-          <h3>Filters</h3>
-          <a className='collapseButton' onClick={collapseAllFilters}>Collapse all</a>
-          <ResetFilters />
-          <RefinementListFilter
-            id="cell_line"
-            title="Cell Line"
-            field="cell_line.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="clonality"
-            title="Clonality"
-            field="clonality.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="conjugate"
-            title="Conjugate"
-            field="conjugate.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="host"
-            title="Host"
-            field="host.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="method"
-            title="Method"
-            field="method.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="organ"
-            title="Organ"
-            field="organ.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="recombinant"
-            title="Recombinant"
-            field="recombinant.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="target_symbol"
-            title="Target Symbol"
-            field="target_symbol.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="tissue_preservation"
-            title="Tissue Preservation"
-            field="tissue_preservation.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
-          <RefinementListFilter
-            id="vendor_name"
-            title="Vendor"
-            field="vendor_name.keyword"
-            operator="OR"
-            searchable={true}
-            size={10} limit={10}
-            containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-          />
+      <SideBar>
+        <h3>Filters</h3>
+        <a className='collapseButton' onClick={collapseAllFilters}>Collapse all</a>
+        <ResetFilters />
+        <RefinementListFilter
+          id="cell_line"
+          title="Cell Line"
+          field="cell_line.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="clonality"
+          title="Clonality"
+          field="clonality.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="conjugate"
+          title="Conjugate"
+          field="conjugate.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="host"
+          title="Host"
+          field="host.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="method"
+          title="Method"
+          field="method.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="organ"
+          title="Organ"
+          field="organ.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="recombinant"
+          title="Recombinant"
+          field="recombinant.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="target_symbol"
+          title="Target Symbol"
+          field="target_symbol.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="tissue_preservation"
+          title="Tissue Preservation"
+          field="tissue_preservation.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
+        <RefinementListFilter
+          id="vendor_name"
+          title="Vendor"
+          field="vendor_name.keyword"
+          operator="OR"
+          searchable={true}
+          size={10} limit={10}
+          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
+        />
 
-        </SideBar>
+      </SideBar>
 
-        <LayoutResults>
+      <LayoutResults>
 
-          <ActionBar>
-            <ActionBarRow>
-              <HitsStats />
-            </ActionBarRow>
-            <ActionBarRow>
-              <SelectedFilters />
-            </ActionBarRow>
-          </ActionBar>
+        <ActionBar>
+          <ActionBarRow>
+            <HitsStats />
+          </ActionBarRow>
+          <ActionBarRow>
+            <SelectedFilters />
+          </ActionBarRow>
+        </ActionBar>
 
-          <Popup trigger={<button className="button-placement">Configure Columns</button>}
-                contentStyle={{width: "280px"}}
-                modal>
-            {close => (
-                <div className="modal form-border">
-                  <button className="close" onClick={close}>
-                    &times;
-                  </button>
-                  <AdditionalColumns/>
-                </div>
-            )}
-          </Popup>
+        <Popup trigger={<button className="button-placement">Configure Columns</button>}
+              contentStyle={{width: "280px"}}
+              modal>
+          {close => (
+              <div className="modal form-border">
+                <button className="close" onClick={close}>
+                  &times;
+                </button>
+                <AdditionalColumns/>
+              </div>
+          )}
+        </Popup>
 
-          <Hits mod="sk-hits-list"
-            hitsPerPage={20}
-            listComponent={AntibodyHitsTable}
-            />
-          <InitialLoader />
-          <NoHits />
+        <Hits mod="sk-hits-list"
+          hitsPerPage={20}
+          listComponent={AntibodyHitsTable}
+          />
+        <InitialLoader />
+        <NoHits />
 
-          <Pagination options={options} />
-          <DownloadFile />
+        <Pagination options={options} />
+        <DownloadFile />
 
-        </LayoutResults>
+      </LayoutResults>
       </div>
     </LayoutBody>
   </Layout>
