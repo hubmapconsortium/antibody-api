@@ -14,7 +14,7 @@ The status of each environment is available at:
 [Prod](https://avr.hubmapconsortium.org/status),
 [Dev](https://avr.dev.hubmapconsortium.org/status).
 
-## Build, Publish, Deploy Workflow
+## Build and Deploy Workflow
 These are the steps used to build, publish a Docker image, and then deploy it.
 
 Before doing so you will need to follow the steps outlined in the section "Antibody API Configuration Changes"
