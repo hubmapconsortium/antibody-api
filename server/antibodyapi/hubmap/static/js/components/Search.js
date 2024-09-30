@@ -68,10 +68,10 @@ function Search(props) {
         </svg>
       </a>
      <div className='topmenuRight'>
-        <a href="https://hubmapconsortium.org/open-working-groups/" target='_blank' style={{display: "inline-block", color: "white", alignItems: "center", margin: "20px"}}>
+        <a href="https://zenodo.org/doi/10.5281/zenodo.7418623" target='_blank' style={{display: "inline-block", color: "white", alignItems: "center", margin: "20px"}}>
           AVR SOP        
         </a>
-        <a href="https://zenodo.org/doi/10.5281/zenodo.7418623" target='_blank' style={{display: "inline-block", color: "white", alignItems: "center", margin: "20px"}}>
+        <a href="https://hubmapconsortium.org/open-working-groups" target='_blank' style={{display: "inline-block", color: "white", alignItems: "center", margin: "20px"}}>
           About AVRs at ARWG
         </a>
         <a href="/upload" style={{display: "inline-block", color: "white", alignItems: "center", margin: "20px"}}>
