@@ -65,3 +65,5 @@ server/VERSION
 BUILD
 antibody-api.code-workspace
 app.conf
+.vscode/*
+server/package-lock.json
