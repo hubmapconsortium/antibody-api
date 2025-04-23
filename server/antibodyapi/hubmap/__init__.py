@@ -60,8 +60,6 @@ def hubmap_search():
 
         "clone_id": "none",
         "host": "none",
-        "cell_line": "none",
-        "cell_line_ontology_id": "none",
         "rrid": "none",
         "catalog_number": "none",
         "lot_number": "none",
@@ -87,7 +85,7 @@ def hubmap_search():
         "target_symbol", "uniprot_accession_number", "clonality", "clone_id", "method",
         "tissue_preservation", "avr_pdf_filename", "antibody_hubmap_id",
 
-        "host", "cell_line", "cell_line_ontoloty_id",
+        "host",
         "rrid", "catalog_number", "lot_number", "vendor_name",
         "recombinant", "organ", "author_orcids", "hgnc_id", "isotype",
         "concentration_value", "dilution_factor", "conjugate", "cycle_number",
