@@ -12,7 +12,7 @@ from antibodyapi.utils import (
     insert_query, insert_query_with_avr_file_and_uuid,
     json_error
 )
-from antibodyapi.utils.validation import validate_antibodycsv, CanonicalizeYNResponse, CanonicalizeDOI
+from antibodyapi.utils.validation import validate_antibodytsv, CanonicalizeYNResponse, CanonicalizeDOI
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
 import string
@@ -49,7 +49,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
         )
 
     if 'file' not in request.files:
-        abort(json_error('CSV file missing', 406))
+        abort(json_error('TSV file missing', 406))
 
     app = current_app
     cur = get_cursor(app)
@@ -61,7 +61,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
 
     # Validate everything before saving anything...
     pdf_files_processed, target_datas =\
-        validate_antibodycsv(request.files, app.config['UBKG_API_URL'])
+        validate_antibodytsv(request.files, app.config['UBKG_API_URL'])
 
     for file in request.files.getlist('file'):
         if file and allowed_file(file.filename):
@@ -69,9 +69,9 @@ def import_antibodies(): # pylint: disable=too-many-branches
             logger.info(f"import_antibodies: processing filename: {filename}")
             file_path: bytes = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            with open(file_path, encoding="ascii", errors="ignore") as csvfile:
+            with open(file_path, encoding="ascii", errors="ignore") as tsvfile:
                 row_i: int = 1
-                for row_dr in csv.DictReader(csvfile, delimiter=','):
+                for row_dr in csv.DictReader(tsvfile, delimiter='\t'):
                     # silently drop any non-printable characters like Trademark symbols from Excel documents
                     # and make all the keys lowercase so comparison is easy...
                     row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
@@ -79,18 +79,18 @@ def import_antibodies(): # pylint: disable=too-many-branches
                     try:
                         row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
                     except KeyError:
-                        abort(json_error(f"CSV file row# {row_i}: Problem processing Vendor field", 406))
+                        abort(json_error(f"TSV file row# {row_i}: Problem processing Vendor field", 406))
                     # Save this for index_antibody() Elasticsearch, but remove from for DB store...
                     vendor_name: str = row['vendor']
                     del row['vendor']
-                    # The .csv file contains a 'target_symbol' field that is (possibly) resolved into a different
+                    # The .tsv file contains a 'target_symbol' field that is (possibly) resolved into a different
                     # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
                     # replaced by the 'target_symbol' returned by UBKG.
-                    target_symbol_from_csv: str = row['target_symbol']
-                    row['target_symbol'] = target_datas[target_symbol_from_csv]['target_symbol']
+                    target_symbol_from_tsv: str = row['target_symbol']
+                    row['target_symbol'] = target_datas[target_symbol_from_tsv]['target_symbol']
                     # The target_aliases is a list of the other symbols that are associated with the target_symbol,
                     # and it gets saved to ElasticSearch, but not the database.
-                    target_aliases: List[str] = target_datas[target_symbol_from_csv]['target_aliases']
+                    target_aliases: List[str] = target_datas[target_symbol_from_tsv]['target_aliases']
                     hubmap_uuid_dict: dict = get_hubmap_uuid(app.config['UUID_API_URL'])
                     row['antibody_uuid'] = hubmap_uuid_dict.get('uuid')
                     row['antibody_hubmap_id'] = hubmap_uuid_dict.get('hubmap_id')
@@ -134,9 +134,9 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         })
                         index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
                     except KeyError as ke:
-                        abort(json_error(f'CSV file row# {row_i}; key error: {ke}.', 406))
+                        abort(json_error(f'TSV file row# {row_i}; key error: {ke}.', 406))
                     except UniqueViolation:
-                        abort(json_error(f"CSV file row# {row_i}: Antibody not unique", 406))
+                        abort(json_error(f"TSV file row# {row_i}: Antibody not unique", 406))
         else:
             abort(json_error('Filetype forbidden', 406))
 
