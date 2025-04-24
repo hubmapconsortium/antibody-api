@@ -30,7 +30,6 @@ class DefaultConfig:
 
     ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
     QUERY_ELASTICSEARCH_DIRECTLY = False
-    CEDAR_VALIDATION_URL = "https://api.metadatavalidator.metadatacenter.org/service/validate-tsv"
 
 
     DATABASE_HOST = 'db'
