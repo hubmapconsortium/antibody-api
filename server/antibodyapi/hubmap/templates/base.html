@@ -56,11 +56,11 @@
                   To upload a report, follow the steps outlined in the
                   <a href="https://docs.hubmapconsortium.org/avr/avr-upload-v2.html" target="_blank">Uploading new reports</a>
                   documentation.
-                  You will need to create a .csv file according to the
-                  <a href="https://docs.hubmapconsortium.org/avr/csv-format-v2.html" target="_blank">CSV Structure</a>
+                  You will need to create a .tsv file according to the
+                  <a href="https://docs.hubmapconsortium.org/avr/tsv-format-v2.html" target="_blank">TSV Structure</a>
                   documentation.
                   We have also provided a
-                  <a href="https://docs.hubmapconsortium.org/avr/avr-template-v2.csv" target="_blank">template csv file</a>
+                  <a href="https://docs.hubmapconsortium.org/avr/avr-template-v2.tsv" target="_blank">template tsv file</a>
                   to get you started.
               </p>
           </div>
@@ -71,10 +71,10 @@
               <div class="uploadInnerWrap">
                 <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody Files</label>
                   <p>
-                      Upload a single csv file describing the AVRs being uploaded (see
+                      Upload a single tsv file describing the AVRs being uploaded (see
                       <a href="https://docs.hubmapconsortium.org/avr/avr-upload-v2.html" target="_blank">Uploading new reports</a>
                       and
-                      <a href="https://docs.hubmapconsortium.org/avr/csv-format-v2.html" target="_blank">CSV Structure</a>
+                      <a href="https://docs.hubmapconsortium.org/avr/tsv-format-v2.html" target="_blank">TSV Structure</a>
                       ).
                   </p>
                   <input accept=".tsv" name="file" multiple="multiple" type="file" id="fileInput" class="" required="" />
@@ -83,7 +83,7 @@
               <div class="uploadInnerWrap">
                 <label for="name" class="text-base leading-7 text-blueGray-500 mb-5">Antibody PDFs</label>
                   <p>
-                      Upload the PDF files associated with the csv by clicking Browse.
+                      Upload the PDF files associated with the tsv by clicking Browse.
                       To easily upload place all files in a single directory and use the ctrl (or command on Mac)
                       key to select them all in the file dialog.
                   </p>
@@ -126,7 +126,7 @@
         <h1 class="toptitle"  style="justify-content: center; display: flex; align-items: center; width: 100%">Antibody Validation Report Upload</h1>
       </div>
         <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Uploading now...</p>
-        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">This may take a few seconds per line in the .csv file.</p>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">This may take a few seconds per line in the .tsv file.</p>
     </div>
   </section>
 
@@ -226,7 +226,7 @@ function ajaxSuccess (event) {
       responsetable += '</table>';
       if (jsonresponse.pdf_files_not_processed.length > 0) {
         responsetable += '<br>';
-        responsetable += '<p>The following .pdf files that were uploaded were not found in the .csv files, and so were not saved.</p>';
+        responsetable += '<p>The following .pdf files that were uploaded were not found in the .tsv files, and so were not saved.</p>';
         responsetable += '<br>';
         responsetable += '<table><tr><th>File Name</th></tr>';
         jQuery.each(jsonresponse.pdf_files_not_processed, function(index, value) {
