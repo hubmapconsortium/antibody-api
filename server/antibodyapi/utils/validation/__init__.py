@@ -10,6 +10,7 @@ import logging
 from typing import List
 import time
 import datetime
+from werkzeug.exceptions import HTTPException
 
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
@@ -125,15 +126,8 @@ def validate_row_data_required_fields(row_i: int, row: dict) -> None:
     """
     # Ellen Quardokus Aug 1, 2023
     # Remove: 'cycle_number' and 'isotype' as 'fields that should always be present' and make them both optional.
-    required_item_keys: list[str] = [
-        'author_orcids', 'avr_pdf_filename', 'catalog_number', 'clonality', 'hgnc_id', 'host',
-        'method', 'protocol_doi', 'recombinant', 'rrid', 'target_symbol',
-        'tissue_preservation', 'uniprot_accession_number', 'vendor'
-    ]
+
     logger.debug(f'validate_row_data_required_fields: row: {row}')
-    for item_key in required_item_keys:
-        if item_key not in row or row[item_key] is None or len(row[item_key].strip()) == 0:
-            abort(json_error(f"TSV file row# {row_i}: value for '{item_key}' is required", 406))
 
     # 'concentration_value' or 'dilution_factor' but not both (e.g, xor).
     concentration_value_present: bool = value_present_in_row('concentration_value', row)
@@ -182,32 +176,6 @@ def validate_row_data(row_i: int, row: dict) -> None:
     if canonicalize_yn_response.canonicalize(row['recombinant']) is None:
         abort(json_error(f"TSV file row# {row_i}: recombinant value '{row['recombinant']}'"
                          f" is not one of: {', '.join(canonicalize_yn_response.valid())}", 406))
-
-    # https://en.wikipedia.org/wiki/Clone_(cell_biology)
-    # This needs to match the database enumm for clonality_types in:
-    # './development/postgresql_init_scripts/create_tables.sql'
-    valid_clonality: list[str] = ['monoclonal', 'polyclonal', 'oligoclonal']
-    if row['clonality'].lower() not in valid_clonality:
-        abort(json_error(f"TSV file row# {row_i}: clonality value '{row['clonality']}'"
-                         f" is not one of: {', '.join(valid_clonality)}", 406))
-
-    if row['concentration_value'] != '':
-        try:
-            float(row['concentration_value'])
-        except ValueError:
-            abort(json_error(
-                f"TSV file row# {row_i}: concentration_value '{row['concentration_value']}' must be numeric",
-                406))
-
-    dilution_factor_re: re.Pattern = re.compile('^[0-9]+$')
-    if row['dilution_factor'] != '' and dilution_factor_re.match(row['dilution_factor']) is None:
-        abort(json_error(f"TSV file row# {row_i}: dilution_factor '{row['dilution_factor']}'"
-                         " must be of the form <integer> (e.g. 100, 50, 2000)", 406))
-
-    omap_id_re: re.Pattern = re.compile('^OMAP-[1-9][0-9]*$')
-    if row['omap_id'] != '' and omap_id_re.match(row['omap_id']) is None:
-        abort(json_error(f"TSV file row# {row_i}: omap_id '{row['omap_id']}'"
-                         " must be of the form OMAP-<integer> (e.g. OMAP-1, OMAP-2, ..., OMAP-n) ", 406))
 
 
 def validate_targets(row_i: int, targets: str, ubkg_api_url: str) -> dict:
@@ -502,14 +470,24 @@ def call_cedar_api(file_obj):
             files=files
         )
         if not response.ok:
-            raise Exception(
-                f"CEDAR validation failed for {file_obj.filename}. "
-                f"Status code: {response.status_code}, Response: {response.text}"
-        )
+            abort(json_error(f"TSV Header Error: One or more key in TSV was invalid. Headers should be one of {', '.join(tsv_header_keys)}", 406))
+        try:
+            cedar_json = response.json()
+        except Exception as e:
+            abort(json_error(f"Error parsing resonse from Cedar: {e}", 500))
+        if cedar_json.get("reporting"):
+            error_strings = [
+                f"Row {e['row']}, Column '{e['column']}': {e['value']} is invalid ({e['errorType']})"
+                for e in cedar_json["reporting"]
+            ]
+    
+            error_message = "Validation errors found:\n" + "\n".join(error_strings)
+            
+            abort(json_error(error_message, 400))
+    except HTTPException:
+        raise
     except Exception as e:
-        raise Exception(
-            f"Spreadsheet Validator API request for {file_obj.filename} failed! Exception: {e}"
-        )
+        abort(json_error(f"Spreadsheet Validator API request for {file_obj.filename} failed! Exception {e}", 500))
 
     return response
 
