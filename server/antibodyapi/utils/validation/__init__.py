@@ -60,9 +60,6 @@ class CanonicalizeDOI:
             doi = original_doi.removeprefix(prefix)
             if len(doi) < len(original_doi):
                 return doi
-        doi_pattern: re.Pattern = re.compile('^10\.\d{4,9}/\S+$')
-        if doi_pattern.match(original_doi):
-            return original_doi
         return None
 
     def canonicalize_multiple(self, original_dois: str) -> str:

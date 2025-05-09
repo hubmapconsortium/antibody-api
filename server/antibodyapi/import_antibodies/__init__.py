@@ -130,7 +130,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         cur.execute(query, row)
                         logger.debug(f"import_antibodies: SQL inserting row SUCCESS!")
                         uuids_and_names.append({
-                            'antibody_uuid': row['antibody_uuid']
+                            'antibody_uuid': row['antibody_uuid'],
+                            'antibody_name': row.get('avr_pdf_filename')
                         })
                         index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
                     except KeyError as ke:
