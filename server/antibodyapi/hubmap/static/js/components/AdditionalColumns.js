@@ -6,8 +6,6 @@ function AdditionalColumns() {
 
   const checkbox_props = [
     {element:"clone_id", label:"Clone ID"},
-    {element:"cell_line", label:"Cell Line"},
-    {element:"cell_line_ontology_id", label:"Cell Line Ontology ID"},
     {element:"host", label:"Host"},
     {element:"rrid", label:"RRID"},
     {element:"catalog_number", label:"Catalog#"},

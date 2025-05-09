@@ -3,7 +3,7 @@ def base_antibody_query():
 SELECT 
     a.antibody_uuid,
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.target_name, a.rrid, a.host,
     a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,
@@ -22,7 +22,7 @@ def base_antibody_query_without_antibody_uuid():
     return '''
 SELECT 
     a.protocol_doi, a.uniprot_accession_number,
-    a.target_name, a.rrid, a.host, a.cell_line, a.cell_line_ontology_id,
+    a.target_name, a.rrid, a.host,
     a.clonality, v.vendor_name,
     a.catalog_number, a.lot_number, a.recombinant, a.organ,
     a.method, a.author_orcids, a.hgnc_id, a.isotype,

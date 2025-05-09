@@ -84,7 +84,7 @@ packages. To do this please see the section `Startup the Search API on localhost
 Once the data is loaded you can use the antibody search api located at [http://localhost:5000/](http://localhost:5000)
 
 Now that the tables exist, you will need to load some data into them.
-Find the file `server/manual_test_files/README.md`, and execute the sequence in the 'Manual test for 'upload' (.csv only)' section.
+Find the file `server/manual_test_files/README.md`, and execute the sequence in the 'Manual test for 'upload' (.tsv only)' section.
 This will upload the data to the PostgreSQL database and to Elastic Search.
 
 To see the data that is in Elastic Search directly you can execute the following.
@@ -242,7 +242,7 @@ If you get an error message like below .
 $ curl -H 'Content-Type: application/json' -d '{"query": {"match_all": {}}}' -X POST  http://host.docker.internal:5005/hm_antibodies/search
 {"error":{"index":"hm_antibodies","index_uuid":"_na_","reason":"no such index [hm_antibodies]"
 ```
-If you get this message you will need to load some data (see 'server/manual_test_files/README.md' section 'Manual test for 'upload' (.csv only)').
+If you get this message you will need to load some data (see 'server/manual_test_files/README.md' section 'Manual test for 'upload' (.tsv only)').
 
 ### Accessing the Antibody API GUI
 

@@ -94,7 +94,7 @@ function Search(props) {
       searchOnChange={true}
       queryFields={[
           "antibody_uuid","antibody_hubmap_id","protocol_doi","manuscript_doi","uniprot_accession_number",
-          "target_symbol","target_aliases","rrid","host","cell_line","cell_line_ontology_id",
+          "target_symbol","target_aliases","rrid","host",
           "clonality","clone_id","vendor","catalog_number","lot_number",
           "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
           "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
@@ -107,15 +107,6 @@ function Search(props) {
         <h3>Filters</h3>
         <a className='collapseButton' onClick={collapseAllFilters}>Collapse all</a>
         <ResetFilters />
-        <RefinementListFilter
-          id="cell_line"
-          title="Cell Line"
-          field="cell_line.keyword"
-          operator="OR"
-          searchable={true}
-          size={10} limit={10}
-          containerComponent={<Panel collapsable={true} defaultCollapsed={true}/>}
-        />
         <RefinementListFilter
           id="clonality"
           title="Clonality"

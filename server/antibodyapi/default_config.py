@@ -31,6 +31,7 @@ class DefaultConfig:
     ANTIBODY_ELASTICSEARCH_INDEX = 'hm_antibodies'
     QUERY_ELASTICSEARCH_DIRECTLY = False
 
+
     DATABASE_HOST = 'db'
     DATABASE_NAME = 'antibodydb_test'
     DATABASE_USER = 'postgres'

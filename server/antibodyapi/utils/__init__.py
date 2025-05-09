@@ -15,7 +15,7 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning) # py
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
-ALLOWED_EXTENSIONS = {'csv'}
+ALLOWED_EXTENSIONS = {'tsv'}
 
 
 def allowed_file(filename):
@@ -60,10 +60,8 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
-    CELL_LINE = 34
-    CELL_LINE_ONTOLOGY_ID = 35
-    CLONE_ID = 36
-    ANTIBODY_HUBMAP_ID = 37
+    CLONE_ID = 34
+    ANTIBODY_HUBMAP_ID = 35
 
 
 # THESE MUST MATCH THE ORDER IN THE ""SI"" CLASS!!!
@@ -83,7 +81,7 @@ SELECT
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid,
-    a.cell_line, a.cell_line_ontology_id, a.clone_id,
+    a.clone_id,
     a.antibody_hubmap_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
@@ -102,8 +100,6 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'uniprot_accession_number': antibody[SI.UNIPROT_ACCESSION_NUMBER],
         'target_symbol': antibody[SI.TARGET_SYMBOL],
         'rrid': antibody[SI.RRID],
-        'cell_line': antibody[SI.CELL_LINE],
-        'cell_line_ontology_id': antibody[SI.CELL_LINE_ONTOLOGY_ID],
         'host': antibody[SI.HOST],
         'clonality': antibody[SI.CLONALITY],
         'clone_id': antibody[SI.CLONE_ID],
@@ -220,7 +216,7 @@ def get_file_uuid(ingest_api_url: str, upload_folder: str, antibody_uuid: str, f
         },
         verify=False
     )
-    if req.status_code != 201:
+    if req2.status_code not in (200, 201):
         logger.debug(f"utils/get_file_uuid: response.status_code {req.status_code}")
         abort(json_error(f"Internal error caused when trying to accessing server '{ingest_api_url}'; status: {req2.status_code}", 406))
 
@@ -309,7 +305,7 @@ def insert_query():
 INSERT INTO antibodies (
     antibody_uuid,
     protocol_doi, uniprot_accession_number,
-    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    target_symbol, rrid, host,
     clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
@@ -325,7 +321,7 @@ INSERT INTO antibodies (
 VALUES (
     %(antibody_uuid)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s,
     %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
@@ -347,7 +343,7 @@ INSERT INTO antibodies (
     antibody_uuid,
     avr_pdf_uuid, avr_pdf_filename,
     protocol_doi, uniprot_accession_number,
-    target_symbol, rrid, host, cell_line, cell_line_ontology_id,
+    target_symbol, rrid, host,
     clonality, clone_id, vendor_id,
     catalog_number, lot_number, recombinant, organ,
     method, author_orcids, hgnc_id, isotype,
@@ -364,7 +360,7 @@ VALUES (
     %(antibody_uuid)s,
     %(avr_pdf_uuid)s, %(avr_pdf_filename)s,
     %(protocol_doi)s, %(uniprot_accession_number)s,
-    %(target_symbol)s, %(rrid)s, %(host)s, %(cell_line)s, %(cell_line_ontology_id)s,
+    %(target_symbol)s, %(rrid)s, %(host)s,
     %(clonality)s, %(clone_id)s, %(vendor_id)s,
     %(catalog_number)s, %(lot_number)s, %(recombinant)s, %(organ)s,
     %(method)s, %(author_orcids)s, %(hgnc_id)s, %(isotype)s,
