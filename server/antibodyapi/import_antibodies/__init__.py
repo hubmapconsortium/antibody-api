@@ -4,6 +4,8 @@ from flask import (
     abort, Blueprint, current_app, jsonify, make_response,
     redirect, request, session, url_for, render_template
 )
+import psycopg2
+from psycopg2._psycopg import connection
 from psycopg2.errors import UniqueViolation #pylint: disable=no-name-in-module
 from werkzeug.utils import secure_filename
 from antibodyapi.utils import (
@@ -62,70 +64,82 @@ def import_antibodies(): # pylint: disable=too-many-branches
     # Validate everything before saving anything...
     pdf_files_processed, target_datas =\
         validate_antibodytsv(request.files, app.config['UBKG_API_URL'])
+    
+    conn = psycopg2.connect(
+        host=app.config['DATABASE_HOST'],
+        user=app.config['DATABASE_USER'],
+        dbname=app.config['DATABASE_NAME'],
+        password=app.config['DATABASE_PASSWORD']
+    )
+    conn.autocommit = False
 
-    for file in request.files.getlist('file'):
-        if file and allowed_file(file.filename):
-            filename: str = secure_filename(file.filename)
-            logger.info(f"import_antibodies: processing filename: {filename}")
-            file_path: bytes = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            with open(file_path, encoding="ascii", errors="ignore") as tsvfile:
-                row_i: int = 1
-                for row_dr in csv.DictReader(tsvfile, delimiter='\t'):
-                    # silently drop any non-printable characters like Trademark symbols from Excel documents
-                    # and make all the keys lowercase so comparison is easy...
-                    row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
-                    row_i += 1
-                    try:
-                        row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
-                    except KeyError:
-                        abort(json_error(f"TSV file row# {row_i}: Problem processing Vendor field", 406))
-                    # Save this for index_antibody() Elasticsearch, but remove from for DB store...
-                    vendor_name: str = row['vendor']
-                    del row['vendor']
-                    # The .tsv file contains a 'target_symbol' field that is (possibly) resolved into a different
-                    # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
-                    # replaced by the 'target_symbol' returned by UBKG.
-                    target_symbol_from_tsv: str = row['target_symbol']
-                    row['target_symbol'] = target_datas[target_symbol_from_tsv]['target_symbol']
-                    # The target_aliases is a list of the other symbols that are associated with the target_symbol,
-                    # and it gets saved to ElasticSearch, but not the database.
-                    target_aliases: List[str] = target_datas[target_symbol_from_tsv]['target_aliases']
-                    hubmap_uuid_dict: dict = get_hubmap_uuid(app.config['UUID_API_URL'])
-                    row['antibody_uuid'] = hubmap_uuid_dict.get('uuid')
-                    row['antibody_hubmap_id'] = hubmap_uuid_dict.get('hubmap_id')
-                    row['created_by_user_displayname'] = session['name']
-                    row['created_by_user_email'] = session['email']
-                    row['created_by_user_sub'] = session['sub']
-                    row['group_uuid'] = group_id
+    try:
+        with conn:
+            cur = conn.cursor()
+            for file in request.files.getlist('file'):
+                if not (file and allowed_file(file.filename)):
+                    raise Exception('Incorrect File Type. TSV and PDF files required.')
+                filename: str = secure_filename(file.filename)
+                logger.info(f"import_antibodies: processing filename: {filename}")
+                file_path: bytes = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                with open(file_path, encoding="ascii", errors="ignore") as tsvfile:
+                    row_i: int = 1
+                    for row_dr in csv.DictReader(tsvfile, delimiter='\t'):
+                        # silently drop any non-printable characters like Trademark symbols from Excel documents
+                        # and make all the keys lowercase so comparison is easy...
+                        row = {k.lower(): only_printable_and_strip(v) for (k, v) in row_dr.items()}
+                        row_i += 1
+                        try:
+                            row['vendor_id'] = find_or_create_vendor(cur, row['vendor'])
+                        except KeyError:
+                            abort(json_error(f"TSV file row# {row_i}: Problem processing Vendor field", 406))
+                        # Save this for index_antibody() Elasticsearch, but remove from for DB store...
+                        vendor_name: str = row['vendor']
+                        del row['vendor']
+                        # The .tsv file contains a 'target_symbol' field that is (possibly) resolved into a different
+                        # 'target_symbol' by the UBKG lookup during validation. Here, whatever the user entered is
+                        # replaced by the 'target_symbol' returned by UBKG.
+                        target_symbol_from_tsv: str = row['target_symbol']
+                        row['target_symbol'] = target_datas[target_symbol_from_tsv]['target_symbol']
+                        # The target_aliases is a list of the other symbols that are associated with the target_symbol,
+                        # and it gets saved to ElasticSearch, but not the database.
+                        target_aliases: List[str] = target_datas[target_symbol_from_tsv]['target_aliases']
+                        hubmap_uuid_dict: dict = get_hubmap_uuid(app.config['UUID_API_URL'])
+                        row['antibody_uuid'] = hubmap_uuid_dict.get('uuid')
+                        row['antibody_hubmap_id'] = hubmap_uuid_dict.get('hubmap_id')
+                        row['created_by_user_displayname'] = session['name']
+                        row['created_by_user_email'] = session['email']
+                        row['created_by_user_sub'] = session['sub']
+                        row['group_uuid'] = group_id
 
-                    # Canonicalize entries that we can so that they are always saved under the same string...
-                    row['clonality'] = row['clonality'].lower()
-                    row['host'] = row['host'].capitalize()
-                    row['organ'] = row['organ'].lower()
-                    # NOTE: The validation step will try to canonicalize and if it can't throw an error.
-                    # So, by the time that we get here canonicalize will return a string.
-                    canonicalize_yn_response = CanonicalizeYNResponse()
-                    row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
-                    canonicalize_doi = CanonicalizeDOI()
-                    row['protocol_doi'] = canonicalize_doi.canonicalize_multiple(row['protocol_doi'])
-                    if row['manuscript_doi'] != '':
-                        row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
+                        # Canonicalize entries that we can so that they are always saved under the same string...
+                        row['clonality'] = row['clonality'].lower()
+                        row['host'] = row['host'].capitalize()
+                        row['organ'] = row['organ'].lower()
+                        # NOTE: The validation step will try to canonicalize and if it can't throw an error.
+                        # So, by the time that we get here canonicalize will return a string.
+                        canonicalize_yn_response = CanonicalizeYNResponse()
+                        row['recombinant'] = canonicalize_yn_response.canonicalize(row['recombinant'])
+                        canonicalize_doi = CanonicalizeDOI()
+                        row['protocol_doi'] = canonicalize_doi.canonicalize_multiple(row['protocol_doi'])
+                        if row['manuscript_doi'] != '':
+                            row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
 
-                    query = insert_query()
-                    if 'avr_pdf_filename' in row.keys():
-                        if 'pdf' in request.files:
-                            for avr_file in request.files.getlist('pdf'):
-                                if avr_file.filename == row['avr_pdf_filename']:
-                                    row['avr_pdf_uuid'] = get_file_uuid(
-                                        app.config['INGEST_API_URL'],
-                                        app.config['UPLOAD_FOLDER'],
-                                        row['antibody_uuid'],
-                                        avr_file
-                                    )
-                                    query = insert_query_with_avr_file_and_uuid()
-                                    row['avr_pdf_filename'] = secure_filename(row['avr_pdf_filename'])
-                    try:
+                        query = insert_query()
+                        if 'avr_pdf_filename' in row.keys():
+                            if 'pdf' in request.files:
+                                for avr_file in request.files.getlist('pdf'):
+                                    if avr_file.filename == row['avr_pdf_filename']:
+                                        row['avr_pdf_uuid'] = get_file_uuid(
+                                            app.config['INGEST_API_URL'],
+                                            app.config['UPLOAD_FOLDER'],
+                                            row['antibody_uuid'],
+                                            avr_file
+                                        )
+                                        query = insert_query_with_avr_file_and_uuid()
+                                        row['avr_pdf_filename'] = secure_filename(row['avr_pdf_filename'])
+                        
                         logger.debug(f"import_antibodies: SQL inserting row: {row}")
                         cur.execute(query, row)
                         logger.debug(f"import_antibodies: SQL inserting row SUCCESS!")
@@ -133,14 +147,20 @@ def import_antibodies(): # pylint: disable=too-many-branches
                             'antibody_uuid': row['antibody_uuid'],
                             'antibody_name': row.get('avr_pdf_filename')
                         })
-                        index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
-                    except KeyError as ke:
-                        abort(json_error(f'TSV file row# {row_i}; key error: {ke}.', 406))
-                    except UniqueViolation:
-                        abort(json_error(f"TSV file row# {row_i}: Antibody not unique", 406))
-        else:
-            abort(json_error('Filetype forbidden', 406))
-
+                        try:
+                            index_antibody(row | {'vendor_name': vendor_name, 'target_aliases': target_aliases})
+                        except Exception as index_err:
+                            logger.debug(f"Elasticsearch indexing failed on row {row_i}: {index_err}")
+                            raise Exception("We couldn’t complete your request due to a system error. Your data has not been saved. Please try again in a few minutes. If the problem continues, contact support.")
+                            
+            cur.close()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        abort(json_error(str(e), 500))
+    finally:
+        if not conn.closed:
+            conn.close()
     pdf_files_not_processed: list = []
     for avr_file in request.files.getlist('pdf'):
         if avr_file.filename not in pdf_files_processed:

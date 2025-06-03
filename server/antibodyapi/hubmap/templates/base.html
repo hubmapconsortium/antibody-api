@@ -210,7 +210,23 @@ function ajaxSuccess (event) {
   console.log('event.target: ',event.target)
   const http_status = event.target.status;
   var responsetable = '';
-  const jsonresponse = JSON.parse(event.target.response);
+  let jsonresponse = null;
+  try {
+      jsonresponse = JSON.parse(event.target.response);
+  } catch {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(responseText, 'text/html');
+    const errorTitle = doc.querySelector('h1')?.textContent || 'Error';
+    const errorMsg = doc.querySelector('p')?.textContent || 'An unexpected error occurred.';
+
+    responsetable += '<div>';
+    responsetable += `<p><b>${errorTitle}</b></p>`;
+    responsetable += `<p>${errorMsg}</p>`;
+    responsetable += '</div><br>';
+
+    jQuery('#upload-results').html(responsetable);
+    return;
+  }
   if (http_status == 201) {
       var csv_content = "antibody_name,antibody_uuid\n";
       responsetable += '<p>All entities in the Andibody Files have been successfully uploaded.</p>';
