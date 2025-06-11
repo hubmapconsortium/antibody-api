@@ -120,12 +120,12 @@ def hubmap_search():
         "OMAP-22": "https://purl.humanatlas.io/omap/22-skin-cell-dive",
         "OMAP-23": "https://purl.humanatlas.io/omap/23-vermiform-appendix-mics",
         "OMAP-24": "https://purl.humanatlas.io/omap/24-pancreas-cycif",
-        "OMAP-25": "https://pur.humanatlas.io/omap/25-lung-codex",
-        "OMAP-26": "https://pur.humanatlas.io/omap/26-kidney-codex",
-        "OMAP-27": "https://pur.humanatlas.io/omap/27-kidney-ims-codex",
-        "OMAP-28": "https://pur.humanatlas.io/omap/28-heart-codex",
-        "OMAP-29": "https://pur.humanatlas.io/omap/29-mouth-mucosa-codex",
-        "OMAP-30": "https://pur.humanatlas.io/omap/30-salivary-gland-codex"
+        "OMAP-25": "https://purl.humanatlas.io/omap/25-lung-codex",
+        "OMAP-26": "https://purl.humanatlas.io/omap/26-kidney-codex",
+        "OMAP-27": "https://purl.humanatlas.io/omap/27-kidney-ims-codex",
+        "OMAP-28": "https://purl.humanatlas.io/omap/28-heart-codex",
+        "OMAP-29": "https://purl.humanatlas.io/omap/29-mouth-mucosa-codex",
+        "OMAP-30": "https://purl.humanatlas.io/omap/30-salivary-gland-codex"
     }
 
     try:
