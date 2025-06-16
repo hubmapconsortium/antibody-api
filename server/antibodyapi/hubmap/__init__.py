@@ -108,7 +108,24 @@ def hubmap_search():
         "OMAP-10": "https://purl.humanatlas.io/omap/10-palatine-tonsil-mics",
         "OMAP-11": "https://purl.humanatlas.io/omap/11-spleen-ibex",
         "OMAP-12": "https://purl.humanatlas.io/omap/12-eye-retina-ibex",
-        "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex"
+        "OMAP-13": "https://purl.humanatlas.io/omap/13-pancreas-codex",
+        "OMAP-14": "https://purl.humanatlas.io/omap/14-kidney-cycif",
+        "OMAP-15": "https://purl.humanatlas.io/omap/15-intestine-codex",
+        "OMAP-16": "https://purl.humanatlas.io/omap/16-lung-codex",
+        "OMAP-17": "https://purl.humanatlas.io/omap/17-thymus-ibex",
+        "OMAP-18": "https://purl.humanatlas.io/omap/18-lymph-node-cell-dive-ibex",
+        "OMAP-19": "https://purl.humanatlas.io/omap/19-palatine-tonsil-ibex",
+        "OMAP-20": "https://purl.humanatlas.io/omap/20-kidney-ims-cycif",
+        "OMAP-21": "https://purl.humanatlas.io/omap/21-palatine-tonsil-mics",
+        "OMAP-22": "https://purl.humanatlas.io/omap/22-skin-cell-dive",
+        "OMAP-23": "https://purl.humanatlas.io/omap/23-vermiform-appendix-mics",
+        "OMAP-24": "https://purl.humanatlas.io/omap/24-pancreas-cycif",
+        "OMAP-25": "https://purl.humanatlas.io/omap/25-lung-codex",
+        "OMAP-26": "https://purl.humanatlas.io/omap/26-kidney-codex",
+        "OMAP-27": "https://purl.humanatlas.io/omap/27-kidney-ims-codex",
+        "OMAP-28": "https://purl.humanatlas.io/omap/28-heart-codex",
+        "OMAP-29": "https://purl.humanatlas.io/omap/29-mouth-mucosa-codex",
+        "OMAP-30": "https://purl.humanatlas.io/omap/30-salivary-gland-codex"
     }
 
     try:

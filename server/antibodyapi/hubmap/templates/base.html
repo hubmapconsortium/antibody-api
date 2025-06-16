@@ -215,7 +215,7 @@ function ajaxSuccess (event) {
       jsonresponse = JSON.parse(event.target.response);
   } catch {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(responseText, 'text/html');
+    const doc = parser.parseFromString(event.target.response, 'text/html');
     const errorTitle = doc.querySelector('h1')?.textContent || 'Error';
     const errorMsg = doc.querySelector('p')?.textContent || 'An unexpected error occurred.';
 
