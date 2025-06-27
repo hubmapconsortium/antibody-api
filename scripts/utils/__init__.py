@@ -80,9 +80,7 @@ class SI(IntEnum):
     CREATED_BY_USER_EMAIL = 31
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
-    CELL_LINE = 34
-    CELL_LINE_ONTOLOGY_ID = 35
-    CLONE_ID = 36
+    CLONE_ID = 34
 
 QUERY = '''
 SELECT
@@ -100,7 +98,7 @@ SELECT
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid,
-    a.cell_line, a.cell_line_ontology_id, a.clone_id
+    a.clone_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
@@ -183,8 +181,6 @@ def check_es_entry_to_db_row(es_conn, es_index, db_row) -> None:
     check_hit(source, 'uniprot_accession_number', db_row, SI.UNIPROT_ACCESSION_NUMBER, antibody_uuid)
     check_hit(source, 'target_symbol', db_row, SI.TARGET_SYMBOL, antibody_uuid)
     check_hit(source, 'rrid', db_row, SI.RRID, antibody_uuid)
-    check_hit(source, 'cell_line', db_row, SI.CELL_LINE, antibody_uuid)
-    check_hit(source, 'cell_line_ontology_id', db_row, SI.CELL_LINE_ONTOLOGY_ID, antibody_uuid)
     check_hit(source, 'host', db_row, SI.HOST, antibody_uuid)
     check_hit(source, 'clonality', db_row, SI.CLONALITY, antibody_uuid)
     check_hit(source, 'vendor_name', db_row, SI.VENDOR_NAME, antibody_uuid)

@@ -36,8 +36,7 @@ def parse_cfg(cfg_file: str) -> dict:
 
 
 VALID_COLUMNS: list = [
-    'antibody_uuid', 'protocol_doi', 'uniprot_accession_number', 'target_symbol', 'rrid', 'host', 'cell_line',
-    'cell_line_ontology_id', 'clonality', 'clone_id', 'vendor_id', 'catalog_number', 'lot_number', 'recombinant',
+    'antibody_uuid', 'protocol_doi', 'uniprot_accession_number', 'target_symbol', 'rrid', 'host', 'clonality', 'clone_id', 'vendor_id', 'catalog_number', 'lot_number', 'recombinant',
     'organ', 'method', 'author_orcids', 'hgnc_id', 'isotype', 'concentration_value', 'dilution_factor', 'conjugate',
     'tissue_preservation', 'cycle_number', 'fluorescent_reporter', 'manuscript_doi', 'vendor_affiliation',
     'organ_uberon_id', 'antigen_retrieval', 'omap_id', 'created_timestamp', 'created_by_user_displayname',
