@@ -27,6 +27,8 @@ function AdditionalColumns() {
     {element:"organ_uberon_id", label:"Organ UBERON ID"},
     {element:"antigen_retrieval", label:"Antigen Retrieval"},
     {element:"created_by_user_email", label:"Submitter Email"},
+    {element:"previous_version_id", label:"Previous Version"},
+    {element:"next_version_id", label:"Next Version"},
   ];
 
   const state_values = Object.assign({}, ...checkbox_props.map((x) =>

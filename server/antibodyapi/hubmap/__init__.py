@@ -79,7 +79,9 @@ def hubmap_search():
         "vendor_affiliation": "none",
         "organ_uberon_id": "none",
         "antigen_retrieval": "none",
-        "created_by_user_email": "none"
+        "created_by_user_email": "none",
+        "previous_version_id": "none",
+        "next_version_id": "none"
     }
     csv_column_order: list = [
         "target_symbol", "uniprot_accession_number", "clonality", "clone_id", "method",
@@ -91,7 +93,7 @@ def hubmap_search():
         "concentration_value", "dilution_factor", "conjugate", "cycle_number",
         "fluorescent_reporter", "manuscript_doi", "protocol_doi",
         "vendor_affiliation", "organ_uberon_id", "antigen_retrieval", "omap_id",
-        "created_by_user_email"
+        "created_by_user_email", "previous_version_id", "next_version_id"
     ]
     # Link the individual OMAP entries to the (P)URLs defined mapped in
     # https://github.com/hubmapconsortium/antibody-api/files/13229463/HRA7threleasetoUBKG-June2024PurlsOMAPs.xlsx

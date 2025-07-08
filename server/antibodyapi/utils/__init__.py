@@ -62,6 +62,8 @@ class SI(IntEnum):
     GROUP_UUID = 33
     CLONE_ID = 34
     ANTIBODY_HUBMAP_ID = 35
+    PREVIOUS_VERSION_ID = 36
+    NEXT_VERSION_ID = 37
 
 
 # THESE MUST MATCH THE ORDER IN THE ""SI"" CLASS!!!
@@ -82,7 +84,7 @@ SELECT
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid,
     a.clone_id,
-    a.antibody_hubmap_id
+    a.antibody_hubmap_id, a.previous_version_id, a.next_version_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
@@ -127,7 +129,9 @@ def base_antibody_query_result_to_json(antibody) -> dict:
         'created_by_user_displayname': antibody[SI.CREATED_BY_USER_DISPLAYNAME],
         'created_by_user_email': antibody[SI.CREATED_BY_USER_EMAIL],
         'created_by_user_sub': antibody[SI.CREATED_BY_USER_SUB],
-        'group_uuid': antibody[SI.GROUP_UUID].replace('-', '')
+        'group_uuid': antibody[SI.GROUP_UUID].replace('-', ''),
+        'previous_version_id': antibody[SI.PREVIOUS_VERSION_ID],
+        'next_version_id': antibody[SI.NEXT_VERSION_ID]
     }
     if antibody[SI.AVR_PDF_UUID] is not None:
         ant['avr_pdf_uuid'] = antibody[SI.AVR_PDF_UUID].replace('-', '')
@@ -300,6 +304,14 @@ def get_user_info(token):
     return auth_client.oauth2_userinfo()
 
 
+def update_next_revision_query():
+    return '''
+UPDATE antibodies
+    SET next_version_id = %(next_version_id)s
+    WHERE antibody_uuid = %(previous_version_id)s
+'''
+
+
 def insert_query():
     return '''
 INSERT INTO antibodies (
@@ -316,7 +328,7 @@ INSERT INTO antibodies (
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
     created_by_user_sub, group_uuid,
-    antibody_hubmap_id
+    previous_version_id, antibody_hubmap_id
 ) 
 VALUES (
     %(antibody_uuid)s,
@@ -332,7 +344,7 @@ VALUES (
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
     %(created_by_user_sub)s, %(group_uuid)s,
-    %(antibody_hubmap_id)s
+    %(previous_version_id)s, %(antibody_hubmap_id)s
 ) RETURNING id
 '''
 
@@ -354,7 +366,7 @@ INSERT INTO antibodies (
     created_timestamp,
     created_by_user_displayname, created_by_user_email,
     created_by_user_sub, group_uuid,
-    antibody_hubmap_id
+    previous_version_id, antibody_hubmap_id
 ) 
 VALUES (
     %(antibody_uuid)s,
@@ -371,7 +383,7 @@ VALUES (
     EXTRACT(epoch FROM NOW()),
     %(created_by_user_displayname)s, %(created_by_user_email)s,
     %(created_by_user_sub)s, %(group_uuid)s,
-    %(antibody_hubmap_id)s
+    %(previous_version_id)s, %(antibody_hubmap_id)s
 ) RETURNING id
 '''
 

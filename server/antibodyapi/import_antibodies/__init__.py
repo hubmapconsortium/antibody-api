@@ -12,8 +12,9 @@ from antibodyapi.utils import (
     allowed_file, find_or_create_vendor, get_cursor,
     get_file_uuid, get_group_id, get_hubmap_uuid,
     insert_query, insert_query_with_avr_file_and_uuid,
-    json_error
+    json_error, update_next_revision_query
 )
+from antibodyapi.utils.elasticsearch import update_next_revision_es
 from antibodyapi.utils.validation import validate_antibodytsv, CanonicalizeYNResponse, CanonicalizeDOI
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
@@ -152,7 +153,16 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         except Exception as index_err:
                             logger.debug(f"Elasticsearch indexing failed on row {row_i}: {index_err}")
                             raise Exception("We couldn’t complete your request due to a system error. Your data has not been saved. Please try again in a few minutes. If the problem continues, contact support.")
-                            
+                        if row['previous_version_id']:
+                            update_query = update_next_revision_query()
+                            cur.execute(update_query, {
+                                'next_version_id': row['antibody_uuid'],
+                                'previous_version_id': row['previous_version_id']
+                            })
+                            try:
+                                update_next_revision_es(row['previous_version_id'], row['antibody_uuid'])
+                            except Exception as index_err:
+                                logger.debug(f"Elasticsearch indexing failed on {row_i} updating next_version_id")
             cur.close()
     except Exception as e:
         conn.rollback()

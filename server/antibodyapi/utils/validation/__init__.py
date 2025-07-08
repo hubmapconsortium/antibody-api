@@ -1,5 +1,6 @@
 import csv
 import io
+import psycopg2
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 import requests
@@ -86,7 +87,7 @@ tsv_header_keys: List[str] = [
     'vendor', 'catalog_number', 'lot_number', 'recombinant', 'concentration_value',
     'dilution_factor', 'conjugate', 'rrid', 'method', 'tissue_preservation', 'protocol_doi', 'manuscript_doi',
     'author_orcids', 'vendor_affiliation', 'organ', 'organ_uberon_id', 'antigen_retrieval', 'avr_pdf_filename',
-    'omap_id', 'cycle_number', 'fluorescent_reporter'
+    'omap_id', 'cycle_number', 'fluorescent_reporter', 'previous_version_id'
 ]
 
 
@@ -225,6 +226,27 @@ def validate_target(row_i: int, target: str, ubkg_api_url: str) -> dict:
     finally:
         if response is not None:
             response.close()
+
+def validate_previous_version_id(row_i: int, previous_version_id: str, cur) -> None:
+    if not previous_version_id.strip():
+        return
+    try:
+        cur.execute("""
+            SELECT next_version_id 
+            FROM antibody_validation_reports 
+            WHERE hubmap_id = %s
+        """, (previous_version_id,))
+
+        result = cur.fetchone()
+
+        if result is None:
+            abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' does not exist", 406))
+        elif result[0] is not None:
+            abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' "
+                             f"already has a newer version specified (next_version_id='{result[0]}')", 406))
+    except Exception as e:
+        logger.exception(f"validate_previous_version_id: Unexpected error: {e}")
+        abort(json_error(f"TSV file row# {row_i}: Problem encountered while validating previous_version_id", 500))
 
 
 def validate_uniprot_accession_numbers(row_i: int, uniprot_accession_numbers: str) -> None:
@@ -399,7 +421,7 @@ def validate_ontology(row_i: int, ontology_id: str) -> None:
             response.close()
 
 
-def validate_antibodytsv_row(row_i: int, row: dict, request_files: dict, ubkg_api_url: str):
+def validate_antibodytsv_row(row_i: int, row: dict, request_files: dict, ubkg_api_url: str, cur):
     """
     This routine will behave as follows.
     1) if any of the validation tests are found to fail it will throw an abort message with http status code,
@@ -440,6 +462,7 @@ def validate_antibodytsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     else:
         abort(json_error(f"TSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}' is not found", 406))
 
+    validate_previous_version_id(row_i, row['previous_revision_id'], cur)
     # All of these make callouts to other RestAPIs...
     validate_uniprot_accession_numbers(row_i, row['uniprot_accession_number'])
     validate_hgncs(row_i, row['hgnc_id'])
@@ -510,29 +533,42 @@ def validate_antibodytsv(request_files: dict, ubkg_api_url: str):
     start_time = time.time()
     pdf_files_processed: list = []
     target_datas: dict = {}
-    for file in request_files.getlist('file'):
-        if not file or file.filename == '':
-            abort(json_error('Filename missing in uploaded files', 406))
-        if file and allowed_file(file.filename):
-            cedar_response = call_cedar_api(file)
-            file.stream.seek(0)
-            lines: [str] = [x.decode("ascii", "ignore") for x in file.stream.read().splitlines()]
-            file.stream.seek(0)
-            logger.debug(f'Lines: {lines}')
-            # TODO: Limit the number of lines to 16 (header plus 15 lines of data)
-            logger.debug(f"validate_antibodytsv: processing filename '{file.filename}'")
-            row_i = 1
-            for row_dr in csv.DictReader(lines, delimiter='\t'):
-                row = {k.lower().strip(): v.strip() for k, v in row_dr.items()}
-                row_i = row_i + 1
-                found_pdf, target_data = validate_antibodytsv_row(row_i, row, request_files, ubkg_api_url)
-                if found_pdf is not None:
-                    logger.debug(f"validate_antibodytsv: TSV file row# {row_i}:"
-                                 f" found PDF file '{found_pdf}' as valid PDF")
-                    pdf_files_processed.append(found_pdf)
-                target_datas |= target_data
-                # else:
-                #     logger.debug(f"validate_antibodytsv: TSV file row# {row_i}: valid PDF not found")
+
+    with psycopg2.connect(
+        host="YOUR_HOST",
+        dbname="YOUR_DB",
+        user="YOUR_USER",
+        password="YOUR_PASSWORD"
+    ) as conn:
+        with conn.cursor() as cur:
+            previous_version_ids = []
+            for file in request_files.getlist('file'):
+                if not file or file.filename == '':
+                    abort(json_error('Filename missing in uploaded files', 406))
+                if file and allowed_file(file.filename):
+                    cedar_response = call_cedar_api(file)
+                    file.stream.seek(0)
+                    lines: [str] = [x.decode("ascii", "ignore") for x in file.stream.read().splitlines()]
+                    file.stream.seek(0)
+                    logger.debug(f'Lines: {lines}')
+                    # TODO: Limit the number of lines to 16 (header plus 15 lines of data)
+                    logger.debug(f"validate_antibodytsv: processing filename '{file.filename}'")
+                    row_i = 1
+                    for row_dr in csv.DictReader(lines, delimiter='\t'):
+                        row = {k.lower().strip(): v.strip() for k, v in row_dr.items()}
+                        if row['previous_version_id']:
+                            if row['previous_version_id'] in previous_version_ids:
+                                abort(json_error('Multiple rows contain the same value "previous_revision_id". Each antibody may only have a single revision', 406))
+                            previous_version_ids.append(row['previous_version_id'])
+                        row_i = row_i + 1
+                        found_pdf, target_data = validate_antibodytsv_row(row_i, row, request_files, ubkg_api_url, cur)
+                        if found_pdf is not None:
+                            logger.debug(f"validate_antibodytsv: TSV file row# {row_i}:"
+                                        f" found PDF file '{found_pdf}' as valid PDF")
+                            pdf_files_processed.append(found_pdf)
+                        target_datas |= target_data
+                        # else:
+                        #     logger.debug(f"validate_antibodytsv: TSV file row# {row_i}: valid PDF not found")
     logger.debug(f"validate_antibodytsv: found valid PDF files ({len(pdf_files_processed)}): '{pdf_files_processed}'")
     logger.debug(f"validate_antibodytsv: found target_datas ({len(target_datas)}): '{target_datas}'")
     logger.debug(f"validate_antibodytsv: run time: {datetime.timedelta(seconds=time.time() - start_time)}")

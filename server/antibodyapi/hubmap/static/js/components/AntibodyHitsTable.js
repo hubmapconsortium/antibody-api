@@ -86,6 +86,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="organ_uberon_id_col" style="display:'+display.organ_uberon_id+`;"><a href="https://www.ebi.ac.uk/ols/search?q=${organ_uberon_id_url_encode}" target="_blank">${hit._source.organ_uberon_id}</a></td>`;
       antibodies += '<td class="antigen_retrieval_col" style="display:'+display.antigen_retrieval+`;">${hit._source.antigen_retrieval}</td>`;
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
+      antibodies += '<td class="previous_version_id_col" style="display:'+display.previous_version_id+`;">${hit._source.previous_version_id}</td>`;
+      antibodies += '<td class="next_version_id_col" style="display:'+display.next_version_id+`;">${hit._source.next_version_id}</td>`;
       antibodies += `</tr>`;
     }
     return (
@@ -124,6 +126,8 @@ class AntibodyHitsTable extends React.Component {
               <th id="organ_uberon_id_col_head" style={{"display": display.organ_uberon_id}}>Organ UBERON ID</th>
               <th id="antigen_retrieval_col_head" style={{"display": display.antigen_retrieval}}>Antigen Retrieval</th>
               <th id="created_by_user_email_col_head" style={{"display": display.created_by_user_email}}>Submitter Email</th>
+              <th id="previous_version_id_col_head" style={{"display": display.previous_version_id}}>Previous Version ID</th>
+              <th id="next_version_id_col_head" style={{"display": display.next_version_id}}>Next Version ID</th>
             </tr>
           </thead>
           <tbody dangerouslySetInnerHTML={{__html: antibodies}}/>
