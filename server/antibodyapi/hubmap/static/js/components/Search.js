@@ -43,9 +43,18 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const searchkit = new SearchkitManager("/");
-  searchkit.addDefaultQuery(query => {
-    return query.addQuery(query.getBoolQuery().addMustNot({ exists: { field: "next_version_id" } }));
+  const searchkit = new SearchkitManager("/", {
+    defaultQuery: (query) => {
+      return query.addFilter({
+        bool: {
+          must_not: {
+            exists: {
+              field: "next_version_id"
+            }
+          }
+        }
+      });
+    }
   });
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
