@@ -50,7 +50,11 @@ def index_antibody(antibody: dict):
         'author_orcids': antibody['author_orcids'],
         'vendor_affiliation': antibody['vendor_affiliation'],
         'created_by_user_displayname': antibody['created_by_user_displayname'],
-        'created_by_user_email': antibody['created_by_user_email']
+        'created_by_user_email': antibody['created_by_user_email'],
+        'previous_version_id': antibody['previous_version_id'],
+        'next_version_id': antibody['next_version_id'],
+        'previous_version_pdf_uuid': antibody['previous_version_pdf_uuid'],
+        'previous_version_pdf_filename': antibody['previous_version_pdf_filename']
     }
     if 'avr_pdf_uuid' in antibody and 'avr_pdf_filename' in antibody and antibody['avr_pdf_filename'] != '':
         doc['avr_pdf_uuid'] = antibody['avr_pdf_uuid']
@@ -58,6 +62,25 @@ def index_antibody(antibody: dict):
     logger.info(f"antibody: {antibody}")
     antibody_elasticsearch_index: str = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
     es_conn.index(index=antibody_elasticsearch_index, body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+
+
+def update_next_version_es(antibody_uuid: str, next_version_id: str):
+    es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
+    antibody_elasticsearch_index = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
+
+    logger.info(f"*** Updating next_version_id for antibody_uuid={antibody_uuid} to {next_version_id}")
+
+    update_body = {
+        'doc': {
+            'next_version_id': next_version_id
+        }
+    }
+
+    es_conn.update(
+        index=antibody_elasticsearch_index,
+        id=antibody_uuid,
+        body=update_body
+    )
 
 
 def execute_query_elasticsearch_directly(query):
@@ -92,5 +115,5 @@ def execute_query(query):
     if query_directly is True:
         result = execute_query_elasticsearch_directly(query)
     result = execute_query_through_search_api(query)
-    logger.info(f"execute_query: result = {result}")
+    #logger.info(f"execute_query: result = {result}")
     return result

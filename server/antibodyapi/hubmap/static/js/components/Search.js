@@ -43,7 +43,19 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const searchkit = new SearchkitManager("/");
+  const searchkit = new SearchkitManager("/", {
+    defaultQuery: (query) => {
+      return query.addFilter({
+        bool: {
+          must_not: {
+            exists: {
+              field: "next_version_id"
+            }
+          }
+        }
+      });
+    }
+  });
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
   const [cookies] = useCookies([]);
@@ -99,7 +111,7 @@ function Search(props) {
           "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
           "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
           "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
-          "created_by_user_email","avr_pdf_filename"
+          "created_by_user_email","avr_pdf_filename", "previous_version_id", "next_version_id"
       ]}
       />
       <div className='searchView'>
