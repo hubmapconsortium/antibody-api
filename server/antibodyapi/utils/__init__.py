@@ -304,12 +304,19 @@ def get_user_info(token):
     return auth_client.oauth2_userinfo()
 
 
-def update_next_revision_query():
+def update_next_version_query():
     return '''
 UPDATE antibodies
     SET next_version_id = %(next_version_id)s
     WHERE antibody_uuid = %(previous_version_id)s
 '''
+
+def fetch_previous_version_pdf_uuid_query():
+    return '''
+        SELECT avr_pdf_uuid, avr_pdf_filename
+        FROM antibodies
+        WHERE antibody_hubmap_id = %(previous_version_id)s
+    '''
 
 
 def insert_query():

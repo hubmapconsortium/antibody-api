@@ -233,20 +233,20 @@ def validate_previous_version_id(row_i: int, previous_version_id: str, cur) -> N
     try:
         cur.execute("""
             SELECT next_version_id 
-            FROM antibody_validation_reports 
-            WHERE hubmap_id = %s
+            FROM antibodies 
+            WHERE antibody_hubmap_id = %s
         """, (previous_version_id,))
 
         result = cur.fetchone()
 
         if result is None:
-            abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' does not exist", 406))
+            abort(json_error(f"TSV file row# {row_i}: previous_revision_hubmap_id '{previous_version_id}' does not exist", 406))
         elif result[0] is not None:
             abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' "
-                             f"already has a newer version specified (next_version_id='{result[0]}')", 406))
+                             f"already has a newer version specified (next_revision_hubmap_id='{result[0]}')", 406))
     except Exception as e:
         logger.exception(f"validate_previous_version_id: Unexpected error: {e}")
-        abort(json_error(f"TSV file row# {row_i}: Problem encountered while validating previous_version_id", 500))
+        abort(json_error(f"TSV file row# {row_i}: Problem encountered while validating previous_revision_hubmap_id", 500))
 
 
 def validate_uniprot_accession_numbers(row_i: int, uniprot_accession_numbers: str) -> None:
@@ -462,7 +462,7 @@ def validate_antibodytsv_row(row_i: int, row: dict, request_files: dict, ubkg_ap
     else:
         abort(json_error(f"TSV file row# {row_i}: avr_pdf_filename '{row['avr_pdf_filename']}' is not found", 406))
 
-    validate_previous_version_id(row_i, row['previous_revision_id'], cur)
+    validate_previous_version_id(row_i, row['previous_version_id'], cur)
     # All of these make callouts to other RestAPIs...
     validate_uniprot_accession_numbers(row_i, row['uniprot_accession_number'])
     validate_hgncs(row_i, row['hgnc_id'])
@@ -558,7 +558,7 @@ def validate_antibodytsv(request_files: dict, ubkg_api_url: str):
                         row = {k.lower().strip(): v.strip() for k, v in row_dr.items()}
                         if row['previous_version_id']:
                             if row['previous_version_id'] in previous_version_ids:
-                                abort(json_error('Multiple rows contain the same value "previous_revision_id". Each antibody may only have a single revision', 406))
+                                abort(json_error('Multiple rows contain the same value "previous_revision_hubmap_id". Each antibody may only have a single next revision', 406))
                             previous_version_ids.append(row['previous_version_id'])
                         row_i = row_i + 1
                         found_pdf, target_data = validate_antibodytsv_row(row_i, row, request_files, ubkg_api_url, cur)

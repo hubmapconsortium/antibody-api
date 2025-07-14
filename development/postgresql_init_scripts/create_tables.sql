@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "omap_id" text,
     "previous_version_id" text,
     "next_version_id" text,
+    "previous_version_pdf_uuid" text,
+    "previous_version_pdf_filename" text,
 
     "group_uuid" uuid NOT NULL,
     "created_timestamp" integer NOT NULL,

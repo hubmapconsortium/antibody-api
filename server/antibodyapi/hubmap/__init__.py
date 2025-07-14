@@ -57,6 +57,7 @@ def hubmap_search():
         "avr_pdf_filename": "table-cell",
         "omap_id": "table-cell",
         "antibody_hubmap_id": "table-cell",
+        "previous_version_id": "table-cell",
 
         "clone_id": "none",
         "host": "none",
@@ -79,9 +80,7 @@ def hubmap_search():
         "vendor_affiliation": "none",
         "organ_uberon_id": "none",
         "antigen_retrieval": "none",
-        "created_by_user_email": "none",
-        "previous_version_id": "none",
-        "next_version_id": "none"
+        "created_by_user_email": "none"
     }
     csv_column_order: list = [
         "target_symbol", "uniprot_accession_number", "clonality", "clone_id", "method",
