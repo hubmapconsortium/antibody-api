@@ -535,10 +535,10 @@ def validate_antibodytsv(request_files: dict, ubkg_api_url: str):
     target_datas: dict = {}
 
     with psycopg2.connect(
-        host="YOUR_HOST",
-        dbname="YOUR_DB",
-        user="YOUR_USER",
-        password="YOUR_PASSWORD"
+        host = current_app.config['DATABASE_HOST'],
+        dbname = current_app.config['DATABASE_NAME'],
+        user = current_app.config['DATABASE_USER'],
+        password = current_app.config['DATABASE_PASSWORD']
     ) as conn:
         with conn.cursor() as cur:
             previous_version_ids = []
