@@ -136,7 +136,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         else:
                             row['previous_version_pdf_uuid'] = None
                             row['previous_version_pdf_filename'] = None
-
+                        row['next_version_id'] = None
                         query = insert_query()
                         if 'avr_pdf_filename' in row.keys():
                             if 'pdf' in request.files:
@@ -166,11 +166,11 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         if row['previous_version_id']:
                             update_query = update_next_version_query()
                             cur.execute(update_query, {
-                                'next_version_id': row['antibody_uuid'],
+                                'next_version_id': row['antibody_hubmap_id'],
                                 'previous_version_id': row['previous_version_id']
                             })
                             try:
-                                update_next_version_es(row['previous_version_id'], row['antibody_uuid'])
+                                update_next_version_es(row['previous_version_id'], row['antibody_hubmap_id'])
                             except Exception as index_err:
                                 logger.debug(f"Elasticsearch indexing failed on {row_i} updating next_version_id")
             cur.close()
