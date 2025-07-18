@@ -64,11 +64,11 @@ def index_antibody(antibody: dict):
     es_conn.index(index=antibody_elasticsearch_index, body=doc) # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 
 
-def update_next_version_es(antibody_uuid: str, next_version_id: str):
+def update_next_version_es(antibody_hubmap_id: str, next_version_id: str):
     es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
     antibody_elasticsearch_index = current_app.config['ANTIBODY_ELASTICSEARCH_INDEX']
 
-    logger.info(f"*** Updating next_version_id for antibody_uuid={antibody_uuid} to {next_version_id}")
+    logger.info(f"*** Updating next_version_id for antibody_hubmap_id={antibody_hubmap_id} to {next_version_id}")
 
     update_body = {
         'doc': {
@@ -78,7 +78,7 @@ def update_next_version_es(antibody_uuid: str, next_version_id: str):
 
     es_conn.update(
         index=antibody_elasticsearch_index,
-        id=antibody_uuid,
+        id=antibody_hubmap_id,
         body=update_body
     )
 

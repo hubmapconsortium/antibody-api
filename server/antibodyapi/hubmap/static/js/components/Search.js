@@ -11,6 +11,16 @@ import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 
+const searchkit = new SearchkitManager("/", {
+  defaultQuery: query => query.addFilter({
+    bool: {
+      must_not: {
+        exists: { field: "next_version_id" }
+      }
+    }
+  })
+});
+
 
 class BannerMessage extends React.Component {
     render () {
@@ -43,19 +53,6 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const searchkit = new SearchkitManager("/", {
-    defaultQuery: (query) => {
-      return query.addFilter({
-        bool: {
-          must_not: {
-            exists: {
-              field: "next_version_id"
-            }
-          }
-        }
-      });
-    }
-  });
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
   const [cookies] = useCookies([]);
