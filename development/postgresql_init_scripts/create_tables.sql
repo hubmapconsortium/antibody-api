@@ -47,6 +47,10 @@ CREATE TABLE IF NOT EXISTS "public"."antibodies" (
     "organ_uberon_id" text NOT NULL,
     "antigen_retrieval" text NOT NULL,
     "omap_id" text,
+    "previous_version_id" text,
+    "next_version_id" text,
+    "previous_version_pdf_uuid" text,
+    "previous_version_pdf_filename" text,
 
     "group_uuid" uuid NOT NULL,
     "created_timestamp" integer NOT NULL,

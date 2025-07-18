@@ -81,6 +81,10 @@ class SI(IntEnum):
     CREATED_BY_USER_SUB = 32
     GROUP_UUID = 33
     CLONE_ID = 34
+    PREVIOUS_VERSION_ID = 35
+    NEXT_VERSION_ID = 36
+    PREVIOUS_VERSION_PDF_UUID = 37
+    PREVIOUS_VERSION_PDF_FILENAME = 38
 
 QUERY = '''
 SELECT
@@ -98,7 +102,8 @@ SELECT
     a.created_timestamp,
     a.created_by_user_displayname, a.created_by_user_email,
     a.created_by_user_sub, a.group_uuid,
-    a.clone_id
+    a.clone_id, a.previous_version_id, a.next_version_id,
+    a.previous_version_pdf_uuid, a.previous_version_pdf_filename
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
