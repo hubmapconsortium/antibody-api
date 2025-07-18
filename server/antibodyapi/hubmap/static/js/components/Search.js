@@ -11,6 +11,18 @@ import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 
+const searchkit = new SearchkitManager("/");
+
+function FilteredHits(props) {
+  const { hits, ...rest } = props;
+  const filteredHits = hits.filter(hit => !hit._source.next_version_id || hit._source.next_version_id === '');
+  return <AntibodyHitsTable hits={filteredHits} {...rest} />;
+}
+
+function FilteredHitsStats({ hits }) {
+  const count = hits.filter(hit => !hit._source.next_version_id || hit._source.next_version_id === '').length;
+  return <div className="sk-hits-stats">{count} results</div>;
+}
 
 class BannerMessage extends React.Component {
     render () {
@@ -43,19 +55,6 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const searchkit = new SearchkitManager("/", {
-    defaultQuery: (query) => {
-      return query.addFilter({
-        bool: {
-          must_not: {
-            exists: {
-              field: "next_version_id"
-            }
-          }
-        }
-      });
-    }
-  });
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
   const [cookies] = useCookies([]);
@@ -207,7 +206,7 @@ function Search(props) {
 
         <ActionBar>
           <ActionBarRow>
-            <HitsStats />
+          <Hits hits={[]} listComponent={props => <FilteredHitsStats {...props} />} />
           </ActionBarRow>
           <ActionBarRow>
             <SelectedFilters />
@@ -227,10 +226,7 @@ function Search(props) {
           )}
         </Popup>
 
-        <Hits mod="sk-hits-list"
-          hitsPerPage={20}
-          listComponent={AntibodyHitsTable}
-          />
+        <Hits listComponent={FilteredHits} hitsPerPage={20} mod="sk-hits-list" />
         <InitialLoader />
         <NoHits />
 
