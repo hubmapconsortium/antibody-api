@@ -88,7 +88,8 @@ class AntibodyHitsTable extends React.Component {
       antibodies += '<td class="created_by_user_email_col" style="display:'+display.created_by_user_email+`;"><a href="mailto:${hit._source.created_by_user_email}" target="_blank">${hit._source.created_by_user_email}</a></td>`;
       antibodies += '<td class="previous_version_id_col">';
       if (hit._source.previous_version_pdf_filename != undefined) {
-        antibodies += `<a href="${assets_url}/${hit._source.previous_version_pdf_uuid}/${hit._source.previous_version_pdf_filename}" target="_blank">${hit._source.previous_version_id}</a>`;
+        const uuidNoHyphens = hit._source.previous_version_pdf_uuid.replaceAll("-", "");
+        antibodies += `<a href="${assets_url}/${uuidNoHyphens}/${hit._source.previous_version_pdf_filename}" target="_blank">${hit._source.previous_version_id}</a>`;
       }
       antibodies += '</td>';
       antibodies += `</tr>`;
