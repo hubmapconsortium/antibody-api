@@ -87,7 +87,7 @@ SELECT
     a.created_by_user_sub, a.group_uuid,
     a.clone_id,
     a.antibody_hubmap_id, a.previous_version_id, a.next_version_id,
-    a.previous_version_pdf_uuid, a.previous_version_pdf_filename
+    a.previous_version_pdf_uuid, a.previous_version_pdf_filename, a.next_version_id
 FROM antibodies a
 JOIN vendors v ON a.vendor_id = v.id
 '''
