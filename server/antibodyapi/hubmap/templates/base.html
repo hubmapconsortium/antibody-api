@@ -228,16 +228,16 @@ function ajaxSuccess (event) {
     return;
   }
   if (http_status == 201) {
-      var csv_content = "antibody_name,antibody_uuid\n";
+      var csv_content = "antibody_name,antibody_hubmap_id\n";
       responsetable += '<p>All entities in the Andibody Files have been successfully uploaded.</p>';
       responsetable += '<br>';
-      responsetable += '<table><tr><th>Antibody</th><th>UUID</th></tr>';
+      responsetable += '<table><tr><th>Antibody</th><th>HuBMAP ID</th></tr>';
       jQuery.each(jsonresponse.antibodies, function(name, value) {
         responsetable += '<tr>';
         responsetable += '<td>' + value.antibody_name + '</td>';
-        responsetable += '<td>' + value.antibody_uuid + '</td>';
+        responsetable += '<td>' + value.antibody_hubmap_id + '</td>';
         responsetable += '</tr>';
-        csv_content += value.antibody_name + ',' + value.antibody_uuid + '\n';
+        csv_content += value.antibody_name + ',' + value.antibody_hubmap_id + '\n';
       })
       responsetable += '</table>';
       if (jsonresponse.pdf_files_not_processed.length > 0) {
