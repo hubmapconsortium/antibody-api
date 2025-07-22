@@ -239,14 +239,15 @@ def validate_previous_version_id(row_i: int, previous_version_id: str, cur) -> N
 
         result = cur.fetchone()
 
-        if result is None:
-            abort(json_error(f"TSV file row# {row_i}: previous_revision_hubmap_id '{previous_version_id}' does not exist", 406))
-        elif result[0] is not None:
-            abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' "
-                             f"already has a newer version specified (next_revision_hubmap_id='{result[0]}')", 406))
     except Exception as e:
         logger.exception(f"validate_previous_version_id: Unexpected error: {e}")
         abort(json_error(f"TSV file row# {row_i}: Problem encountered while validating previous_revision_hubmap_id", 500))
+    
+    if result is None:
+            abort(json_error(f"TSV file row# {row_i}: previous_revision_hubmap_id '{previous_version_id}' does not exist", 406))
+    elif result[0] is not None:
+        abort(json_error(f"TSV file row# {row_i}: previous_version_id '{previous_version_id}' "
+                            f"already has a newer version specified (next_revision_hubmap_id='{result[0]}')", 406))
 
 
 def validate_uniprot_accession_numbers(row_i: int, uniprot_accession_numbers: str) -> None:

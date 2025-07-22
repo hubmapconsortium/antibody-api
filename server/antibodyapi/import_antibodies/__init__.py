@@ -56,7 +56,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
 
     app = current_app
     cur = get_cursor(app)
-    uuids_and_names = []
+    hubmap_ids_and_names = []
 
     group_id = get_group_id(app.config['INGEST_API_URL'], request.form.get('group_id'))
     if group_id is None:
@@ -154,8 +154,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         logger.debug(f"import_antibodies: SQL inserting row: {row}")
                         cur.execute(query, row)
                         logger.debug(f"import_antibodies: SQL inserting row SUCCESS!")
-                        uuids_and_names.append({
-                            'antibody_uuid': row['antibody_uuid'],
+                        hubmap_ids_and_names.append({
+                            'antibody_hubmap_id': row['antibody_hubmap_id'],
                             'antibody_name': row.get('avr_pdf_filename')
                         })
                         try:
@@ -185,4 +185,4 @@ def import_antibodies(): # pylint: disable=too-many-branches
     for avr_file in request.files.getlist('pdf'):
         if avr_file.filename not in pdf_files_processed:
             pdf_files_not_processed.append(avr_file.filename)
-    return make_response(jsonify(antibodies=uuids_and_names, pdf_files_not_processed=pdf_files_not_processed), 201)
+    return make_response(jsonify(antibodies=hubmap_ids_and_names, pdf_files_not_processed=pdf_files_not_processed), 201)
