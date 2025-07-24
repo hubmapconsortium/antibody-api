@@ -2,7 +2,7 @@ import React from 'react';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
-  ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
+  ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader, ExistsQuery, BoolMustNot
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
 import { AdditionalColumns } from './AdditionalColumns';
@@ -12,17 +12,11 @@ import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 
 const searchkit = new SearchkitManager("/");
-
-function FilteredHits(props) {
-  const { hits, ...rest } = props;
-  const filteredHits = hits.filter(hit => !hit._source.next_version_id || hit._source.next_version_id === '');
-  return <AntibodyHitsTable hits={filteredHits} {...rest} />;
-}
-
-function FilteredHitsStats({ hits }) {
-  const count = hits.filter(hit => !hit._source.next_version_id || hit._source.next_version_id === '').length;
-  return <div className="sk-hits-stats">{count} results</div>;
-}
+searchkit.addDefaultQuery(query =>
+  query.addQuery(
+    BoolMustNot([ ExistsQuery("next_version_id") ])
+  )
+);
 
 class BannerMessage extends React.Component {
     render () {
@@ -206,7 +200,7 @@ function Search(props) {
 
         <ActionBar>
           <ActionBarRow>
-          <Hits hits={[]} listComponent={props => <FilteredHitsStats {...props} />} />
+          <HitsStats />
           </ActionBarRow>
           <ActionBarRow>
             <SelectedFilters />
@@ -226,7 +220,11 @@ function Search(props) {
           )}
         </Popup>
 
-        <Hits listComponent={FilteredHits} hitsPerPage={20} mod="sk-hits-list" />
+          <Hits
+            listComponent={AntibodyHitsTable}
+            hitsPerPage={20}
+            mod="sk-hits-list"
+          />
         <InitialLoader />
         <NoHits />
 
