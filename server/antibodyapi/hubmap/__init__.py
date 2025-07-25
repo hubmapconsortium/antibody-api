@@ -57,6 +57,7 @@ def hubmap_search():
         "avr_pdf_filename": "table-cell",
         "omap_id": "table-cell",
         "antibody_hubmap_id": "table-cell",
+        "previous_version_id": "table-cell",
 
         "clone_id": "none",
         "host": "none",
@@ -91,7 +92,7 @@ def hubmap_search():
         "concentration_value", "dilution_factor", "conjugate", "cycle_number",
         "fluorescent_reporter", "manuscript_doi", "protocol_doi",
         "vendor_affiliation", "organ_uberon_id", "antigen_retrieval", "omap_id",
-        "created_by_user_email"
+        "created_by_user_email", "previous_version_id", "next_version_id"
     ]
     # Link the individual OMAP entries to the (P)URLs defined mapped in
     # https://github.com/hubmapconsortium/antibody-api/files/13229463/HRA7threleasetoUBKG-June2024PurlsOMAPs.xlsx

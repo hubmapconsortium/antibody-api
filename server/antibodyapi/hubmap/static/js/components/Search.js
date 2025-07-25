@@ -2,7 +2,7 @@ import React from 'react';
 import {
   SearchkitManager, SearchkitProvider, SearchBox, Hits, Layout, TopBar, LayoutBody, SideBar,
   HierarchicalMenuFilter, RefinementListFilter, ActionBar, LayoutResults, HitsStats, Panel,
-  ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader
+  ActionBarRow, SelectedFilters, ResetFilters, NoHits, Pagination, InitialLoader, ExistsQuery, BoolMustNot
 } from "searchkit";
 import AntibodyHitsTable from './AntibodyHitsTable';
 import { AdditionalColumns } from './AdditionalColumns';
@@ -11,6 +11,12 @@ import Popup from 'reactjs-popup';
 import { useCookies } from 'react-cookie';
 import CookieConsent from 'react-cookie-consent';
 
+const searchkit = new SearchkitManager("/");
+searchkit.addDefaultQuery(query =>
+  query.addQuery(
+    BoolMustNot([ ExistsQuery("next_version_id") ])
+  )
+);
 
 class BannerMessage extends React.Component {
     render () {
@@ -43,7 +49,6 @@ function collapseAllFilters() {
 }
 
 function Search(props) {
-  const searchkit = new SearchkitManager("/");
   const options = { showEllipsis: true, showLastIcon: false, showNumbers: true }
   //console.info('Search display: ', display);
   const [cookies] = useCookies([]);
@@ -99,7 +104,7 @@ function Search(props) {
           "recombinant","organ","organ_uberon_id","omap_id","antigen_retrieval","hgnc_id","isotype",
           "concentration_value","dilution_factor","conjugate","method","tissue_preservation","cycle_number",
           "fluorescent_reporter","author_orcids","vendor_affiliation","created_by_user_displayname",
-          "created_by_user_email","avr_pdf_filename"
+          "created_by_user_email","avr_pdf_filename", "previous_version_id", "next_version_id"
       ]}
       />
       <div className='searchView'>
@@ -195,7 +200,7 @@ function Search(props) {
 
         <ActionBar>
           <ActionBarRow>
-            <HitsStats />
+          <HitsStats />
           </ActionBarRow>
           <ActionBarRow>
             <SelectedFilters />
@@ -215,9 +220,10 @@ function Search(props) {
           )}
         </Popup>
 
-        <Hits mod="sk-hits-list"
-          hitsPerPage={20}
-          listComponent={AntibodyHitsTable}
+          <Hits
+            listComponent={AntibodyHitsTable}
+            hitsPerPage={20}
+            mod="sk-hits-list"
           />
         <InitialLoader />
         <NoHits />

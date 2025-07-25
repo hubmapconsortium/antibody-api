@@ -12,8 +12,9 @@ from antibodyapi.utils import (
     allowed_file, find_or_create_vendor, get_cursor,
     get_file_uuid, get_group_id, get_hubmap_uuid,
     insert_query, insert_query_with_avr_file_and_uuid,
-    json_error
+    json_error, update_next_version_query, fetch_previous_version_pdf_uuid_query
 )
+from antibodyapi.utils.elasticsearch import update_next_version_es
 from antibodyapi.utils.validation import validate_antibodytsv, CanonicalizeYNResponse, CanonicalizeDOI
 from antibodyapi.utils.elasticsearch import index_antibody
 from typing import List
@@ -55,7 +56,7 @@ def import_antibodies(): # pylint: disable=too-many-branches
 
     app = current_app
     cur = get_cursor(app)
-    uuids_and_names = []
+    hubmap_ids_and_names = []
 
     group_id = get_group_id(app.config['INGEST_API_URL'], request.form.get('group_id'))
     if group_id is None:
@@ -125,7 +126,17 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         row['protocol_doi'] = canonicalize_doi.canonicalize_multiple(row['protocol_doi'])
                         if row['manuscript_doi'] != '':
                             row['manuscript_doi'] = canonicalize_doi.canonicalize(row['manuscript_doi'])
-
+                        
+                        previous_pdf = fetch_previous_version_pdf_uuid_query()
+                        cur.execute(previous_pdf, {'previous_version_id': row['previous_version_id']})
+                        prev_result = cur.fetchone()            
+                        if prev_result:
+                            row['previous_version_pdf_uuid'] = prev_result[0]
+                            row['previous_version_pdf_filename'] = prev_result[1]
+                        else:
+                            row['previous_version_pdf_uuid'] = None
+                            row['previous_version_pdf_filename'] = None
+                        row['next_version_id'] = None
                         query = insert_query()
                         if 'avr_pdf_filename' in row.keys():
                             if 'pdf' in request.files:
@@ -143,8 +154,8 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         logger.debug(f"import_antibodies: SQL inserting row: {row}")
                         cur.execute(query, row)
                         logger.debug(f"import_antibodies: SQL inserting row SUCCESS!")
-                        uuids_and_names.append({
-                            'antibody_uuid': row['antibody_uuid'],
+                        hubmap_ids_and_names.append({
+                            'antibody_hubmap_id': row['antibody_hubmap_id'],
                             'antibody_name': row.get('avr_pdf_filename')
                         })
                         try:
@@ -152,7 +163,16 @@ def import_antibodies(): # pylint: disable=too-many-branches
                         except Exception as index_err:
                             logger.debug(f"Elasticsearch indexing failed on row {row_i}: {index_err}")
                             raise Exception("We couldn’t complete your request due to a system error. Your data has not been saved. Please try again in a few minutes. If the problem continues, contact support.")
-                            
+                        if row['previous_version_id']:
+                            update_query = update_next_version_query()
+                            cur.execute(update_query, {
+                                'next_version_id': row['antibody_hubmap_id'],
+                                'previous_version_id': row['previous_version_id']
+                            })
+                            try:
+                                update_next_version_es(row['previous_version_id'], row['antibody_hubmap_id'])
+                            except Exception as index_err:
+                                logger.debug(f"Elasticsearch indexing failed on {row_i} updating next_version_id")
             cur.close()
     except Exception as e:
         conn.rollback()
@@ -165,4 +185,4 @@ def import_antibodies(): # pylint: disable=too-many-branches
     for avr_file in request.files.getlist('pdf'):
         if avr_file.filename not in pdf_files_processed:
             pdf_files_not_processed.append(avr_file.filename)
-    return make_response(jsonify(antibodies=uuids_and_names, pdf_files_not_processed=pdf_files_not_processed), 201)
+    return make_response(jsonify(antibodies=hubmap_ids_and_names, pdf_files_not_processed=pdf_files_not_processed), 201)
