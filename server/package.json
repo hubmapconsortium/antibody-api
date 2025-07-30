@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "searchkit": "^2.4.4",
+    "searchkit": "^4.15.0",
     "react": "^16.14.0",
     "react-cookie": "^7.2.0",
     "react-cookie-consent": "^9.0.0",
