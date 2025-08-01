@@ -25,6 +25,7 @@
     "webpack-dev-server": "^5.2.1"
   },
   "resolutions": {
-    "axios": "^0.30.0"
+    "axios": "^0.30.0",
+    "searchkit/qs": "6.4.1"
   }
 }
