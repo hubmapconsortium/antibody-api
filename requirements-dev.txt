@@ -7,7 +7,7 @@ globus-sdk==3.41.0
 html5lib==1.1
 psycopg2==2.9.9
 pylint==3.2.2
-pypdf==4.2.0
+pypdf==6.0.0
 pytest==8.2.1
 pytest-mock==3.14.0
 requests==2.32.0
