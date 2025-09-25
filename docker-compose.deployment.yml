@@ -13,12 +13,6 @@ services:
       - HOST_UID=${HOST_UID:-1001}
     init: true
     restart: always
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://hubmap-auth:8888" ]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     networks:
       - gateway_hubmap
     volumes:
