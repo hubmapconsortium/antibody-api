@@ -58,6 +58,7 @@ class DownloadFile extends SearchkitComponent {
                     var line = [];
                     _source.forEach((key) => {
                         let item_source = item._source[key] || '';
+                        item_source = item_source.replace(/\r?\n/g, ' ');
                         if (this.avr_file_as_url && key == 'avr_pdf_filename') {
                             item_source = assets_url + '/' + item._source['avr_pdf_uuid'] + '/' + item_source;
                             item_source = item_source.replace(/,/g, '%2C');
