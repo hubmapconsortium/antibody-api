@@ -16,11 +16,7 @@ def index_antibody(antibody: dict):
     and server.import_antibodies() after the antibody information is successfully saved
     to the PostgreSQL database.
     """
-    for k, v in antibody.items():
-        if isinstance(v, str):
-            antibody[k] = v.strip().title()
-        elif isinstance(v, list):
-            antibody[k] = [i.strip().title() if isinstance(i, str) else i for i in v]
+    
     es_conn = elasticsearch.Elasticsearch([current_app.config['ELASTICSEARCH_SERVER']])
     logger.info(f"*** Indexing: {antibody}")
     doc = {
