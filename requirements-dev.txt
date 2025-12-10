@@ -11,5 +11,4 @@ pypdf==4.2.0
 pytest==8.2.1
 pytest-mock==3.14.0
 requests==2.32.4
-Werkzeug==3.0.3
 uWSGI==2.0.25.1
