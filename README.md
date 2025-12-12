@@ -1,4 +1,4 @@
-# antibody-api
+# AVR/antibody-api
 
 This information will help you get the Antibody API up in running whether locally or on an environment.
 
@@ -30,14 +30,14 @@ In building a deployment version of the image, specify a version tag.
 You can see the previous version tags at [DockerHub Antibody APi](https://github.com/hubmapconsortium/antibody-api/releases/).
 ````bash
 $ ./generate-build-version.sh
-$ docker build -t hubmap/antibody-api:1.0.2 .
+$ docker build -t hubmap/antibody-api:<VERSION> .
 ````
 
 ### Deploy DEV VM
 
 ````bash
-$ export ANTIBODY_API_VERSION=1.0.1; docker-compose -f docker-compose.deployment.yml down --rmi all
-$ export ANTIBODY_API_VERSION=1.0.2; docker-compose -f docker-compose.deployment.yml up -d --no-build
+$ export ANTIBODY_API_VERSION=<old-version>; docker compose -f docker-compose.deployment.yml down --rmi all
+$ export ANTIBODY_API_VERSION=<new-version>; docker compose -f docker-compose.deployment.yml up -d --no-build
 ````
 
 ## Local Deployment
@@ -176,7 +176,7 @@ You will also have to set the `APP_CLIENT_ID`, `APP_CLIENT_SECRET`, `GLOBUS_HUBM
 These are not saved in GitHub for security reasons.
 ```commandline
 ELASTICSEARCH_URL = 'http://localhost:9200'
-ENTITY_API_URL = 'https://entity-api.test.hubmapconsortium.org'
+ENTITY_API_URL = 'https://entity-api.dev.hubmapconsortium.org'
 ```
 
 ### Startup the Search API on localhost
